@@ -1,0 +1,28 @@
+#Главная страница
+IpoetryBundle_index:
+    path:     /index
+    defaults: { _controller: IpoetryBundle:Index:index }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#Главная страница
+IpoetryBundle_root:
+    path:     /
+    defaults: { _controller: IpoetryBundle:Index:index }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#Форма логина сущ. пользователя
+IpoetryBundle_login:
+    path:     /login
+    defaults: { _controller: IpoetryBundle:Login:login }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#Форма регистрации нового пользователя
+IpoetryBundle_signin:
+    path:     /signin
+    defaults: { _controller: IpoetryBundle:Signin:signin }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru

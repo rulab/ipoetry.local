@@ -9,3 +9,6 @@ _cmf_create:
 app:
     resource: '@AppBundle/Controller/'
     type:     annotation
+
+IpoetryBundle:
+    resource: '@IpoetryBundle/Resources/config/routing.yml'

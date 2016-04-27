@@ -1,0 +1,11 @@
+## YAML Template.
+messages.Login : Имя
+messages.Password : Пароль
+messages.Save : Сохранить
+messages.Enter : Войти
+Whatson : Уотсон
+Name : Имя
+Password : Пароль
+Enter : Войти
+Already've login. : Уже есть логин.
+John : Джон

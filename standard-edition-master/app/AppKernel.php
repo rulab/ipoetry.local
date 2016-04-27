@@ -38,7 +38,7 @@ class AppKernel extends Kernel
 
             // Application bundles
             new AppBundle\AppBundle(),
-
+            new IpoetryBundle\IpoetryBundle(),
             // Remove this Bundle when using the SE as the basis for a new project
             new Acme\DemoBundle\AcmeDemoBundle(),
         );

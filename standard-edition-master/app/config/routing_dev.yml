@@ -12,3 +12,7 @@ _errors:
 
 _main:
     resource: routing.yml
+    
+#contact:
+#    path:     /login
+#    defaults: { _controller: AppBundle:Controller:Default }
