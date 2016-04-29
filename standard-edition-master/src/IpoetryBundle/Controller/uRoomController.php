@@ -60,12 +60,15 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 use IpoetryBundle\Form\Type\UserLoginType;
-use IpoetryBundle\Entity\UserLogin;
 use IpoetryBundle\Form\Type\UserSigninType;
+use IpoetryBundle\Form\Type\UserRoomType;
+
 use IpoetryBundle\Entity\UserSignin;
+use IpoetryBundle\Entity\user;
+use IpoetryBundle\Entity\UserRoom;
+use IpoetryBundle\Entity\UserLogin;
 
 use IpoetryBundle\Controller\Abstracts\LoggingController;
-use IpoetryBundle\Entity\user;
 
 /**
  * Description of uRoomController
@@ -82,12 +85,27 @@ class uRoomController extends LoggingController{
         private $is_cache=false;
         
         public function uroomAction(Request $request){
+        parent::loginAction($request);
         //проверяем что пришло в сессии
         $this->GetCache($request);
         VarDumper::dump(array('cache'=>$this->cacheDriver,'$is_cache='=>$this->is_cache));
+        if ($request->hasSession())
+            $this->session=$request->getSession();
+        //выводим форму
+        $UserRoom=new UserRoom();
+        $UserRoomType=new UserRoomType($this->get('router'),$this->session,$request);
+                $form =$this->createForm($UserRoomType, $UserRoom);
+                $form->handleRequest($request);
+        //стыкуем таблицу ipoetry_user с шаблоном личного кабинета
 
+        $uroom = $this->getDoctrine()
+        ->getRepository('IpoetryBundle:UserRoom')
+        ->find(1);
+        if (!$uroom) {
+            throw $this->createNotFoundException('No user found for id 1');
+        }
         //return new Response('тут отображается форма с данными о пользователе');
-        return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => 'тут отображается форма с данными о пользователе'));
+        return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView()));
     }
     //ajax запросы по логированию и регистрации пользователей
     public function uroomajaxAction(Request $request){
@@ -233,8 +251,8 @@ class uRoomController extends LoggingController{
     public function GetCache($request){
         //проверяем что пришло в сессии
         if ($request->hasSession()) {
-            $session=$request->getSession();
-            $this->cacheDriver=$session->get('cacheDriver',array());
+            $this->session=$request->getSession();
+            $this->cacheDriver=$this->session->get('cacheDriver',array());
         if (!isset($this->cacheDriver))
             $this->cacheDriver = new \Doctrine\Common\Cache\ArrayCache();
         }

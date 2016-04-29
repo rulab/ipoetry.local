@@ -28,8 +28,21 @@
 </div>
 <div class="row">
     <div class="col-lg-14">
-    <p style="margin: 0 15px 0;">{{ form }}</p>
+    <p style="margin: 0 15px 0;">тут отображается информация о пользователе</p>
     </div>
+</div>
+<div class="row">
+<div class="col-lg-offset-5 col-lg-2">
+{% form_theme form 'IpoetryBundle:Default:form_fields.html.twig' %}
+<form id="uroom_user_form" class="bg-info form-signin" role="form" method="post" action="uroom">
+{# {{ form_start(form) }} #}
+<h2 class="form-signin-heading">{{'личная информация'|trans}}</h2>
+    {{ form_widget(form) }}
+{# {{ form_end(form) }} #}
+</form>
+
+</div>
+
 </div>
 {% block javascripts %}
 {% javascripts '@IpoetryBundle/Resources/public/js/jquery-1.11.0.min.js'

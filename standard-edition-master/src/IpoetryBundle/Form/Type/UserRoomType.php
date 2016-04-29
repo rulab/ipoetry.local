@@ -72,14 +72,17 @@ class UserRoomType extends LoggingForms{
                  */
                 //$errorsString = (string) $errors;
             //}
-        VarDumper::dump(array('user='=>$request->get('user'),'password'=>$request->get('password')));
-        if ($this->request->get('user') && $this->request->get('password')) {
+        //VarDumper::dump(array('user='=>$request->get('user'),'password'=>$request->get('password')));
+        //if ($this->request->get('user') && $this->request->get('password')) {
             $builder
                 ->setMethod('POST')
-                ->add('login',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('John')),'label' => $translator->trans('Name')))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('password',TextType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('Password')))
+                ->add('username',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('John')),'label' => $translator->trans('Name')))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userlastname',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('LastName')))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userpassword',TextType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Wha37on')),'label' => $translator->trans('Password')))
+                ->add('useremail',EmailType::class,array('attr' => array('maxlength' => 255,'required' => true,'placeholder'=>$translator->trans('JWhatson@mail.ru')),'label' => $translator->trans('email')))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userphone',TextType::class,array('attr' => array('maxlength' => 11,'required' => true,'placeholder'=>$translator->trans('+71019090101')),'label' => $translator->trans('phone number')))
                 //->add('captcha', $CaptchaType,array('attr' => array('required' => true,'disabled' => false)))
-                ->add('enter', SubmitType::class, array('attr'=>array('class'=>'btn btn-lg btn-primary btn-block'),'label' => $translator->trans('Enter')));
+                ->add('enter', SubmitType::class, array('attr'=>array('class'=>'btn btn-lg btn-primary btn-block'),'label' => $translator->trans('Refresh')));
                 //->add('user', HiddenType::class,array('data' => $options['data']['user']))
                 //->add('data_modification', HiddenType::class,array('data' => 1))
                 //->add('mail_link_activation', HiddenType::class,array('data' => $options['data']['mail_link_activation_old']))
@@ -92,7 +95,7 @@ class UserRoomType extends LoggingForms{
             });
 
             //VarDumper::dump(array('$generator_phrase='=>$generator->getPhrase($this->option),'CaptchaType'=>$CaptchaType->getName(),'fingerprint'=>$this->captchabuilder->getPhrase()));
-        }
+        //}
     }
 
     //public function configureOptions(OptionsResolver $resolver)
@@ -103,7 +106,7 @@ class UserRoomType extends LoggingForms{
     //}
     public function getName()
     {
-        return 'uroom';
+        return 'UserRoom';
     }
     
     public function __construct($c_container=null,$c_session=null,Request $request){
