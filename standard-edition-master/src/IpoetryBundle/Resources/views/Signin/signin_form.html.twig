@@ -2,11 +2,11 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
 <head>
-<title>ipoetry-логин</title>
+<title>ipoetry-регистрация</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="Keywords" content="" />
-<meta name="description" content="Вход в личный кабинет пользователя ipoetry" />
+<meta name="description" content="Регистрация пользователя ipoetry" />
 <meta name="robots" content="index,follow" />
 
     {% block stylesheets %}
@@ -38,7 +38,7 @@
 {% form_theme form 'IpoetryBundle:Default:form_fields.html.twig' %}
 <form id="login_user_form" class="bg-info form-signin" role="form" method="post" action="uroom">
 {# {{ form_start(form) }} #}
-<h2 class="form-signin-heading">{{'Already\'ve login.'|trans}}</h2>
+<h2 class="form-signin-heading">{{'Registeration.'|trans}}</h2>
     {{ form_widget(form) }}
 {# {{ form_end(form) }} #}
 </form>
@@ -62,8 +62,11 @@
         $.ajax({
         url: '{{ path('IpoetryBundle_uroomajax') }}',
         type: 'post',
-        cache: true,
-        data: 'login_json={"type":"login","login":"'+$('#login_login').val()+'","password":"'+$('#login_password').val()+'"}' ,
+        data: 'login_json={"type":"signin","signin_username":"'+$('#signin_username').val()+
+                                         '","signin_userlastname":"'+$('#signin_userlastname').val()+
+                                         '","signin_useremail":"'+$('#signin_useremail').val()+
+                                         '","signin_userpassword":"'+$('#signin_userpassword').val()+
+            '"}' ,
         //HTTP='login='+$('#login_login').val()+'&password='+$('#login_password').val()
         //JSON='{"login":"'+$('#login_login').val()+'","password":"'+$('#login_password').val()+'"}'
         dataType: 'json',

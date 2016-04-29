@@ -5,7 +5,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 namespace IpoetryBundle\Form\Type;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +21,7 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -37,23 +40,16 @@ use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\VarDumper\Dumper\HTMLDumper;
 
 use IpoetryBundle\Form\Abstracts\LoggingForms;
-//use Gregwar\CaptchaBundle\Type\CaptchaType;
-//use Gregwar\CaptchaBundle\Generator\CaptchaGenerator;
-//use Gregwar\CaptchaBundle\Validator\CapchaValidator;
-//use Gregwar\Captcha\CaptchaBuilder;
-//use Gregwar\Captcha\PhraseBuilder;
-//use Gregwar\CaptchaBundle\Generator\ImageFileHandler;
 
 /**
- * Description of UserLoginType
+ * Description of UserRoomType
  *
  * @author d.krasavin
- * форма входа существующего пользователя
+ * форма личного кабинета пользователя
  */
-class UserLoginType extends LoggingForms{
+class UserRoomType extends LoggingForms{
 
-    //put your code here
-   public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         //$validator=Validation::createValidatorBuilder()->addMethodMapping('constrains');
         //$phrasebuilderinterface=new PhraseBuilder;
@@ -64,15 +60,6 @@ class UserLoginType extends LoggingForms{
         //$generator = new CaptchaGenerator($router,$this->captchabuilder,$phrasebuilderinterface,$imagefilehandler);//$this->session->get('captchabuilder')
        
         $translator = new Translator($this->request->getLocale());
-        //$translator = new Translator('ru_RU');
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array(
-            //'login' => 'имя',
-            //'password' => 'пароль',
-            //'Save' => 'Сохранить'
-            //,'John' => 'Джон'
-        ), 'ru_RU');
-        //VarDumper::dump(array('$phrase='=>$form_data,'$phrase'=>$phrase));
         
         //$CaptchaType = new CaptchaType($this->c_session,$generator,$translator,$this->option);
         //$validator = $this->get('validator');
@@ -85,22 +72,27 @@ class UserLoginType extends LoggingForms{
                  */
                 //$errorsString = (string) $errors;
             //}
-        //VarDumper::dump(array('translator='=>$translator->trans('имя')));
-        $builder
-            ->setMethod('POST')
-            ->add('login',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('John')),'label' => $translator->trans('Name')))//array('attr' => array('maxlength' => 50,'required' => true)))
-            ->add('password',TextType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Wha37on')),'label' => $translator->trans('Password')))
-            ->add('vcode', HiddenType::class,array('data' => ''))
-            //->add('captcha', $CaptchaType,array('attr' => array('required' => true,'disabled' => false)))
-            ->add('enter', SubmitType::class, array('attr'=>array('class'=>'btn btn-lg btn-primary btn-block'),'label' => $translator->trans('Enter')));
- 
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
-            $form_data = $event->getData();
-            //$phrase=$this->captchabuilder->getPhrase();
-            //VarDumper::dump(array('$phrase='=>$form_data,'$phrase'=>$phrase));
-        });
-        
-        //VarDumper::dump(array('$generator_phrase='=>$generator->getPhrase($this->option),'CaptchaType'=>$CaptchaType->getName(),'fingerprint'=>$this->captchabuilder->getPhrase()));
+        VarDumper::dump(array('user='=>$request->get('user'),'password'=>$request->get('password')));
+        if ($this->request->get('user') && $this->request->get('password')) {
+            $builder
+                ->setMethod('POST')
+                ->add('login',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('John')),'label' => $translator->trans('Name')))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('password',TextType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('Password')))
+                //->add('captcha', $CaptchaType,array('attr' => array('required' => true,'disabled' => false)))
+                ->add('enter', SubmitType::class, array('attr'=>array('class'=>'btn btn-lg btn-primary btn-block'),'label' => $translator->trans('Enter')));
+                //->add('user', HiddenType::class,array('data' => $options['data']['user']))
+                //->add('data_modification', HiddenType::class,array('data' => 1))
+                //->add('mail_link_activation', HiddenType::class,array('data' => $options['data']['mail_link_activation_old']))
+                //->add('system_captcha', HiddenType::class,array('data' => $phrasebuilderinterface->niceize($generator->getPhrase($this->option))) 
+
+            $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+                $form_data = $event->getData();
+                //$phrase=$this->captchabuilder->getPhrase();
+                //VarDumper::dump(array('$phrase='=>$form_data,'$phrase'=>$phrase));
+            });
+
+            //VarDumper::dump(array('$generator_phrase='=>$generator->getPhrase($this->option),'CaptchaType'=>$CaptchaType->getName(),'fingerprint'=>$this->captchabuilder->getPhrase()));
+        }
     }
 
     //public function configureOptions(OptionsResolver $resolver)
@@ -109,14 +101,15 @@ class UserLoginType extends LoggingForms{
     //        'data_class' => 'AppBundle\Entity\UserLogin'
     //    ));
     //}
+    public function getName()
+    {
+        return 'uroom';
+    }
     
     public function __construct($c_container=null,$c_session=null,Request $request){
         parent::__construct($c_container,$c_session,$request ); 
     }
-
-    public function getName()
-    {
-        return 'login';
-    }
-
 }
+
+
+

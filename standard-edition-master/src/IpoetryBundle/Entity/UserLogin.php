@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author denvkr
  */
 class UserLogin {
+    private $user_id;
+
     /**
      * @Assert\NotBlank()
      * @Assert\Length(
@@ -28,16 +30,30 @@ class UserLogin {
     /**
      * @Assert\NotBlank()
      * @Assert\Length(
-     *      min = 2,
+     *      min = 8,
      *      max = 20,
      *      minMessage = "Your password must be at least {{ limit }} characters long",
      *      maxMessage = "Your password cannot be longer than {{ limit }} characters"
      * )
      */
     private $password;
+    /**
+     * @Assert\Length(
+     *      min = 0,
+     *      max = 0,
+     *      minMessage = "Your vcode must be at least {{ limit }} characters long",
+     *      maxMessage = "Your vcode cannot be longer than {{ limit }} characters"
+     * )
+     */
+    private $vcode;
 
-    private $save;
-
+    function SetUserid($id){
+       $this->user_id=$id;
+    }
+    function GetUserid(){
+        return $this->user_id;
+    }
+    
     function SetLogin($login){
        $this->login=$login;
     }
@@ -50,10 +66,18 @@ class UserLogin {
     function GetPassword(){
         return $this->password;
     }
+    function SetVcode($vcode){
+        $this->vcode=$vcode;
+    }
+    function GetVcode(){
+        return $this->vcode;
+    }
+    /*
     function SetSave($save){
         $this->save=$save;
     }
     function GetSave(){
         return $this->save;
     }
+     */
 }

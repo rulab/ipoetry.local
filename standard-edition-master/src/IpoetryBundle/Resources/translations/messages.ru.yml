@@ -5,7 +5,11 @@ messages.Save : Сохранить
 messages.Enter : Войти
 Whatson : Уотсон
 Name : Имя
+LastName : Фамилия
 Password : Пароль
 Enter : Войти
 Already've login. : Уже есть логин.
 John : Джон
+email : эл.почта
+Sign in: Зарегистрироваться
+Registeration. : Регистрация.

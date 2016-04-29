@@ -26,3 +26,17 @@ IpoetryBundle_signin:
     requirements:
         _method:  GET|POST
         _locale: en|ru
+#ЛК пользователя
+IpoetryBundle_uroom:
+    path:     /uroom
+    defaults: { _controller: IpoetryBundle:uRoom:uroom }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#AJAX запрос в форме login
+IpoetryBundle_uroomajax:
+    path:     /uroomajax
+    defaults: { _controller: IpoetryBundle:uRoom:uroomajax }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
