@@ -74,13 +74,14 @@ class UserRoomType extends LoggingForms{
             //}
         //VarDumper::dump(array('user='=>$request->get('user'),'password'=>$request->get('password')));
         //if ($this->request->get('user') && $this->request->get('password')) {
+
             $builder
                 ->setMethod('POST')
-                ->add('username',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('John')),'label' => $translator->trans('Name')))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userlastname',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('LastName')))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userpassword',TextType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Wha37on')),'label' => $translator->trans('Password')))
-                ->add('useremail',EmailType::class,array('attr' => array('maxlength' => 255,'required' => true,'placeholder'=>$translator->trans('JWhatson@mail.ru')),'label' => $translator->trans('email')))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userphone',TextType::class,array('attr' => array('maxlength' => 11,'required' => true,'placeholder'=>$translator->trans('+71019090101')),'label' => $translator->trans('phone number')))
+                ->add('username',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('John')),'label' => $translator->trans('Name'),'data'=>$options['data']['user_name']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userlastname',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('LastName'),'data'=>$options['data']['user_lastname']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userpassword',TextType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Wha37on')),'label' => $translator->trans('Password'),'data'=>$options['data']['user_password']))
+                ->add('useremail',EmailType::class,array('attr' => array('maxlength' => 255,'required' => true,'placeholder'=>$translator->trans('JWhatson@mail.ru')),'label' => $translator->trans('email'),'data'=>$options['data']['user_email']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userphone',TextType::class,array('attr' => array('maxlength' => 11,'required' => true,'placeholder'=>$translator->trans('+71019090101')),'label' => $translator->trans('phone number'),'data'=>$options['data']['user_phone']))
                 //->add('captcha', $CaptchaType,array('attr' => array('required' => true,'disabled' => false)))
                 ->add('enter', SubmitType::class, array('attr'=>array('class'=>'btn btn-lg btn-primary btn-block'),'label' => $translator->trans('Refresh')));
                 //->add('user', HiddenType::class,array('data' => $options['data']['user']))

@@ -81,29 +81,42 @@ class uRoomController extends LoggingController{
         //массив запросов к БД
         private $sql_array=array('login_action'=>'SELECT concat(user_email,user_password) userpassword FROM ipoetry_user WHERE user_email = ? and user_password=? LIMIT 1',
                                  'signin_action1'=>'SELECT user_email FROM ipoetry_user WHERE user_email = ? LIMIT 1',
-                                 'signin_action2'=>'INSERT INTO ipoetry_user (user_name,user_password,user_lastname,user_email) VALUES(?,?,?,?)');
+                                 'signin_action2'=>'INSERT INTO ipoetry_user (user_name,user_password,user_lastname,user_email) VALUES(?,?,?,?)',
+                                 'uroom_action1'=>'SELECT user_name,user_lastname,user_password,user_email,user_phone from ipoetry_user where user_id= :id LIMIT 1');
         private $is_cache=false;
         
         public function uroomAction(Request $request){
+        $stmt='';
         parent::loginAction($request);
         //проверяем что пришло в сессии
         $this->GetCache($request);
         VarDumper::dump(array('cache'=>$this->cacheDriver,'$is_cache='=>$this->is_cache));
         if ($request->hasSession())
             $this->session=$request->getSession();
-        //выводим форму
-        $UserRoom=new UserRoom();
-        $UserRoomType=new UserRoomType($this->get('router'),$this->session,$request);
-                $form =$this->createForm($UserRoomType, $UserRoom);
-                $form->handleRequest($request);
-        //стыкуем таблицу ipoetry_user с шаблоном личного кабинета
 
+        //стыкуем таблицу ipoetry_user с шаблоном личного кабинета
+        $stmt = $this->getDoctrine()
+                     ->getConnection()
+                     ->prepare($this->sql_array['uroom_action1']);
+        $stmt->bindValue(':id',1);
+        $stmt->execute();
+        $result=$stmt->fetchAll();
+        /*
         $uroom = $this->getDoctrine()
         ->getRepository('IpoetryBundle:UserRoom')
         ->find(1);
         if (!$uroom) {
             throw $this->createNotFoundException('No user found for id 1');
         }
+         */
+        VarDumper::dump(array('result'=>$result));
+        $options['data']=$result[0];
+        VarDumper::dump(array('options'=>$options));
+        //выводим форму
+        $UserRoom=new UserRoom();
+        $UserRoomType=new UserRoomType($this->get('router'),$this->session,$request);
+                $form =$this->createForm($UserRoomType, $UserRoom, $options);
+                $form->handleRequest($request);
         //return new Response('тут отображается форма с данными о пользователе');
         return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView()));
     }
