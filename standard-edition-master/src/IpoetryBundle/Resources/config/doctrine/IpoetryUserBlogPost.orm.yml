@@ -1,0 +1,29 @@
+IpoetryBundle\Entity\IpoetryUserBlogPost:
+    type: entity
+    table: ipoetry_user_blog_post
+    id:
+        ipoetryUserBlogPostId:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+            id: true
+            column: ipoetry_user_blog_post_id
+            generator:
+                strategy: IDENTITY
+    fields:
+        ipoetryUserBlogPostText:
+            type: text
+            nullable: true
+            length: 255
+            options:
+                fixed: false
+            column: ipoetry_user_blog_post_text
+        ipoetryUserBlogPostTheme:
+            type: string
+            nullable: true
+            length: 255
+            options:
+                fixed: false
+            column: ipoetry_user_blog_post_theme
+    lifecycleCallbacks: {  }

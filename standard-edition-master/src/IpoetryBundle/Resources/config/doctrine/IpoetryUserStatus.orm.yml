@@ -1,0 +1,23 @@
+IpoetryBundle\Entity\IpoetryUserStatus:
+    type: entity
+    table: ipoetry_user_status
+    id:
+        ipoetryUserStatusId:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+            id: true
+            column: ipoetry_user_status_id
+            generator:
+                strategy: IDENTITY
+    fields:
+        ipoetryUserStatus:
+            type: string
+            nullable: true
+            length: 45
+            options:
+                fixed: false
+                default: undefined
+            column: ipoetry_user_status
+    lifecycleCallbacks: {  }

@@ -1,0 +1,120 @@
+IpoetryBundle\Entity\IpoetryPoetry:
+    type: entity
+    table: ipoetry_poetry
+    id:
+        poetryId:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+            id: true
+            column: poetry_id
+        poetryParentId:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+                comment: 'если стих передавался несколькими людьми друг другу то это поле для истории стиха'
+                default: '0'
+            id: true
+            column: poetry_parent_id
+    fields:
+        poetryBody:
+            type: text
+            nullable: true
+            length: 255
+            options:
+                fixed: false
+            column: poetry_body
+        poetryTagId:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+                default: '0'
+            column: poetry_tag_id
+        poetryDiscussId:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+                default: '0'
+            column: poetry_discuss_id
+        poetryVideoId:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+                comment: 'вложение видео'
+                default: '0'
+            column: poetry_video_id
+        poetryPhotoId:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+                comment: 'вложение фото'
+                default: '0'
+            column: poetry_photo_id
+        poetryAudioId:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+                comment: 'вложение аудио'
+                default: '0'
+            column: poetry_audio_id
+        poetryThemeId:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+                comment: 'Тема стихотворения'
+                default: '0'
+            column: poetry_theme_id
+        poetryBackgroundImageId:
+            type: integer
+            nullable: true
+            options:
+                unsigned: false
+                comment: 'фоновая картинка'
+                default: '0'
+            column: poetry_background_image_id
+        poetryIsGift:
+            type: boolean
+            nullable: true
+            options:
+                default: '0'
+            column: poetry_is_gift
+        poetryDescription:
+            type: string
+            nullable: true
+            length: 1024
+            options:
+                fixed: false
+            column: poetry_description
+    manyToMany:
+        ipoetryUserUser:
+            targetEntity: IpoetryUser
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: ipoetryPoetryPoetry
+            joinTable:
+                name: ipoetry_poetry_rating
+                joinColumns:
+                    -
+                        name: ipoetry_poetry_poetry_id
+                        referencedColumnName: poetry_id
+                    -
+                        name: ipoetry_poetry_poetry_parent_id
+                        referencedColumnName: poetry_parent_id
+                inverseJoinColumns:
+                    -
+                        name: ipoetry_user_user_id
+                        referencedColumnName: user_id
+                    -
+                        name: ipoetry_user_user_parent_id
+                        referencedColumnName: user_parent_id
+            orderBy: null
+    lifecycleCallbacks: {  }

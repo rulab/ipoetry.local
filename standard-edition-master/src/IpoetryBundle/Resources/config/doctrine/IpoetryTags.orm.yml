@@ -1,0 +1,23 @@
+IpoetryBundle\Entity\IpoetryTags:
+    type: entity
+    table: ipoetry_tags
+    id:
+        tagsId:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+            id: true
+            column: tags_id
+            generator:
+                strategy: IDENTITY
+    fields:
+        tagsText:
+            type: string
+            nullable: true
+            length: 255
+            options:
+                fixed: false
+                default: undefined
+            column: tags_text
+    lifecycleCallbacks: {  }
