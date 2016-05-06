@@ -79,10 +79,10 @@ class uRoomController extends LoggingController{
         //кеширование запросов БД
         public $cacheDriver;
         //массив запросов к БД
-        private $sql_array=array('login_action'=>'SELECT concat(user_email,user_password) userpassword FROM ipoetry_user WHERE user_email = ? and user_password=? LIMIT 1',
+        private $sql_array=array('login_action'=>'CALL get_ipoetry_user(?,?)',
                                  'signin_action1'=>'SELECT user_email FROM ipoetry_user WHERE user_email = ? LIMIT 1',
                                  'signin_action2'=>'INSERT INTO ipoetry_user (user_name,user_password,user_lastname,user_email) VALUES(?,?,?,?)',
-                                 'uroom_action1'=>'SELECT user_name,user_lastname,user_password,user_email,user_phone from ipoetry_user where user_id= :id LIMIT 1');
+                                 'uroom_action1'=>'SELECT user_name,user_lastname,user_password,user_email,ipoetry_user_phone user_phone from ipoetry_user join ipoetry_user_phone on ipoetry_user.user_id=ipoetry_user_phone.ipoetry_user_phone_id where user_id= :id LIMIT 1');
         private $is_cache=false;
         
         public function uroomAction(Request $request){
@@ -90,15 +90,15 @@ class uRoomController extends LoggingController{
         parent::loginAction($request);
         //проверяем что пришло в сессии
         $this->GetCache($request);
-        VarDumper::dump(array('cache'=>$this->cacheDriver,'$is_cache='=>$this->is_cache));
+        VarDumper::dump(array('cache'=>$this->cacheDriver,'$is_cache='=>$this->is_cache,'request'=>$request,'login='=>$this->session->get('login')));
         if ($request->hasSession())
             $this->session=$request->getSession();
-
         //стыкуем таблицу ipoetry_user с шаблоном личного кабинета
         $stmt = $this->getDoctrine()
                      ->getConnection()
                      ->prepare($this->sql_array['uroom_action1']);
-        $stmt->bindValue(':id',1);
+        if ($this->session->has('login'))
+        $stmt->bindValue(':id',$this->session->get('login'));
         $stmt->execute();
         $result=$stmt->fetchAll();
         /*
@@ -176,6 +176,7 @@ class uRoomController extends LoggingController{
                 if ($request->hasSession()) {
                     $session=$request->getSession();
                     $session->set('is_cache', $this->is_cache);
+                    $session->set('login',$json_array['login'] );
                 }
                 return 1;                
             }
@@ -193,9 +194,11 @@ class uRoomController extends LoggingController{
                      ->prepare($this->sql_array['login_action']);
         $stmt->bindParam(1,$json_array['login']);
         $stmt->bindParam(2,$json_array['password']);
+        //$stmt->bindresult(3,$result[0]['userpassword']);
         $stmt->execute();
+        //$stmt->query('SELECT @userpassword');
+        //$stmt->fetchAll();
         $result=$stmt->fetchAll();
-
         //VarDumper::dump(array('$result='=>$result));
 
         //если есть что то в базе, то хорошо, будем писать в кеш
@@ -213,6 +216,7 @@ class uRoomController extends LoggingController{
 
             //пара логин+пароль совпадает с базой.
             if ($result[0]['userpassword']==$json_array['login'].$json_array['password']) {
+                $session->set('login',$json_array['login']);
                 return 1;
             }
             //данные в базе отсутствуют
