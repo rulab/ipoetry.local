@@ -3,11 +3,11 @@
 namespace IpoetryBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use IpoetryBundle\Entity\IpoetryUserStatus;
 /**
  * IpoetryUser
  *
- * @ORM\Table(name="ipoetry_user", indexes={@ORM\Index(name="user_name_index", columns={"user_name"}), @ORM\Index(name="user_password_index", columns={"user_password"}), @ORM\Index(name="user_password", columns={"user_name", "user_password"}), @ORM\Index(name="user_name_lastname_email", columns={"user_name", "user_lastname", "user_email"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_photo1_idx", columns={"user_photo_id"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_city1_idx", columns={"user_city_id"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_age1_idx", columns={"user_age_id"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_website1_idx", columns={"user_website_id"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_phone_idx", columns={"user_phone_id"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_status1_idx", columns={"user_status_id"})})
+ * @ORM\Table(name="ipoetry_user", indexes={@ORM\Index(name="user_name_index", columns={"user_name"}), @ORM\Index(name="user_password_index", columns={"user_password"}), @ORM\Index(name="user_password", columns={"user_name", "user_password"}), @ORM\Index(name="user_name_lastname_email", columns={"user_name", "user_lastname", "user_email"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_photo1_idx", columns={"user_photo_id"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_city1_idx", columns={"user_city_id"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_age1_idx", columns={"user_age_id"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_website1_idx", columns={"user_website_id"}), @ORM\Index(name="fk_ipoetry_user_ipoetry_user_phone_idx", columns={"user_phone_id"})})
  * @ORM\Entity
  */
 class IpoetryUser
@@ -15,18 +15,16 @@ class IpoetryUser
     /**
      * @var integer
      *
-     * @ORM\Column(name="user_id", type="integer")
+     * @ORM\Column(name="user_id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $userId;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="user_parent_id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\Column(name="user_parent_id", type="integer", nullable=false)
      */
     private $userParentId = '0';
 
@@ -103,7 +101,7 @@ class IpoetryUser
     /**
      * @var \IpoetryBundle\Entity\IpoetryUserAge
      *
-     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserAge")
+     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserAge")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_age_id", referencedColumnName="ipoetry_user_age_id")
      * })
@@ -113,7 +111,7 @@ class IpoetryUser
     /**
      * @var \IpoetryBundle\Entity\IpoetryUserCity
      *
-     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserCity")
+     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserCity")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_city_id", referencedColumnName="ipoetry_city_id")
      * })
@@ -123,7 +121,7 @@ class IpoetryUser
     /**
      * @var \IpoetryBundle\Entity\IpoetryUserPhone
      *
-     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserPhone")
+     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserPhone")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_phone_id", referencedColumnName="ipoetry_user_phone_id")
      * })
@@ -133,7 +131,7 @@ class IpoetryUser
     /**
      * @var \IpoetryBundle\Entity\IpoetryUserPhoto
      *
-     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserPhoto")
+     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserPhoto")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_photo_id", referencedColumnName="ipoetry_user_photo_id")
      * })
@@ -141,19 +139,9 @@ class IpoetryUser
     private $userPhoto;
 
     /**
-     * @var \IpoetryBundle\Entity\IpoetryUserStatus
-     *
-     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserStatus")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="user_status_id", referencedColumnName="ipoetry_user_status_id")
-     * })
-     */
-    private $userStatus;
-
-    /**
      * @var \IpoetryBundle\Entity\IpoetryUserWebsite
      *
-     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserWebsite")
+     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryUserWebsite")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_website_id", referencedColumnName="ipoetry_user_website_id")
      * })
@@ -173,21 +161,6 @@ class IpoetryUser
     public function __construct()
     {
         $this->ipoetryPoetryPoetry = new \Doctrine\Common\Collections\ArrayCollection();
-    }
-
-
-    /**
-     * Set userId
-     *
-     * @param integer $userId
-     *
-     * @return IpoetryUser
-     */
-    public function setUserId($userId)
-    {
-        $this->userId = $userId;
-
-        return $this;
     }
 
     /**
@@ -471,7 +444,7 @@ class IpoetryUser
      *
      * @return IpoetryUser
      */
-    public function setUserAge(\IpoetryBundle\Entity\IpoetryUserAge $userAge = null)
+    public function setUserAge(\IpoetryBundle\Entity\IpoetryUserAge $userAge  = null)
     {
         $this->userAge = $userAge;
 
@@ -558,30 +531,6 @@ class IpoetryUser
     public function getUserPhoto()
     {
         return $this->userPhoto;
-    }
-
-    /**
-     * Set userStatus
-     *
-     * @param \IpoetryBundle\Entity\IpoetryUserStatus $userStatus
-     *
-     * @return IpoetryUser
-     */
-    public function setUserStatus(\IpoetryBundle\Entity\IpoetryUserStatus $userStatus = null)
-    {
-        $this->userStatus = $userStatus;
-
-        return $this;
-    }
-
-    /**
-     * Get userStatus
-     *
-     * @return \IpoetryBundle\Entity\IpoetryUserStatus
-     */
-    public function getUserStatus()
-    {
-        return $this->userStatus;
     }
 
     /**

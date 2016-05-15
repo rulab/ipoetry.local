@@ -28,8 +28,6 @@ class IpoetryUserWebsite
      */
     private $ipoetryUserWebsite = 'undefined';
 
-
-
     /**
      * Get ipoetryUserWebsiteId
      *

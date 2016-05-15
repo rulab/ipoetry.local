@@ -21,9 +21,14 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
+
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -79,9 +84,13 @@ class UserRoomType extends LoggingForms{
                 ->setMethod('POST')
                 ->add('username',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('John')),'label' => $translator->trans('Name'),'data'=>$options['data']['user_name']))//array('attr' => array('maxlength' => 50,'required' => true)))
                 ->add('userlastname',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('LastName'),'data'=>$options['data']['user_lastname']))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userpassword',TextType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Wha37on')),'label' => $translator->trans('Password'),'data'=>$options['data']['user_password']))
+                ->add('userpassword',PasswordType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Wha37on')),'label' => $translator->trans('Password'),'data'=>$options['data']['user_password']))
                 ->add('useremail',EmailType::class,array('attr' => array('maxlength' => 255,'required' => true,'placeholder'=>$translator->trans('JWhatson@mail.ru')),'label' => $translator->trans('email'),'data'=>$options['data']['user_email']))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userphone',TextType::class,array('attr' => array('maxlength' => 11,'required' => true,'placeholder'=>$translator->trans('+71019090101')),'label' => $translator->trans('phone number'),'data'=>$options['data']['user_phone']))
+                ->add('usercity',TextType::class,array('attr' => array('maxlength' => 255,'required' => false,'placeholder'=>$translator->trans('Москва')),'label' => $translator->trans('City'),'data'=>$options['data']['user_city']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userage',IntegerType::class,array('attr' => array('maxlength' => 3,'required' => false,'placeholder'=>$translator->trans('30')),'label' => $translator->trans('Age'),'data'=>$options['data']['user_age']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userwebsite',TextType::class,array('attr' => array('maxlength' => 2083,'required' => false,'placeholder'=>$translator->trans('vk.com/poetryguy87')),'label' => $translator->trans('website'),'data'=>$options['data']['user_website']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userphone',TextType::class,array('attr' => array('maxlength' => 11,'required' => false,'placeholder'=>$translator->trans('+71019090101')),'label' => $translator->trans('phone number'),'data'=>$options['data']['user_phone']))
+                ->add('userphoto',UrlType::class,array('attr' => array('maxlength' => 2083,'required' => false,'placeholder'=>$translator->trans('site.com/image.jpg')),'label' => $translator->trans('avatar url'),'data'=>$options['data']['user_photo']))
                 //->add('captcha', $CaptchaType,array('attr' => array('required' => true,'disabled' => false)))
                 ->add('enter', SubmitType::class, array('attr'=>array('class'=>'btn btn-lg btn-primary btn-block'),'label' => $translator->trans('Refresh')));
                 //->add('user', HiddenType::class,array('data' => $options['data']['user']))

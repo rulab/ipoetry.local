@@ -14,8 +14,9 @@ IpoetryBundle\Entity\IpoetryUserAge:
     fields:
         ipoetryUserAge:
             type: integer
-            nullable: true
+            nullable: false
             options:
                 unsigned: false
+                default: 0
             column: ipoetry_user_age
     lifecycleCallbacks: {  }

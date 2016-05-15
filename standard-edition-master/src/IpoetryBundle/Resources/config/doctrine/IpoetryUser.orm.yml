@@ -32,26 +32,23 @@ IpoetryBundle\Entity\IpoetryUser:
         fk_ipoetry_user_ipoetry_user_phone_idx:
             columns:
                 - user_phone_id
-        fk_ipoetry_user_ipoetry_user_status1_idx:
-            columns:
-                - user_status_id
     id:
         userId:
             type: integer
             nullable: false
+            strategy: AUTO
             options:
                 unsigned: false
             id: true
             column: user_id
+    fields:
         userParentId:
             type: integer
             nullable: false
             options:
                 unsigned: false
                 default: '0'
-            id: true
             column: user_parent_id
-    fields:
         userName:
             type: string
             nullable: false
@@ -132,7 +129,7 @@ IpoetryBundle\Entity\IpoetryUser:
                 comment: 'только подписанные пользователи могут читать посты и стихи пользователя'
                 default: '0'
             column: ipoetry_user_followers_can_read
-    manyToOne:
+    oneToOne:
         userAge:
             targetEntity: IpoetryUserAge
             cascade: {  }
@@ -172,16 +169,6 @@ IpoetryBundle\Entity\IpoetryUser:
             joinColumns:
                 user_photo_id:
                     referencedColumnName: ipoetry_user_photo_id
-            orphanRemoval: false
-        userStatus:
-            targetEntity: IpoetryUserStatus
-            cascade: {  }
-            fetch: LAZY
-            mappedBy: null
-            inversedBy: null
-            joinColumns:
-                user_status_id:
-                    referencedColumnName: ipoetry_user_status_id
             orphanRemoval: false
         userWebsite:
             targetEntity: IpoetryUserWebsite

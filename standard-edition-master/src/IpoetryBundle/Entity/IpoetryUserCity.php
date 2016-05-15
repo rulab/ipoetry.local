@@ -28,8 +28,6 @@ class IpoetryUserCity
      */
     private $cityName = 'undefined';
 
-
-
     /**
      * Get ipoetryCityId
      *

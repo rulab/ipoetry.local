@@ -52,6 +52,8 @@ use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
+use SwiftMailer;
+
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
@@ -80,6 +82,9 @@ use IpoetryBundle\Controller\Abstracts\LoggingController;
  * контроллер для формы логина существующего пользовтеля
  */
 class LoginController extends LoggingController {
+    //массив запросов к БД
+    private $sql_array=array('lost_password_email_action'=>'CALL get_ipoetry_user_email_check(:ipoetry_user_email)',
+                             'set_user_change_pwdstatus'=>'CALL set_user_change_pwdstatus(:ipoetry_user_email,:ipoetry_user_md5passwordhash,:user_password_is_verified,:db_name,:tbl_name)');
 
     public function loginAction(Request $request){
         parent::loginAction($request);
@@ -206,11 +211,11 @@ class LoginController extends LoggingController {
                 //$request->getSession()->set('data_modification', 1);
                 //$request->getSession()->set('mail_link_activation', substr($mail_link_activation_old,-33));
         if (isset($form)){
-            $html = $this->render('IpoetryBundle:Login:login_form.html.twig',array('form' => $form->createView()));//,'captcha'=>$CaptchaView
+            $html = $this->render('IpoetryBundle:Login:login_form.html.twig',array('login_form' => $form->createView(),'lost_password_form'=>$this->generate_lost_password_form($request)->createView()));//,'captcha'=>$CaptchaView
         }
         //echo $this->captchabuilder->getPhrase().' ';
         //if($form->isValid()) {
-            return $html;            
+        return $html;            
         //} else {
         //    $errorsRaw = $this->get('validator')->validate($form);
         //    if (count($errorsRaw) > 0) {
@@ -219,6 +224,21 @@ class LoginController extends LoggingController {
 
         //}
         
+    }
+    //ajax запрос по отправке верификации на почту пользователя
+    public function loginajaxAction(Request $request){
+        //по полученном параметрам делаем запрос в базу узнать что такой пользователь существует
+        $mas=array();
+
+        $authorization_parameters=json_decode($request->get('login_json'),true);
+        if ($authorization_parameters<>null){
+            //в зависимости от типа запроса выполняем логику работы с БД
+            if ($authorization_parameters['type']=='lost_pwd_email'){
+                $mas['lost_pwd_email_send']=$this->LostpwdEmailAjaxAnswer($authorization_parameters,$request);
+            } else
+                $mas['lost_pwd_email_send']=0;
+        }
+        return new Response(json_encode($mas));
     }
 
     public function createAction(){
@@ -229,6 +249,35 @@ class LoginController extends LoggingController {
         $em->persist($ipoetry_user);
         $em->flush();
     }
+    public function LostpwdEmailAjaxAnswer($json_array,$request) {
+        //проверяем email по нашей базе
+        //если таковой имеется то отправляем пользователю запрос на почту
+        $stmt = $this->getDoctrine()
+                     ->getConnection()
+                     ->prepare($this->sql_array['lost_password_email_action']);
+        $stmt->bindValue(':ipoetry_user_email',$json_array['email']);
+        $stmt->execute();
+        $result=$stmt->fetchAll();
+        if ($result[0]['user_email']==1){
+            //генерируем значение md5 для проверки пользователя по email
+            $user_md5=parent::GetMd5hash($json_array['email'].rand(1,9999));
+            //обновляем статус пользователя для уникальности ссылки через хранимую процедуру
+            $stmt = $this->getDoctrine()
+                         ->getConnection()
+                         ->prepare($this->sql_array['set_user_change_pwdstatus']);
+            $stmt->bindValue(':ipoetry_user_email',$json_array['email']);
+            $stmt->bindValue(':ipoetry_user_md5passwordhash',$user_md5);
+            $stmt->bindValue(':user_password_is_verified',0);            
+            $stmt->bindValue(':db_name','ipoetry');
+            $stmt->bindValue(':tbl_name','ipoetry_user');
+            $stmt->execute();
+            
+            //если такой адрес в базе существует, то хорошо, отправляем на почту запрос
+            $this->SendPasswordChangeMail(null,$json_array['email'],$user_md5);
+            return 1;
+        } else
+            return 0;
+    }
     
     function get_site_config($xmlfile,$attribute) {
         parent::get_site_config($xmlfile,$attribute);
@@ -236,4 +285,32 @@ class LoginController extends LoggingController {
     function captcha_options($key=false,$val=false) {
         parent::captcha_options($key,$val);
     }
+    public function generate_lost_password_form($request){
+        $formFactory = Forms::createFormFactoryBuilder()
+            ->addExtension(new HttpFoundationExtension())
+            ->getFormFactory();
+        $translator = new Translator($request->getLocale());
+
+        $form = $formFactory->createBuilder('form', array('action' => '#','method' => 'POST'))
+                ->add('email',TextType::class,array('attr' => array('maxlength' => 255,'required' => true),'label' => $translator->trans('email')))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('Send_email', SubmitType::class, array('attr'=>array('class'=>'btn btn-lg btn-primary btn-block'),'label' => $translator->trans('Send email')))
+                ->getForm();
+        return $form;
+    }
+    
+    public function SendPasswordChangeMail($user_name=null,$email=null,$url_verify_param=null) {
+    $message = \Swift_Message::newInstance()
+            ->setSubject('Запрос смены пароля на сайте iPoetry.')
+            ->setFrom('ipoetry.rus@gmail.com')
+            ->setTo($email)
+            ->setBody(
+                $this->renderView(
+                    'IpoetryBundle:Emails:passwordchange.html.twig',
+                    array('name' => $user_name,'url'=>$this->getParameter('ipoetry.UserPasswordChangeUrl'),'url_verify_param'=>$url_verify_param)
+                ),
+                'text/html'
+            );
+        $this->get('mailer')->send($message);
+    }
+
 }

@@ -35,12 +35,16 @@
     
 <div class="row">
 <div class="col-lg-offset-5 col-lg-2">
-{% form_theme form 'IpoetryBundle:Default:form_fields.html.twig' %}
+{% form_theme login_form 'IpoetryBundle:Default:form_fields.html.twig' %}
 <form id="login_user_form" class="bg-info form-signin" role="form" method="post" action="uroom">
-{# {{ form_start(form) }} #}
 <h2 class="form-signin-heading">{{'Already\'ve login.'|trans}}</h2>
-    {{ form_widget(form) }}
-{# {{ form_end(form) }} #}
+    {{ form_widget(login_form) }}
+</form>
+<a id="lost_password_a" href="#">забыли пароль?</a>
+{% form_theme lost_password_form 'IpoetryBundle:Default:form_fields.html.twig' %}
+<form id="lost_password_form" class="bg-info form-signin" style="visibility:hidden;" role="form" method="post" action="#">
+<h2 class="form-signin-heading">{{'Enter your email'|trans}}</h2>
+    {{ form_widget(lost_password_form) }}
 </form>
 
 </div>
@@ -57,7 +61,7 @@
 {% endjavascripts %}
 {% endblock %}
 <script type="text/javascript">
-    function validating_form(){
+    function validating_login_form(){
         $.ajax({
         url: '{{ path('IpoetryBundle_uroomajax') }}',
         type: 'post',
@@ -79,13 +83,46 @@
         }
         });
     }
+    function validating_lost_password_form(){
+        $.ajax({
+        url: '{{ path('IpoetryBundle_loginajax') }}',
+        type: 'post',
+        cache: true,
+        data: 'login_json={"type":"lost_pwd_email","email":"'+$('#form_email').val()+'"}' ,
+        //JSON='{"type":"lost_pwd_email","email":"'+$('#form_email').val()+'"}'
+        dataType: 'json',
+        beforeSend: function() {},
+        complete: function() {},
+        success: function(json) {
+            if (json['lost_pwd_email_send']==1) {
+                console.log('AJAX_lost_pwd_email successfull lost_pwd_email_send='+json['lost_pwd_email_send']);
+                location.href='{{ path('IpoetryBundle_login') }}';
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log('error AJAX_user_login ' + textStatus);
+        }
+        });
+    }
+    function lost_password(){
+        //console.log('href_was_clicked');
+        $('#login_user_form').css('visibility','hidden');
+        $('#lost_password_form').css('visibility','visible');
+    }
     $(document).ready(function () {
         {% block documentReady %}
         $('[data-toggle="popover"]').popover(); 
-
+            //переопределяем экшн у формы логина
             $('#login_user_form').attr('method','');
-            $('#login_user_form').attr('action','javascript:validating_form();');
-
+            $('#login_user_form').attr('action','javascript:validating_login_form();');
+            //переопределяем экшн у формы отправки смены пароля на почту пользователя
+            $('#lost_password_form').attr('method','');
+            $('#lost_password_form').attr('action','javascript:validating_lost_password_form();');
+            //переопределяем событие для ссылки
+            $('#lost_password_a').on('click',function(evt){
+                evt.preventDefault()
+                lost_password();
+            });
         {% endblock documentReady %}
     });
 </script>

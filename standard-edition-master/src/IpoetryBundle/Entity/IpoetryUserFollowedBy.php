@@ -14,6 +14,12 @@ class IpoetryUserFollowedBy
 {
     /**
      * @var integer
+     * @ORM\Id
+     * @ORM\Column(name="pk_ipoetry_user_followed_by_id", type="integer", nullable=false, strategy="AUTO")
+     */
+    private $pkipoetryUserFollowedById;
+    /**
+     * @var integer
      *
      * @ORM\Column(name="ipoetry_user_followed_by_id", type="integer", nullable=false)
      */
@@ -29,14 +35,35 @@ class IpoetryUserFollowedBy
     /**
      * @var \IpoetryBundle\Entity\IpoetryUser
      *
-     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryUser")
+     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUser")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="ipoetry_user_user_id", referencedColumnName="user_id", unique=true)
      * })
      */
     private $ipoetryUserUser;
 
+    /**
+     * Set pkipoetryUserFollowedById
+     *
+     * @param integer $pkipoetryUserFollowedById
+     *
+     * @return pkipoetryUserFollowedById
+     */
+    public function setpkipoetryUserFollowedById($pkipoetryUserFollowedById)
+    {
+        $this->pkipoetryUserFollowedById = $pkipoetryUserFollowedById;
 
+        return $this;
+    }
+    /**
+     * Get pkipoetryUserFollowedById
+     *
+     * @return integer
+     */
+    public function getpkipoetryUserFollowedById()
+    {
+        return $this->pkipoetryUserFollowedById;
+    }
 
     /**
      * Set ipoetryUserFollowedById

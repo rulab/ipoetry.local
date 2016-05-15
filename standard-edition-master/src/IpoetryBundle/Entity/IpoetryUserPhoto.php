@@ -35,8 +35,6 @@ class IpoetryUserPhoto
      */
     private $userPhotoUrl = 'undefined';
 
-
-
     /**
      * Get ipoetryUserPhotoId
      *

@@ -24,11 +24,9 @@ class IpoetryUserAge
     /**
      * @var integer
      *
-     * @ORM\Column(name="ipoetry_user_age", type="integer", nullable=true)
+     * @ORM\Column(name="ipoetry_user_age", type="integer", nullable=false)
      */
     private $ipoetryUserAge;
-
-
 
     /**
      * Get ipoetryUserAgeId

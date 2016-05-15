@@ -14,6 +14,12 @@ class IpoetryUserFollowers
 {
     /**
      * @var integer
+     * @ORM\Id
+     * @ORM\Column(name="pk_ipoetry_user_followers_id", type="integer", nullable=false, strategy="AUTO")
+     */
+    private $pkIpoetryUserFollowersId;
+    /**
+     * @var integer
      *
      * @ORM\Column(name="ipoetry_user_followers_id", type="integer", nullable=false)
      */
@@ -29,14 +35,12 @@ class IpoetryUserFollowers
     /**
      * @var \IpoetryBundle\Entity\IpoetryUser
      *
-     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryUser")
+     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUser")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="ipoetry_user_user_id", referencedColumnName="user_id", unique=true)
      * })
      */
     private $ipoetryUserUser;
-
-
 
     /**
      * Set ipoetryUserFollowersId
@@ -45,9 +49,9 @@ class IpoetryUserFollowers
      *
      * @return IpoetryUserFollowers
      */
-    public function setIpoetryUserFollowersId($ipoetryUserFollowersId)
+    public function setpkIpoetryUserFollowersId($pkIpoetryUserFollowersId)
     {
-        $this->ipoetryUserFollowersId = $ipoetryUserFollowersId;
+        $this->pkIpoetryUserFollowersId = $pkIpoetryUserFollowersId;
 
         return $this;
     }
@@ -57,9 +61,9 @@ class IpoetryUserFollowers
      *
      * @return integer
      */
-    public function getIpoetryUserFollowersId()
+    public function getpkIpoetryUserFollowersId()
     {
-        return $this->ipoetryUserFollowersId;
+        return $this->pkIpoetryUserFollowersId;
     }
 
     /**

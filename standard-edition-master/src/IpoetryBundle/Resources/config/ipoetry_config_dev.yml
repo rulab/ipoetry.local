@@ -1,0 +1,4 @@
+## YAML Template.
+ipoetry:
+    UserEmailAuthUrl: http://ipoetry.local/standard-edition-master/web/app_dev.php/useremailauth?code=
+    UserPasswordChangeUrl: http://ipoetry.local/standard-edition-master/web/app_dev.php/userpasswordchange?code=

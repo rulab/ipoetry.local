@@ -26,6 +26,28 @@ IpoetryBundle_signin:
     requirements:
         _method:  GET|POST
         _locale: en|ru
+#Страница верификации пользователя по email
+IpoetryBundle_useremailauth:
+    path:     /useremailauth
+    defaults: { _controller: IpoetryBundle:UserEmailAuth:useremailauth }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#Страница сброса пароля пользователя
+IpoetryBundle_userpasswordchange:
+    path:     /userpasswordchange
+    defaults: { _controller: IpoetryBundle:UserPasswordChange:userpasswordchange }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#AJAX запрос сброс пароля 
+IpoetryBundle_changepwdajax:
+    path:     /changepwdajax
+    defaults: { _controller: IpoetryBundle:UserPasswordChange:changepwdajax }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+
 #ЛК пользователя
 IpoetryBundle_uroom:
     path:     /uroom
@@ -37,6 +59,13 @@ IpoetryBundle_uroom:
 IpoetryBundle_uroomajax:
     path:     /uroomajax
     defaults: { _controller: IpoetryBundle:uRoom:uroomajax }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#AJAX запрос в форме login
+IpoetryBundle_loginajax:
+    path:     /loginajax
+    defaults: { _controller: IpoetryBundle:Login:loginajax }
     requirements:
         _method:  GET|POST
         _locale: en|ru

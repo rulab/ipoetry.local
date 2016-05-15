@@ -5,8 +5,15 @@ IpoetryBundle\Entity\IpoetryUserFollowedBy:
         fk_ipoetry_user_followed_by_ipoetry_user1_idx:
             columns:
                 - ipoetry_user_user_id
-                - ipoetry_user_user_parent_id
-    id: {  }
+    id:
+        pkipoetryUserFollowedById:
+            type: integer
+            nullable: false
+            strategy: AUTO
+            options:
+                unsigned: false
+            id: true
+            column: pk_ipoetry_user_followed_by_id
     fields:
         ipoetryUserFollowedById:
             type: integer

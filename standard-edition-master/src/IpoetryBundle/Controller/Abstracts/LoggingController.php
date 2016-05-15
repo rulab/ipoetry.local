@@ -177,5 +177,7 @@ abstract class LoggingController extends Controller{
             );
         return $option;
     }
-
+    public function GetMd5hash($hashstring='5hrtGtdfjy'){
+        return md5($hashstring);
+    }
 }
