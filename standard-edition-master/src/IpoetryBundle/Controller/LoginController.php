@@ -260,7 +260,7 @@ class LoginController extends LoggingController {
         $result=$stmt->fetchAll();
         if ($result[0]['user_email']==1){
             //генерируем значение md5 для проверки пользователя по email
-            $user_md5=parent::GetMd5hash($json_array['email'].rand(1,9999));
+            $user_md5=parent::GetMd5hash($json_array['email'].random_int(1,9999));
             //обновляем статус пользователя для уникальности ссылки через хранимую процедуру
             $stmt = $this->getDoctrine()
                          ->getConnection()

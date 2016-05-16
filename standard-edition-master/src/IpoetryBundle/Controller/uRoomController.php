@@ -352,7 +352,7 @@ class uRoomController extends LoggingController{
                          ->query($this->sql_array['signin_action2']);
              */
             //генерируем значение md5 для проверки пользователя по email
-            $user_md5=parent::GetMd5hash($json_array['signin_username'].$json_array['signin_useremail'].rand(1,9999));
+            $user_md5=parent::GetMd5hash($json_array['signin_username'].$json_array['signin_useremail'].random_int(1,9999));
             VarDumper::dump(array('user_md5='=>$user_md5));
             //заводим нового пользователя через хранимую процедуру
             $stmt = $this->getDoctrine()

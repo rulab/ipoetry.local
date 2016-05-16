@@ -32,7 +32,8 @@
         "nelmio/alice": "~1.0",
         "phpdocumentor/phpdocumentor": "2.*",
         "symfony/translation": "~3.0",
-        "symfony/config": "~3.0"
+        "symfony/config": "~3.0",
+        "hwi/oauth-bundle": "^0.4.1"
     },
     "require-dev": {
         "liip/functional-test-bundle": "~1.0",
