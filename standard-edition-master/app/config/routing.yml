@@ -13,10 +13,11 @@ hwi_oauth_redirect:
 
 hwi_oauth_login:
     resource: "@HWIOAuthBundle/Resources/config/routing/login.xml"
-    prefix:   /login
-
-vkontakte_login:
-    path: /login/check-vkontakte
+    prefix:   /loginvk
     
 IpoetryBundle:
     resource: '@IpoetryBundle/Resources/config/routing.yml'
+
+vkontakte_loginvk:
+    path: '@IpoetryBundle/loginvk/checkvk'
+    defaults: { _controller: IpoetryBundle:LoginVk:checkvk }

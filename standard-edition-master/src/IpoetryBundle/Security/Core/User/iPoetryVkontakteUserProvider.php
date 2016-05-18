@@ -86,7 +86,7 @@ class iPoetryVkontakteUserProvider extends EntityUserProvider
      */
     public function __construct(ManagerRegistry $registry, $class, array $properties, $managerName = null)
     {
-        //VarDumper::dump(array('kernel-debug='=>$this->getContainer()->getParameter('kernel.debug')));
+        //VarDumper::dump(array('properties='=>$properties));
         //return 1;
         $this->em         = $registry->getManager($managerName);
         $this->class      = $class;
@@ -98,6 +98,7 @@ class iPoetryVkontakteUserProvider extends EntityUserProvider
      */
     public function loadUserByUsername($username)
     {
+        VarDumper::dump(array('loadUserByUsername'=>$username));
         $user = $this->findUser(array('username' => $username));
         if (!$user) {
             throw new UsernameNotFoundException(sprintf("User '%s' not found.", $username));

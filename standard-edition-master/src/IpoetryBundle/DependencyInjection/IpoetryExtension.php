@@ -32,8 +32,8 @@ class IpoetryExtension extends Extension {
         $loader->load('ipoetry_config_dev.yml');
  * 
  */
-        foreach (array('UserEmailAuthUrl','UserPasswordChangeUrl') as $attribute) {
-        $container->setParameter('ipoetry.'.$attribute, $config[$attribute]);
+        foreach (array('UserEmailAuthUrl','UserPasswordChangeUrl','vkontakte') as $attribute) {
+            $container->setParameter('ipoetry.'.$attribute, $config[$attribute]);
         }
     }
     public function getAlias() {

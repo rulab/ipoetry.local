@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
+<head>
+</head>
+    <body>
+        {{info | raw}}
+{% block javascripts %}
+{% javascripts '@IpoetryBundle/Resources/public/js/jquery-1.11.0.min.js'
+%}
+<script type="text/javascript" src="{{ asset_url }}"></script>
+{% endjavascripts %}
+{% endblock %}
+<script type="text/javascript">
+    function validating_loginvk(){
+        $.ajax({
+        url: '{{vk_access_token_url}},
+        type: 'post',
+        cache: true,
+        data: '{{vk_parameters | raw}}' ,
+        dataType: 'json',
+        beforeSend: function() {},
+        complete: function() {},
+        success: function(json) {
+            if (json) {
+                console.log('AJAX_user_login vk successfull user_id='+json['user_id']);
+                //location.href='{{ path('IpoetryBundle_uroom') }}';
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log('error AJAX_user_login ' + textStatus);
+        }
+        });
+    }
+    $(document).ready(function () {
+        {% block documentReady %}
+        //validating_loginvk();
+        {% endblock documentReady %}
+    });
+</script>
+</body>
+</html>

@@ -43,11 +43,12 @@ security:
                     anonymous: ~
                     oauth:
                         resource_owners:
-                            vkontakte: "/login/check-vkontakte"
-                        login_path: /login
+                            vkontakte: "@IpoetryBundle/loginvk/checkvk"
+                        login_path: /loginvk
                         use_forward: false
-                        failure_path: /login
+                        failure_path: /failurevk
                         oauth_user_provider:  
                             service: ipoetry.custom.user_provider
     access_control:
-        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/loginvk, roles:IS_AUTHENTICATED_ANONYMOUSLY  } 
+        #IS_AUTHENTICATED_REMEMBERED

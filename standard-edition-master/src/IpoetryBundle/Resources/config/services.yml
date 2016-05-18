@@ -4,4 +4,7 @@ services:
 #        arguments: ["@service_id", "plain_value", %parameter%]
     ipoetry.custom.user_provider:
         class:        IpoetryBundle\Security\Core\User\iPoetryVkontakteUserProvider
-        arguments: [@doctrine, 'ipoetry_user',{vkontakte: vkontakte_id}]
+        arguments: [@doctrine, 'ipoetry_user',{vkontakte: 5465145}]
+        
+    #hwi_oauth.resource_owner.vkontakte:
+    #    class:  HWI\Bundle\OAuthBundle\ResourceOwner\VkontakteResourceOwner

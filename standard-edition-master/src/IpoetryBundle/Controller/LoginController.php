@@ -65,6 +65,7 @@ use IpoetryBundle\Form\Type\UserLoginType;
 use IpoetryBundle\Entity\UserLogin;
 
 use IpoetryBundle\Controller\Abstracts\LoggingController;
+use IpoetryBundle\Controller\LoginVkController;
 //use AppBundle\Form\Type\User_profileType;
 
 //use Gregwar\CaptchaBundle\Type\CaptchaType;
@@ -210,8 +211,17 @@ class LoginController extends LoggingController {
                 //$capchavalidator=new CaptchaValidator($translator,$this->session,)
                 //$request->getSession()->set('data_modification', 1);
                 //$request->getSession()->set('mail_link_activation', substr($mail_link_activation_old,-33));
+
         if (isset($form)){
-            $html = $this->render('IpoetryBundle:Login:login_form.html.twig',array('login_form' => $form->createView(),'lost_password_form'=>$this->generate_lost_password_form($request)->createView()));//,'captcha'=>$CaptchaView
+            $html = $this->render('IpoetryBundle:Login:login_form.html.twig',array('login_form' => $form->createView(),
+                'lost_password_form'=>$this->generate_lost_password_form($request)->createView(),
+                'vk_auth_url'=>LoginVkController::configureVKOptions()['authorization_url'].'?'.
+                'client_id='.$this->getParameter('ipoetry.vkontakte')['client_id'].
+                '&display=page'.
+                '&redirect_uri='.$this->getParameter('ipoetry.vkontakte')['target_path_parameter'].
+                '&scope='.$this->getParameter('ipoetry.vkontakte')['scope'].
+                '&response_type=code'.
+                '&v='.$this->getParameter('ipoetry.vkontakte')['version']));//,'captcha'=>$CaptchaView
         }
         //echo $this->captchabuilder->getPhrase().' ';
         //if($form->isValid()) {

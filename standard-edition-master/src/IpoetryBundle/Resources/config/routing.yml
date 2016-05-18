@@ -69,3 +69,10 @@ IpoetryBundle_loginajax:
     requirements:
         _method:  GET|POST
         _locale: en|ru
+
+IpoetryBundle_checkvk:
+    path: /checkvk
+    defaults: { _controller: IpoetryBundle:LoginVk:checkvk }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru

@@ -2,3 +2,12 @@
 ipoetry:
     UserEmailAuthUrl: http://ipoetry.local/standard-edition-master/web/app_dev.php/useremailauth?code=
     UserPasswordChangeUrl: http://ipoetry.local/standard-edition-master/web/app_dev.php/userpasswordchange?code=
+    vkontakte:
+            target_path_parameter: 'http://ipoetry.local/standard-edition-master/web/app_dev.php/checkvk'
+            type: vkontakte
+            client_id: 5465145
+            client_secret: UugQE0bzTHVheK5tFWfg
+            scope: email
+            version: 5.52
+            options:
+                csrf: true

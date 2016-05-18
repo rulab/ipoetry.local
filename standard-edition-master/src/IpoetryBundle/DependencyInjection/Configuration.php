@@ -23,6 +23,27 @@ class Configuration implements ConfigurationInterface{
         ->children()
         ->scalarNode('UserEmailAuthUrl')->end()
         ->scalarNode('UserPasswordChangeUrl')->end()
+        ->arrayNode('vkontakte')
+            ->children()
+                ->scalarNode('target_path_parameter')->end()
+                ->scalarNode('type')->end()
+                ->scalarNode('client_id')->end()
+                ->scalarNode('client_secret')->end()
+                ->scalarNode('scope')
+                    ->validate()
+                        ->ifTrue(function($v) {
+                            return empty($v);
+                        })
+                        ->thenUnset()
+                    ->end()
+                ->end()
+                ->scalarNode('version')->end()
+                ->arrayNode('options')
+                    ->useAttributeAsKey('name')
+                    ->prototype('scalar')->end()
+                ->end()
+            ->end()
+        ->end()
         ->end();
         return $treeBuilder;
     }
