@@ -13,13 +13,13 @@ IpoetryBundle\Entity\IpoetryBackgroundImages:
             columns:
                 - ipoetry_user_group_ipoetry_user_group_id
     id:
-        idipoetryBackgroundImagesId:
+        ipoetryBackgroundImagesId:
             type: integer
             nullable: false
             options:
                 unsigned: false
             id: true
-            column: idipoetry_background_images_id
+            column: ipoetry_background_images_id
             generator:
                 strategy: IDENTITY
     fields:
@@ -41,18 +41,6 @@ IpoetryBundle\Entity\IpoetryBackgroundImages:
                 ipoetry_event_ipoetry_event_id:
                     referencedColumnName: ipoetry_event_id
             orphanRemoval: false
-        ipoetryPoetryPoetry:
-            targetEntity: IpoetryPoetry
-            cascade: {  }
-            fetch: LAZY
-            mappedBy: null
-            inversedBy: null
-            joinColumns:
-                ipoetry_poetry_poetry_id:
-                    referencedColumnName: poetry_id
-                ipoetry_poetry_ipoetry_poetry_parent_id:
-                    referencedColumnName: poetry_parent_id
-            orphanRemoval: false
         ipoetryUserGroupIpoetryUserGroup:
             targetEntity: IpoetryUserGroup
             cascade: {  }
@@ -62,5 +50,16 @@ IpoetryBundle\Entity\IpoetryBackgroundImages:
             joinColumns:
                 ipoetry_user_group_ipoetry_user_group_id:
                     referencedColumnName: ipoetry_user_group_id
+            orphanRemoval: false
+    oneToOne:
+        ipoetryPoetryPoetry:
+            targetEntity: IpoetryPoetry
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                ipoetry_poetry_poetry_id:
+                    referencedColumnName: poetry_id
             orphanRemoval: false
     lifecycleCallbacks: {  }

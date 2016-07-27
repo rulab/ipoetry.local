@@ -17,7 +17,7 @@ class IpoetryUserIpoetryPoetryRelation
      *
      * @ORM\Column(name="ipoetry_user_poetry_relation_id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $ipoetryUserPoetryRelationId;
 

@@ -89,15 +89,13 @@ use IpoetryBundle\Controller\Abstracts\LoggingController;
  * контроллер для личного кабинета пользователя
  */
 class uRoomController extends LoggingController{
-        //кеширование запросов БД
-        public $cacheDriver;
         //массив запросов к БД
         private $sql_array=array('login_action'=>'CALL get_ipoetry_user(?,?)',
                                  'signin_action1'=>'CALL get_ipoetry_user_email(?)',
                                  'signin_action2'=>'INSERT INTO ipoetry_user (user_name,user_password,user_lastname,user_email) VALUES(?,?,?,?)',
                                  'uroom_action1'=>'CALL get_ipoetry_user_room_info(:id)',
                                  'get_auto_increment'=>'SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = :db AND TABLE_NAME = :tbl',
-                                 'add_ipoetry_user'=> 'CALL add_ipoetry_user(:ipoetry_user_name,:ipoetry_user_lastname,:ipoetry_user_email,:ipoetry_user_password,:ipoetry_user_md5hash,:db_name,:tbl_name)');
+                                 'add_ipoetry_user'=> 'CALL add_ipoetry_user(:ipoetry_user_name,:ipoetry_user_lastname,:ipoetry_user_city,:ipoetry_user_email,:ipoetry_user_password,:ipoetry_user_md5hash,:db_name,:tbl_name)');
                                  
         private $is_cache=false;
         
@@ -130,7 +128,7 @@ class uRoomController extends LoggingController{
                         if ($UserRoom_key=='userlastname' && $UserRoom_val!=$result->getUserLastname())
                             $result->SetUserLastname($UserRoom_val);
                         if ($UserRoom_key=='userpassword' && $UserRoom_val!=$result->getUserPassword())
-                            $result->SetUserLastname($UserRoom_val);
+                            $result->setUserPassword($UserRoom_val);
                         if ($UserRoom_key=='usercity' && $UserRoom_val!=$result->getUserCity()->getCityName()){
                             $result_city->setCityName($UserRoom_val);
                             $result->setUserCity($result_city);
@@ -172,12 +170,14 @@ class uRoomController extends LoggingController{
 
         $uroom = $this->getDoctrine()->getManager()
         ->getRepository('IpoetryBundle:IpoetryUser');
-        if ($this->session->has('login'))
-        $result=$uroom->findOneBy(array('userEmail'=>$this->session->get('login')));
-        if (!$result) {
+        if ($this->session->has('login')) {
+            $result=$uroom->findOneBy(array('userEmail'=>$this->session->get('login')));
+        }
+        if (!isset($result)) {
             throw $this->createNotFoundException('No user found for email:'.$this->session->get('login'));
         }
         VarDumper::dump(array('result'=>$result));
+
 
         $options['data']['user_name']=$result->getUserName();
         $options['data']['user_lastname']=$result->getUserLastname();
@@ -188,6 +188,12 @@ class uRoomController extends LoggingController{
         $options['data']['user_website']=$result->getUserWebsite()->getIpoetryUserWebsite();
         $options['data']['user_phone']=$result->getUserPhone()->getIpoetryUserPhone();
         $options['data']['user_photo']=$result->getUserPhoto()->getUserPhotoUrl();
+        //пишем в сессию необходимые данные
+        $this->session->set('user_photo_url',$options['data']['user_photo']);
+        $this->session->set('user_name',$options['data']['user_name']);
+        $this->session->set('user_lastname',$options['data']['user_lastname']);
+
+        
 /*
                 ->add('username',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('John')),'label' => $translator->trans('Name'),'data'=>$options['data']['user_name']))//array('attr' => array('maxlength' => 50,'required' => true)))
                 ->add('userlastname',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('LastName'),'data'=>$options['data']['user_lastname']))//array('attr' => array('maxlength' => 50,'required' => true)))
@@ -210,13 +216,14 @@ class uRoomController extends LoggingController{
         //return new Response('тут отображается форма с данными о пользователе');                
         return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView(),'user_photo'=>$options['data']['user_photo']));
     }
-    //ajax запросы по логированию и регистрации пользователей
+
+    //распределитель ajax запросов по логированию и регистрации пользователей
     public function uroomajaxAction(Request $request){
         //по полученном параметрам делаем запрос в базу узнать что такой пользователь существует
         $mas=array();
 
-        $authorization_parameters=json_decode($request->get('login_json'),true);
-        if ($authorization_parameters<>null){
+        $authorization_parameters=@json_decode($request->get('login_json'),true);
+        if (isset($authorization_parameters)){
         //проверяем что пришло в сессии
         $this->GetCache($request);
         //в зависимости от типа запроса выполняем логику работы с БД
@@ -259,24 +266,28 @@ class uRoomController extends LoggingController{
         //VarDumper::dump(array('sql'=>$sql));
         //VarDumper::dump(array('isset(cacheDriver)='=>isset($this->cacheDriver),'cacheDriver'=>$this->cacheDriver));
         //смотрим если данные в кеше уже есть тогда берем из кеша
+        //$this->session->set( 'login_id',16 );
         if (isset($this->cacheDriver)){
             if ($this->cacheDriver->contains($json_array['login'].$json_array['password'])) {
                 //использовали кеш
                 $this->is_cache=true;
                 if ($request->hasSession()) {
-                    $session=$request->getSession();
-                    $session->set('is_cache', $this->is_cache);
-                    $session->set('login',$json_array['login'] );
+                    $this->session=$request->getSession();
+                    $this->session->set('is_cache', $this->is_cache);
+                    $this->session->set('login',$json_array['login'] );
+                    if ($this->cacheDriver->contains('login_id')) {
+                        $this->session->set( 'login_id',$this->cacheDriver->fetch('login_id') );                    
+                    }
                 }
-                return 1;                
+                return 1;
             }
         }
 
         //без кеша
         $this->is_cache=false;
                 if ($request->hasSession()) {
-                    $session=$request->getSession();
-                    $session->set('is_cache', $this->is_cache);
+                    $this->session=$request->getSession();
+                    $this->session->set('is_cache', $this->is_cache);
                 }
         //читаем базу данных
         $stmt = $this->getDoctrine()
@@ -296,16 +307,19 @@ class uRoomController extends LoggingController{
 
             //VarDumper::dump(array('$result[0][\'userpassword\']'=>$result[0]['userpassword'],' $authorization_parameters[\'login\'].$authorization_parameters[\'password\']'=>$authorization_parameters['login'].$authorization_parameters['password']));
             //кешируем полученную информацию
-            if (isset($this->cacheDriver))
+            if (isset($this->cacheDriver)) {
                 $this->cacheDriver->save($json_array['login'].$json_array['password'], 1);
+                $this->cacheDriver->save('login_id',$result[0]['user_id']);
                 if ($request->hasSession()) {
-                    $session=$request->getSession();
-                    $session->set('cacheDriver', $this->cacheDriver);
+                    $this->session=$request->getSession();
+                    $this->session->set('cacheDriver', $this->cacheDriver);
                 }
-
+            }
             //пара логин+пароль совпадает с базой.
             if ($result[0]['userpassword']==$json_array['login'].$json_array['password']) {
-                $session->set('login',$json_array['login']);
+                //пишем в сессию данные о пользователе
+                $this->session->set('login',$json_array['login']);
+                $this->session->set('login_id',$result[0]['user_id']);
                 return 1;
             }
             //данные в базе отсутствуют
@@ -325,10 +339,10 @@ class uRoomController extends LoggingController{
 
         //без кеша
         $this->is_cache=false;
-                if ($request->hasSession()) {
-                    $session=$request->getSession();
-                    $session->set('is_cache', $this->is_cache);
-                }
+        if ($request->hasSession()) {
+            $this->session=$request->getSession();
+            $this->session->set('is_cache', $this->is_cache);
+        }
 
         $stmt = $this->getDoctrine()
                      ->getConnection()
@@ -341,7 +355,13 @@ class uRoomController extends LoggingController{
         if (isset($result[0]['user_email'])){
             //VarDumper::dump(array('$result[0][\'userpassword\']'=>$result[0]['userpassword'],' $authorization_parameters[\'login\'].$authorization_parameters[\'password\']'=>$authorization_parameters['login'].$authorization_parameters['password']));
             //такой email уже существует
+            //в случае захода через вконтакте и другие сети смотрим в сессии access_token если он есть
             if ($result[0]['user_email']==$json_array['signin_useremail']) {
+                //тогда мы перенаправляем пользователя в личный кабинет без регистрации
+                if ($this->session->has('vk_access_token')){
+                    $this->session->set('login',$json_array['signin_useremail']);
+                return 1;
+                } else
                 return 0;
             }
         } else {
@@ -360,15 +380,22 @@ class uRoomController extends LoggingController{
                          ->prepare($this->sql_array['add_ipoetry_user']);
             $stmt->bindValue(':ipoetry_user_name',$json_array['signin_username']);
             $stmt->bindValue(':ipoetry_user_lastname',$json_array['signin_userlastname']);
+            if (isset($json_array['signin_usercity']))
+                $stmt->bindValue(':ipoetry_user_city',$json_array['signin_usercity']);
+            else
+                $stmt->bindValue(':ipoetry_user_city','undefined');                
             $stmt->bindValue(':ipoetry_user_email',$json_array['signin_useremail']);
             $stmt->bindValue(':ipoetry_user_password',$json_array['signin_userpassword']);
             $stmt->bindValue(':ipoetry_user_md5hash',$user_md5);
             $stmt->bindValue(':db_name','ipoetry');
             $stmt->bindValue(':tbl_name','ipoetry_user');
             $stmt->execute();
+            $result=$stmt->fetchAll();            
             if ($request->hasSession()) {
-                $session=$request->getSession();
-                $session->set('login',$json_array['signin_useremail']);
+                $this->session=$request->getSession();
+                $this->session->set('login',$json_array['signin_useremail']);
+                $this->session->set('login_id',$result[0][user_id]);
+                
             }
             //шлем почту пользователю
             //$url_verify_param='5hrtGtdfjy';
@@ -394,17 +421,6 @@ class uRoomController extends LoggingController{
             $uroom->flush();
              */
             return 1;
-        }
-    }
-    
-    //читаем данные из сессии о кеше
-    public function GetCache($request){
-        //проверяем что пришло в сессии
-        if ($request->hasSession()) {
-            $this->session=$request->getSession();
-            $this->cacheDriver=$this->session->get('cacheDriver');
-        if (!isset($this->cacheDriver))
-            $this->cacheDriver = new \Doctrine\Common\Cache\ArrayCache();
         }
     }
     

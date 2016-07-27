@@ -15,11 +15,11 @@ class IpoetryBackgroundImages
     /**
      * @var integer
      *
-     * @ORM\Column(name="idipoetry_background_images_id", type="integer")
+     * @ORM\Column(name="ipoetry_background_images_id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $idipoetryBackgroundImagesId;
+    private $ipoetryBackgroundImagesId;
 
     /**
      * @var string
@@ -28,6 +28,7 @@ class IpoetryBackgroundImages
      */
     private $ipoetryBackgroundImage;
 
+   
     /**
      * @var \IpoetryBundle\Entity\IpoetryEvent
      *
@@ -41,10 +42,9 @@ class IpoetryBackgroundImages
     /**
      * @var \IpoetryBundle\Entity\IpoetryPoetry
      *
-     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryPoetry")
+     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryPoetry")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="ipoetry_poetry_poetry_id", referencedColumnName="poetry_id"),
-     *   @ORM\JoinColumn(name="ipoetry_poetry_ipoetry_poetry_parent_id", referencedColumnName="poetry_parent_id")
      * })
      */
     private $ipoetryPoetryPoetry;
@@ -66,9 +66,9 @@ class IpoetryBackgroundImages
      *
      * @return integer
      */
-    public function getIdipoetryBackgroundImagesId()
+    public function getIpoetryBackgroundImagesId()
     {
-        return $this->idipoetryBackgroundImagesId;
+        return $this->ipoetryBackgroundImagesId;
     }
 
     /**
@@ -92,7 +92,7 @@ class IpoetryBackgroundImages
      */
     public function getIpoetryBackgroundImage()
     {
-        return $this->ipoetryBackgroundImage;
+        return stripslashes(stream_get_contents($this->ipoetryBackgroundImage));
     }
 
     /**

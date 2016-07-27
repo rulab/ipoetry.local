@@ -17,7 +17,7 @@ IpoetryBundle\Entity\IpoetryUserIpoetryPoetryRelation:
             id: true
             column: ipoetry_user_poetry_relation_id
             generator:
-                strategy: IDENTITY
+                strategy: AUTO
     fields:
         ipoetryPoetryPoetryParentId:
             type: integer

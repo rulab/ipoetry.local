@@ -1,8 +1,6 @@
 ## YAML Template.
-messages.Login : Имя
-messages.Password : Пароль
-messages.Save : Сохранить
-messages.Enter : Войти
+Save : Сохранить
+Enter : Войти
 Whatson : Уотсон
 Name : Имя
 LastName : Фамилия
@@ -23,3 +21,5 @@ Send email : Отправить запрос
 Enter your email : Восстановление пароля
 Enter password : Введите пароль
 Accept : Подтвердить
+Enter email and password to continue registration. : Введите эл.почту и пароль для продолжения регистрации
+Attach Picture : Загрузить

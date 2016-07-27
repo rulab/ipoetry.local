@@ -74,19 +74,18 @@
         complete: function() {},
         success: function(json) {
             if (json['logging']==1) {
-                console.log('AJAX_user_login successfull logging='+json['logging']+' login='+json['login']+' password='+json['password']);
+                console.log('AJAX_user_signin successfull logging='+json['logging']+' login='+json['login']+' password='+json['password']);
                 location.href='{{ path('IpoetryBundle_uroom') }}';
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            console.log('error AJAX_user_login ' + textStatus);
+            console.log('error AJAX_user_signin ' + textStatus);
         }
         });
     }
     $(document).ready(function () {
         {% block documentReady %}
-        $('[data-toggle="popover"]').popover(); 
-
+            //$('[data-toggle="popover"]').popover(); 
             $('#login_user_form').attr('method','');
             $('#login_user_form').attr('action','javascript:validating_form();');
 

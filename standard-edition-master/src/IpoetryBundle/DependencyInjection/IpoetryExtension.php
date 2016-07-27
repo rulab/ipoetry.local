@@ -32,7 +32,19 @@ class IpoetryExtension extends Extension {
         $loader->load('ipoetry_config_dev.yml');
  * 
  */
-        foreach (array('UserEmailAuthUrl','UserPasswordChangeUrl','vkontakte') as $attribute) {
+        foreach (array('UserEmailAuthUrl',
+            'UserPasswordChangeUrl',
+            'RedirectAfterUnsuccOauthLogin',
+            'UserProfileUrl',
+            'uprofilenewsfeedlimit',
+            'uprofilecommentslimit',
+            'userratinglimit',
+            'poetryratinglimit',
+            'poetrysearchlimit',
+            'usersearchlimit',
+            'SessionTimeout',
+            'userslimit',
+            'vkontakte') as $attribute) {
             $container->setParameter('ipoetry.'.$attribute, $config[$attribute]);
         }
     }

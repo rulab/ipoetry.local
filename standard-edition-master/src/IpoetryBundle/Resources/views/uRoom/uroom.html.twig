@@ -2,11 +2,11 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
 <head>
-<title>ipoetry-логин</title>
+<title>ipoetry-настройки личного кабинета</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="Keywords" content="" />
-<meta name="description" content="Вход в личный кабинет пользователя ipoetry" />
+<meta name="description" content="Настройки личного кабинета пользователя ipoetry" />
 <meta name="robots" content="index,follow" />
 
     {% block stylesheets %}
@@ -23,6 +23,8 @@
 <div class="row">
     <div class="col-lg-14">
     <a style="margin-left: 15px;" href="{{ path('IpoetryBundle_root') }}" data-toggle="popover" title="На главную" data-content="Some content inside the popover">На главную</a>
+    <a id="ipoetryexithref" style="margin-right: 15px;float:right;" href="{{ path('IpoetryBundle_root') }}" data-toggle="popover" title="Выход" data-content="Some content inside the popover">Выйти из ipoetry</a>
+    
     <br />
     </div>
 </div>
@@ -41,6 +43,7 @@
     {{ form_widget(form) }}
 {# {{ form_end(form) }} #}
 </form>
+        <input id="fileupload" type="file" name="files[]"/>
 
 </div>
 
@@ -51,9 +54,93 @@
 '@IpoetryBundle/Resources/public/js/w_load.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie-emulation-modes-warning.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie10-viewport-bug-workaround.js'
+'@IpoetryBundle/Resources/public/js/jQuery-File-Upload-9.12.3/js/vendor/jquery.ui.widget.js'
+'@IpoetryBundle/Resources/public/js/jQuery-File-Upload-9.12.3/js/jquery.iframe-transport.js'
+'@IpoetryBundle/Resources/public/js/jQuery-File-Upload-9.12.3/js/jquery.fileupload.js'
 %}
 <script type="text/javascript" src="{{ asset_url }}"></script>
 {% endjavascripts %}
 {% endblock %}
+<script type="text/javascript">
+    function CloseiPoetrySession(){
+        //делаем запрос на закрытие сессии
+        //шлем AJAX
+        ajaxdata='login_json={"type":"set_user_session_closed"}';
+        console.log(ajaxdata);
+        url='{{ path('IpoetryBundle_uprofileajax') }}';
+        type='post';
+        dataType='json';
+        onsuccess=function(json) {
+            console.log(json['result']);
+            if (json['result']===1) {
+                console.log('AJAX_set_user_session_closed result='+json['result']);
+                location.href='{{ path('IpoetryBundle_root') }}';
+            }
+        };
+        onerror=function(jqXHR, textStatus, errorThrown) {
+            console.log('error AJAX_set_user_session_closed ' + textStatus);
+        };
+        ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror);
+        
+    }
+
+    $(document).ready(function () {
+        {% block documentReady %}
+            $('#fileupload').fileupload({
+                type: 'POST',
+                dataType: 'json',
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                url: '{{ path('IpoetryBundle_uroomajax') }}',
+                dropZone:null,
+                //fileInput:$('input:file[id="fileupload"]'),
+                //paramName:'files[]',
+                multipart:false,
+                singleFileUploads:true,
+                loadImageMaxFileSize:999000,
+                imageMaxWidth:1024,
+                imageMaxHeight:768,
+                loadAudioMaxFileSize:999000,
+                add: function (e, data) {
+                    data.context = $('<p/>').text(data.files[0].name+' uploading...').appendTo(document.body);
+                    //data.submit();
+                        //.success(function (result, textStatus, jqXHR) {console.log(result);})
+                        //.error(function (jqXHR, textStatus, errorThrown) {})
+                        //.complete(function (result, textStatus, jqXHR) { console.log(result);});
+                },
+                drop: function (e, data) {
+                    $.each(data.files, function (index, file) {
+                        console.log('Dropped file: ' + file.name);
+                    });
+                },
+                change: function (e, data) {
+                    $.each(data.files, function (index, file) {
+                        console.log('Selected file: ' + file.name);
+                    });
+                },
+                done: function (e, data) {
+                    data.context.text('Upload '+data.files[0].name+' finished.');
+                    $.each(data.result.files, function (index, file) {
+                        console.log('File uploaded: ' + file.name);
+                    });
+                }
+
+            });
+            $('#sendfileupload').on('click',function () {
+                    //data.context = $('<p/>').text('Uploading...').replaceAll($(this));
+                    //data.submit();
+            });
+            $('#ipoetryexithref').on('click',function (event) {
+                event = event || window.event;
+
+                  if (event.preventDefault) { // если метод существует
+                    event.preventDefault(); // то вызвать его
+                  } else { // иначе вариант IE8-:
+                    event.returnValue = false;
+                  }
+                CloseiPoetrySession();
+            });
+        {% endblock documentReady %}
+    });
+</script>
 </body>
 </html>

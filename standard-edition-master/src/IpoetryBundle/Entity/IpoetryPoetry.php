@@ -17,7 +17,7 @@ class IpoetryPoetry
      *
      * @ORM\Column(name="poetry_id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $poetryId;
 
@@ -25,15 +25,13 @@ class IpoetryPoetry
      * @var integer
      *
      * @ORM\Column(name="poetry_parent_id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
      */
     private $poetryParentId = '0';
 
     /**
      * @var string
      *
-     * @ORM\Column(name="poetry_body", type="text", length=255, nullable=true)
+     * @ORM\Column(name="poetry_body", type="blob", nullable=true)
      */
     private $poetryBody;
 
@@ -54,75 +52,161 @@ class IpoetryPoetry
     /**
      * @var integer
      *
-     * @ORM\Column(name="poetry_video_id", type="integer", nullable=true)
+     * @ORM\Column(name="poetry_video_id", type="integer", nullable=false)
      */
     private $poetryVideoId = '0';
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="poetry_photo_id", type="integer", nullable=true)
+     * @ORM\Column(name="poetry_photo_id", type="integer", nullable=false)
      */
     private $poetryPhotoId = '0';
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="poetry_audio_id", type="integer", nullable=true)
+     * @ORM\Column(name="poetry_audio_id", type="integer", nullable=false)
      */
     private $poetryAudioId = '0';
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="poetry_theme_id", type="integer", nullable=true)
+     * @ORM\Column(name="poetry_theme_id", type="integer", nullable=false)
      */
     private $poetryThemeId = '0';
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="poetry_background_image_id", type="integer", nullable=true)
+     * @ORM\Column(name="poetry_background_image_id", type="integer", nullable=false)
      */
     private $poetryBackgroundImageId = '0';
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="poetry_poetry_rating_id", type="integer", nullable=false)
+     */
+    private $poetryPoetryRatingId = '0';
 
     /**
      * @var boolean
      *
-     * @ORM\Column(name="poetry_is_gift", type="boolean", nullable=true)
+     * @ORM\Column(name="poetry_is_gift", type="boolean", nullable=false)
      */
     private $poetryIsGift = '0';
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="poetry_title", type="string", length=255, nullable=false)
+     */
+    private $poetryTitle;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="poetry_description", type="string", length=1024, nullable=false)
+     */
+    private $poetryDescription;
+    
+    /**
+     * @var datetime
+     *
+     * @ORM\Column(name="ipoetry_poetry_created_at", type="datetime", nullable=false)
+     */
+    private $poetryCreatedAt;
+
+    /**
+     * @var mediumtext
+     *
+     * @ORM\Column(name="ipoetry_poetry_body_text", type="mediumtext", nullable=true)
+     */
+    private $poetryBodyText;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="poetry_description", type="string", length=1024, nullable=true)
+     * @ORM\Column(name="ipoetry_poetry_resource_ext", length=5, type="string", nullable=false)
      */
-    private $poetryDescription;
+    private $poetryResourceExt;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var string
+     *
+     * @ORM\Column(name="ipoetry_poetry_tags", length=255, type="string", nullable=true)
+     */
+    private $poetryPoetryTags;
+    
+    /**
+     * @var \Doctrine\Common\Collections\ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="IpoetryBundle\Entity\IpoetryUser", inversedBy="ipoetryPoetryPoetry")
-     * @ORM\JoinTable(name="ipoetry_poetry_rating",
+     * @ORM\JoinTable(name="ipoetry_user_ipoetry_poetry_relation",
      *   joinColumns={
      *     @ORM\JoinColumn(name="ipoetry_poetry_poetry_id", referencedColumnName="poetry_id"),
-     *     @ORM\JoinColumn(name="ipoetry_poetry_poetry_parent_id", referencedColumnName="poetry_parent_id")
      *   },
      *   inverseJoinColumns={
      *     @ORM\JoinColumn(name="ipoetry_user_user_id", referencedColumnName="user_id"),
-     *     @ORM\JoinColumn(name="ipoetry_user_user_parent_id", referencedColumnName="user_parent_id")
      *   }
      * )
      */
     private $ipoetryUserUser;
 
     /**
+     * @var \Doctrine\Common\Collections\ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="IpoetryBundle\Entity\IpoetryTags", inversedBy="ipoetryPoetryPoetry")
+     * @ORM\JoinTable(name="ipoetry_poetry_ipoetry_tags_relation",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="ipoetry_poetry_poetry_id", referencedColumnName="poetry_id"),
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="ipoetry_tags_tags_id", referencedColumnName="ipoetry_tags_tags_id"),
+     *   }
+     * )
+     */
+    private $ipoetryTagsTags;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\OneToMany(targetEntity="IpoetryBundle\Entity\PoetryRepostToOwnFeed", mappedBy="ipoetryPoetryPoetry")
+     */
+    private $ipoetryUserRepost;
+    
+    /**
+     * @var \IpoetryBundle\Entity\IpoetryBackgroundImages
+     *
+     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryBackgroundImages")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="poetry_background_image_id", referencedColumnName="ipoetry_background_images_id")
+     * })
+     */
+    private $ipoetryPoetryBackgroundImages;
+
+    /**
+     * @var \IpoetryBundle\Entity\IpoetryPoetryRating
+     *
+     * @ORM\OneToOne(targetEntity="IpoetryBundle\Entity\IpoetryPoetryRating")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="poetry_poetry_rating_id", referencedColumnName="ipoetry_poetry_rating_id")
+     * })
+     */
+    private $ipoetryPoetryRating;
+
+        
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->ipoetryUserUser = new \Doctrine\Common\Collections\ArrayCollection();
+        
+        $this->ipoetryTags = new \Doctrine\Common\Collections\ArrayCollection();
+        
+        $this->ipoetryUserRepost = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
 
@@ -195,7 +279,7 @@ class IpoetryPoetry
      */
     public function getPoetryBody()
     {
-        return $this->poetryBody;
+        return stripslashes(stream_get_contents($this->poetryBody));
     }
 
     /**
@@ -367,6 +451,30 @@ class IpoetryPoetry
     }
 
     /**
+     * Set poetryPoetryRatingId
+     *
+     * @param integer $poetryPoetryRatingId
+     *
+     * @return IpoetryPoetry
+     */
+    public function setPoetryPoetryRatingId($poetryPoetryRatingId)
+    {
+        $this->poetryPoetryRatingId = $poetryPoetryRatingId;
+
+        return $this;
+    }
+
+    /**
+     * Get poetryPoetryRatingId
+     *
+     * @return integer
+     */
+    public function getPoetryPoetryRatingId()
+    {
+        return $this->poetryPoetryRatingId;
+    }
+
+    /**
      * Set poetryIsGift
      *
      * @param boolean $poetryIsGift
@@ -388,6 +496,29 @@ class IpoetryPoetry
     public function getPoetryIsGift()
     {
         return $this->poetryIsGift;
+    }
+    /**
+     * Set poetryTitle
+     *
+     * @param string $poetryTitle
+     *
+     * @return IpoetryPoetry
+     */
+    public function setPoetryTitle($poetryTitle)
+    {
+        $this->poetryTitle = $poetryTitle;
+
+        return $this;
+    }
+
+    /**
+     * Get poetryTitle
+     *
+     * @return string
+     */
+    public function getPoetryTitle()
+    {
+        return $this->poetryTitle;
     }
 
     /**
@@ -413,7 +544,103 @@ class IpoetryPoetry
     {
         return $this->poetryDescription;
     }
+    
+    /**
+     * Set poetryCreatedAt
+     *
+     * @param string $poetryCreatedAt
+     *
+     * @return IpoetryPoetry
+     */
+    public function setPoetryCreatedAt($poetryCreatedAt)
+    {
+        $this->poetryCreatedAt = $poetryCreatedAt;
 
+        return $this;
+    }    
+    
+    /**
+     * Get poetryCreatedAt
+     *
+     * @return string
+     */
+    public function getPoetryCreatedAt()
+    {
+        return $this->poetryCreatedAt;
+    }
+
+    /**
+     * Set poetryBodyText
+     *
+     * @param mediumtext $poetryBodyText
+     *
+     * @return IpoetryPoetry
+     */
+    public function setPoetryBodyText($poetryBodyText)
+    {
+        $this->poetryBodyText = $poetryBodyText;
+
+        return $this;
+    }    
+    
+    /**
+     * Get poetryBodyText
+     *
+     * @return mediumtext
+     */
+    public function getPoetryBodyText()
+    {
+        return $this->poetryBodyText;
+    }
+
+    /**
+     * Set poetryResourceExt
+     *
+     * @param string $poetryResourceExt
+     *
+     * @return IpoetryPoetry
+     */
+    public function setPoetryResourceExt($poetryResourceExt)
+    {
+        $this->poetryResourceExt = $poetryResourceExt;
+
+        return $this;
+    }    
+
+    /**
+     * Get poetryResourceExt
+     *
+     * @return string
+     */
+    public function getPoetryResourceExt()
+    {
+        return $this->poetryResourceExt;
+    }
+
+    /**
+     * Set poetryPoetryTags
+     *
+     * @param string $poetryPoetryTags
+     *
+     * @return IpoetryPoetry
+     */
+    public function setPoetryPoetryTags($poetryPoetryTags)
+    {
+        $this->poetryPoetryTags = $poetryPoetryTags;
+
+        return $this;
+    }    
+
+    /**
+     * Get poetryPoetryTags
+     *
+     * @return string
+     */
+    public function getPoetryPoetryTags()
+    {
+        return $this->poetryPoetryTags;
+    }
+    
     /**
      * Add ipoetryUserUser
      *
@@ -446,5 +673,121 @@ class IpoetryPoetry
     public function getIpoetryUserUser()
     {
         return $this->ipoetryUserUser;
+    }
+
+    /**
+     * Add ipoetryTagsTags
+     *
+     * @param \IpoetryBundle\Entity\IpoetryTags $ipoetryTagsTags
+     *
+     * @return IpoetryPoetry
+     */
+    public function addIpoetryTagsTags(\IpoetryBundle\Entity\IpoetryTags $ipoetryTagsTags)
+    {
+        $this->ipoetryTagsTags[] = $ipoetryTagsTags;
+
+        return $this;
+    }
+
+    /**
+     * Remove ipoetryTagsTags
+     *
+     * @param \IpoetryBundle\Entity\IpoetryTags $ipoetryTagsTags
+     */
+    public function removeIpoetryTagsTags(\IpoetryBundle\Entity\IpoetryTags $ipoetryTagsTags)
+    {
+        $this->ipoetryTagsTags->removeElement($ipoetryTagsTags);
+    }
+
+    /**
+     * Get ipoetryTagsTags
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getIpoetryTagsTags()
+    {
+        return $this->ipoetryTagsTags;
+    }
+    
+    /**
+     * Set IpoetryBackgroundImages
+     *
+     * @param \IpoetryBundle\Entity\IpoetryBackgroundImages $ipoetryBackgroundImages
+     *
+     * @return IpoetryBackgroundImages
+     */
+    public function setIpoetryBackgroundImages(\IpoetryBundle\Entity\IpoetryBackgroundImages $ipoetryPoetryBackgroundImages  = null)
+    {
+        $this->ipoetryPoetryBackgroundImages = $ipoetryPoetryBackgroundImages;
+
+        return $this;
+    }
+
+    /**
+     * Get IpoetryBackgroundImages
+     *
+     * @return \IpoetryBundle\Entity\IpoetryBackgroundImages
+     */
+    public function getIpoetryBackgroundImages()
+    {
+        return $this->$ipoetryPoetryBackgroundImages;
+    }
+    
+    /**
+     * Set class IpoetryPoetryRating
+     *
+     * @param \IpoetryBundle\Entity\IpoetryPoetryRating $ipoetryPoetryRating
+     *
+     * @return IpoetryPoetryRating
+     */
+    public function setIpoetryPoetryRating(\IpoetryBundle\Entity\IpoetryPoetryRating $ipoetryPoetryRating  = null)
+    {
+        $this->ipoetryPoetryRating = $ipoetryPoetryRating;
+
+        return $this;
+    }
+
+    /**
+     * Get IpoetryPoetryRating
+     *
+     * @return \IpoetryBundle\Entity\IpoetryPoetryRating
+     */
+    public function getIpoetryPoetryRating()
+    {
+        return $this->$ipoetryPoetryRating;
+    }
+
+    /**
+     * Get ipoetryUserRepost
+     *
+     * @return \IpoetryBundle\Entity\PoetryRepostToOwnFeed
+     */
+    public function getIpoetryUserRepost()
+    {
+        return $this->ipoetryUserRepost;
+    }
+
+    /**
+     * Add ipoetryUserRepost
+     *
+     * @param \IpoetryBundle\Entity\PoetryRepostToOwnFeed $ipoetryUserRepost
+     *
+     * @return PoetryRepostToOwnFeed
+     */
+    public function addIpoetryUserRepost(\IpoetryBundle\Entity\PoetryRepostToOwnFeed $ipoetryUserRepost)
+    {
+        $this->ipoetryUserRepost[] = $ipoetryUserRepost;
+
+        return $this;
+    }
+
+    /**
+     * Remove ipoetryUserRepost
+     *
+     * @param \IpoetryBundle\Entity\PoetryRepostToOwnFeed $ipoetryUserRepost
+     */
+    public function removeIpoetryPoetryPoetry(\IpoetryBundle\Entity\PoetryRepostToOwnFeed $ipoetryUserRepost)
+    {
+        $this->ipoetryUserRepost->removeElement($ipoetryUserRepost);
     }
 }

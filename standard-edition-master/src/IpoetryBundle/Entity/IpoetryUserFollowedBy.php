@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * IpoetryUserFollowedBy
  *
- * @ORM\Table(name="ipoetry_user_followed_by", indexes={@ORM\Index(name="fk_ipoetry_user_followed_by_ipoetry_user1_idx", columns={"ipoetry_user_user_id"})})
+ * @ORM\Table(name="ipoetry_user_followed_by")
  * @ORM\Entity
  */
 class IpoetryUserFollowedBy
@@ -24,6 +24,12 @@ class IpoetryUserFollowedBy
      * @ORM\Column(name="ipoetry_user_followed_by_id", type="integer", nullable=false)
      */
     private $ipoetryUserFollowedById;
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="ipoetry_user_user_id", type="integer", nullable=false)
+     */
+    private $ipoetryUserUserId;
 
     /**
      * @var integer
@@ -33,12 +39,12 @@ class IpoetryUserFollowedBy
     private $ipoetryUserUserParentId;
 
     /**
-     * @var \IpoetryBundle\Entity\IpoetryUser
+     * @var IpoetryBundle\Entity\IpoetryUser
      *
-     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUser")
+     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUser",inversedBy="ipoetryUserFollowedBy")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="ipoetry_user_user_id", referencedColumnName="user_id", unique=true)
-     * })
+     })
      */
     private $ipoetryUserUser;
 
@@ -90,6 +96,30 @@ class IpoetryUserFollowedBy
     }
 
     /**
+     * Set ipoetryUserUserId
+     *
+     * @param integer $ipoetryUserUserId
+     *
+     * @return IpoetryUserFollowedBy
+     */
+    public function setIpoetryUserUserId($ipoetryUserUserId)
+    {
+        $this->ipoetryUserUserId = $ipoetryUserUserId;
+
+        return $this;
+    }
+
+    /**
+     * Get ipoetryUserUserId
+     *
+     * @return integer
+     */
+    public function getIpoetryUserUserId()
+    {
+        return $this->ipoetryUserUserId;
+    }
+
+    /**
      * Set ipoetryUserUserParentId
      *
      * @param integer $ipoetryUserUserParentId
@@ -113,18 +143,16 @@ class IpoetryUserFollowedBy
         return $this->ipoetryUserUserParentId;
     }
 
+    
+
     /**
-     * Set ipoetryUserUser
+     * Remove ipoetryUserUser
      *
      * @param \IpoetryBundle\Entity\IpoetryUser $ipoetryUserUser
-     *
-     * @return IpoetryUserFollowedBy
      */
-    public function setIpoetryUserUser(\IpoetryBundle\Entity\IpoetryUser $ipoetryUserUser = null)
+    public function setIpoetryUserUser(\IpoetryBundle\Entity\IpoetryUser $ipoetryUserUser)
     {
-        $this->ipoetryUserUser = $ipoetryUserUser;
-
-        return $this;
+        $this->ipoetryUserUser->$ipoetryUserUser;
     }
 
     /**

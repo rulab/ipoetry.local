@@ -1,0 +1,19 @@
+IpoetryBundle\Entity\PoetryDisLike:
+    type: entity
+    table: poetrydislike
+    id:
+        userId:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+            id: true
+            column: user_id
+    fields:
+        poetryId:
+            type: integer
+            nullable: false
+            options:
+                fixed: false
+                default: 0
+            column: poetry_id

@@ -1,0 +1,1 @@
+new Response(json_encode($mas));

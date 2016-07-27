@@ -10,7 +10,7 @@ IpoetryBundle\Entity\IpoetryPoetryAudioAttached:
             id: true
             column: ipoetry_poetry_audio_attached_id
             generator:
-                strategy: IDENTITY
+                strategy: AUTO
     fields:
         ipoetryPoetryAudioAttachedUrl:
             type: string

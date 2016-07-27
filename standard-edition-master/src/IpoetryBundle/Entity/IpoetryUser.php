@@ -146,7 +146,15 @@ class IpoetryUser
      *   @ORM\JoinColumn(name="user_website_id", referencedColumnName="ipoetry_user_website_id")
      * })
      */
+    
     private $userWebsite;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\OneToMany(targetEntity="IpoetryBundle\Entity\IpoetryUserFollowedBy", mappedBy="ipoetryUserUser")
+     */
+    private $ipoetryUserFollowedBy;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -160,7 +168,10 @@ class IpoetryUser
      */
     public function __construct()
     {
+        //связь со стихом
         $this->ipoetryPoetryPoetry = new \Doctrine\Common\Collections\ArrayCollection();
+        //связь с подписантами
+        $this->ipoetryUserFollowedBy = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**

@@ -25,6 +25,7 @@
                                 <li><a href="{{ path('IpoetryBundle_root') }}">Home</a></li>
                                 <li><a href="{{ path('IpoetryBundle_login') }}">Login</a></li>
                                 <li><a href="{{ path('IpoetryBundle_signin') }}">Signin</a></li>
+                                <li><div id="user_shortinfo_block"><img src="{{user_short_info[0]}}" height="50" width="50"><label id="user_name">{{user_short_info[1]}}</label><label id="user_lastname">{{user_short_info[2]}}</label></div></li>
                             </ul>
                         </nav>
                     {% endblock %}
@@ -40,7 +41,8 @@
                 {% block body %}{% endblock %}
             </section>
             <aside class="sidebar">
-                {% block sidebar %}{% endblock %}
+                {% block sidebar %}
+                {% endblock %}
             </aside>
 
             <div id="footer">

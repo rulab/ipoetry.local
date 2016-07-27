@@ -9,6 +9,7 @@ IpoetryBundle\Entity\IpoetryPoetry:
                 unsigned: false
             id: true
             column: poetry_id
+    fields:
         poetryParentId:
             type: integer
             nullable: false
@@ -16,13 +17,10 @@ IpoetryBundle\Entity\IpoetryPoetry:
                 unsigned: false
                 comment: 'если стих передавался несколькими людьми друг другу то это поле для истории стиха'
                 default: '0'
-            id: true
             column: poetry_parent_id
-    fields:
         poetryBody:
-            type: text
+            type: blob
             nullable: true
-            length: 255
             options:
                 fixed: false
             column: poetry_body
@@ -42,7 +40,7 @@ IpoetryBundle\Entity\IpoetryPoetry:
             column: poetry_discuss_id
         poetryVideoId:
             type: integer
-            nullable: true
+            nullable: false
             options:
                 unsigned: false
                 comment: 'вложение видео'
@@ -50,7 +48,7 @@ IpoetryBundle\Entity\IpoetryPoetry:
             column: poetry_video_id
         poetryPhotoId:
             type: integer
-            nullable: true
+            nullable: false
             options:
                 unsigned: false
                 comment: 'вложение фото'
@@ -58,7 +56,7 @@ IpoetryBundle\Entity\IpoetryPoetry:
             column: poetry_photo_id
         poetryAudioId:
             type: integer
-            nullable: true
+            nullable: false
             options:
                 unsigned: false
                 comment: 'вложение аудио'
@@ -66,7 +64,7 @@ IpoetryBundle\Entity\IpoetryPoetry:
             column: poetry_audio_id
         poetryThemeId:
             type: integer
-            nullable: true
+            nullable: false
             options:
                 unsigned: false
                 comment: 'Тема стихотворения'
@@ -74,25 +72,71 @@ IpoetryBundle\Entity\IpoetryPoetry:
             column: poetry_theme_id
         poetryBackgroundImageId:
             type: integer
-            nullable: true
+            nullable: false
             options:
                 unsigned: false
                 comment: 'фоновая картинка'
                 default: '0'
             column: poetry_background_image_id
+        poetryPoetryRatingId:
+            type: integer
+            nullable: false
+            options:
+                unsigned: false
+                comment: 'рейтинг,лайки стиха'
+                default: '0'
+            column: ipoetry_poetry_rating_id
         poetryIsGift:
             type: boolean
-            nullable: true
+            nullable: false
             options:
                 default: '0'
             column: poetry_is_gift
+        poetryTitle:
+            type: string
+            nullable: false
+            length: 255
+            default: 'undefined'
+            options:
+                fixed: false
+            column: poetry_title
         poetryDescription:
             type: string
-            nullable: true
+            nullable: false
             length: 1024
+            default: 'undefined'
             options:
                 fixed: false
             column: poetry_description
+        poetryBodyText:
+            type: mediumtext
+            nullable: true
+            options:
+                fixed: false
+            column: ipoetry_poetry_body_text
+        poetryResourceExt:
+            type: string
+            nullable: false
+            length: 5
+            default: 'undef'
+            options:
+                fixed: false
+            column: ipoetry_poetry_resource_ext
+        poetryPoetryTags:
+            type: string
+            nullable: true
+            length: 255
+            default: null
+            options:
+                fixed: false
+            column: ipoetry_poetry_tags
+        poetryCreatedAt:
+            type: datetime
+            nullable: false
+            default: '1970-01-01'
+            options:
+                fixed: false
+            column: ipoetry_poetry_created_at           
     manyToMany:
         ipoetryUserUser:
             targetEntity: IpoetryUser
@@ -101,20 +145,64 @@ IpoetryBundle\Entity\IpoetryPoetry:
             mappedBy: null
             inversedBy: ipoetryPoetryPoetry
             joinTable:
-                name: ipoetry_poetry_rating
+                name: ipoetry_user_ipoetry_poetry_relation
                 joinColumns:
                     -
                         name: ipoetry_poetry_poetry_id
                         referencedColumnName: poetry_id
-                    -
-                        name: ipoetry_poetry_poetry_parent_id
-                        referencedColumnName: poetry_parent_id
+
                 inverseJoinColumns:
                     -
                         name: ipoetry_user_user_id
                         referencedColumnName: user_id
-                    -
-                        name: ipoetry_user_user_parent_id
-                        referencedColumnName: user_parent_id
+
             orderBy: null
+        ipoetryTagsTags:
+            targetEntity: IpoetryTags
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: ipoetryPoetryPoetry
+            joinTable:
+                name: ipoetry_poetry_ipoetry_tags_relation
+                joinColumns:
+                    -
+                        name: ipoetry_poetry_poetry_id
+                        referencedColumnName: poetry_id
+
+                inverseJoinColumns:
+                    -
+                        name: ipoetry_tags_tags_id
+                        referencedColumnName: ipoetry_tags_tags_id
+
+            orderBy: null
+    oneToOne:
+        ipoetryPoetryBackgroundImages:
+            targetEntity: IpoetryBackgroundImages
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                poetry_background_image_id:
+                    referencedColumnName: ipoetry_background_images_id
+            orphanRemoval: false
+        ipoetryPoetryRating:
+            targetEntity: IpoetryPoetryRating
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                ipoetry_poetry_rating_id:
+                    referencedColumnName: ipoetry_poetry_rating_id
+            orphanRemoval: false
+    oneToMany:
+        ipoetryUserRepost:
+            targetEntity: PoetryRepostToOwnFeed
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: ipoetryPoetryPoetry
+            inversedBy: null
+            orphanRemoval: false
     lifecycleCallbacks: {  }

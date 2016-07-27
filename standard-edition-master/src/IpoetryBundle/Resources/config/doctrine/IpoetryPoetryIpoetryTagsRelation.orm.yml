@@ -1,13 +1,6 @@
 IpoetryBundle\Entity\IpoetryPoetryIpoetryTagsRelation:
     type: entity
     table: ipoetry_poetry_ipoetry_tags_relation
-    indexes:
-        fk_ipoetry_poetry_tags_relation_ipoetry_tags1_idx:
-            columns:
-                - ipoetry_tags_tags_id
-        fk_ipoetry_poetry_tags_relation_ipoetry_poetry1_idx:
-            columns:
-                - ipoetry_poetry_poetry_id
     id:
         ipoetryPoetryIpoetryTagsRelationId:
             type: integer
@@ -44,6 +37,6 @@ IpoetryBundle\Entity\IpoetryPoetryIpoetryTagsRelation:
             inversedBy: null
             joinColumns:
                 ipoetry_tags_tags_id:
-                    referencedColumnName: tags_id
+                    referencedColumnName: ipoetry_tags_tags_id
             orphanRemoval: false
     lifecycleCallbacks: {  }

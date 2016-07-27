@@ -48,9 +48,13 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\Loader\YamlFileLoader;
+use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Loader\YamlFileLoader;
+use Symfony\Component\Yaml\Yaml;
 
+use IpoetryBundle\Event\CloseUserSessionEvent;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 
@@ -72,23 +76,25 @@ use Doctrine\ORM\Query\ResultSetMapping;
  * абстрактный контроллер для форм логина и регистрации
  */
 abstract class LoggingController extends Controller{
+    public $translator;
     public $config;
     public $encoders=array();
     public $normalizers=array();
     public $serializer;
-    private $session;
+    public $session;
     private $site_config='site_config.xml';
     private $captchabuilder;
     private $option;
-    //put your code here
+    //кеширование запросов БД
+    public $cacheDriver;
+    
     public function loginAction(Request $request){
         $html='';
         $str_tab='';
         $action='';
         $retval=array();
 
-        VarDumper::dump(array('request_locale'=>$request->getLocale()));//'messages_locale'=> 'z:/domains/ipoetry/standard-edition-master/src/IpoetryBundle/Resources/translations/messages.ru.yml'
-        
+        VarDumper::dump(array('request_locale'=>$request->getLocale()));//'messages_locale'=> 'z:/domains/ipoetry/standard-edition-master/src/IpoetryBundle/Resources/translations/messages.ru.yml'        
     }
 
     public function createAction(){
@@ -177,7 +183,462 @@ abstract class LoggingController extends Controller{
             );
         return $option;
     }
+
     public function GetMd5hash($hashstring='5hrtGtdfjy'){
         return md5($hashstring);
     }
+    
+    //читаем данные из сессии о кеше
+    public function GetCache($request){
+        //проверяем что пришло в сессии
+        if ($request->hasSession()) {
+            $this->session=$request->getSession();
+            $this->cacheDriver=$this->session->get('cacheDriver');
+            return 1;
+        if (!isset($this->cacheDriver))
+            $this->cacheDriver = new \Doctrine\Common\Cache\ArrayCache();
+            return 1;
+        } else
+            return 0;
+    }
+    
+    // просмотр отдельного стиха 
+    // заход в эту функцию осуществляется как с роутинга так и с функций контроллера uProfileController
+    public function uNewsFeedEntityAction(Request $request,$poetryowneruser=0,$user,$poetry,$retvaltype='TEMPLATE'){
+        $this->request=$request;
+        $this->GetTranslator($request);
+        //директория для хранения временных файлов
+        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/uploadtmp';        
+        //читаем данные по стихотворению по данным в параметрах url
+        $stmt='';
+        $originalpoetryid=$poetry;
+        //проверяем что пришло в сессии
+        $this->GetCache($request);
+
+        if ($request->hasSession()) {
+
+            VarDumper::dump(array('cache'=>$this->cacheDriver,'$poetryowneruser'=>$poetryowneruser,'user'=>$user,'poetry='=>$poetry));
+
+            $this->session=$request->getSession();
+            //если есть обновленные поля то обновляем их
+            //пишем обновленные данные в базу
+            $unewsfeedentity = $this->getDoctrine()->getManager();
+            if ($this->session->has('login') && $this->session->has('login_id')){
+                //получаем связанные таблицы для показа данных
+                //получаем кол-во записей
+                $userspoetry = $this->getDoctrine()->getEntityManager();
+
+                if (is_string($poetry) && $poetryowneruser<>0){
+                    $query=$userspoetry->createQuery('SELECT COUNT(pr.poetryId),pr.poetryId FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.poetryRepostId=?1')
+                         ->setMaxResults(1);
+                    $query->setParameter(1,$poetry );
+                } else {
+                    $query=$userspoetry->createQuery('SELECT COUNT(ip.poetryId),ip.poetryId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr WHERE usr.userId=?1 and ip.poetryId=?2');// usr usr.userId=?1 and
+                    //если это не стих репост
+                    if ($poetryowneruser<>0)
+                        $query->setParameter(1,$poetryowneruser );//$this->session->has('login_id')
+                    else
+                        $query->setParameter(1,$user );//$this->session->has('login_id')
+
+                    $query->setParameter(2,$poetry );
+                }
+                    
+                //VarDumper::dump(array('sql'=>$query->getSQL()));                
+                $usersubscribedcnt=$query->getResult();
+                VarDumper::dump(array('$usersubscribedcnt'=>$usersubscribedcnt,'$query'=>$query->getDQL()));
+                $poetry=$usersubscribedcnt[0]['poetryId'];
+                //$usersubscribedcnt[0][1];
+                if ($usersubscribedcnt[0][1]==1) {
+                    $result['user']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$user));
+                    //если это не стих репост
+                    if ($poetryowneruser<>0) {
+                        $result['userowner']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$poetryowneruser));
+                        $result['poetryrepost']=$unewsfeedentity->getRepository('IpoetryBundle:PoetryRepostToOwnFeed')->findOneBy(array('userId'=>$user,'poetryId'=>$poetry));
+                        //VarDumper::dump(array('$result[poetryrepost]'=>$result['poetryrepost']));
+                    }
+                    $result['poetry']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetry')->findOneBy(array('poetryId'=>$poetry));
+                    $result['poetrybackgroundimage']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryBackgroundImages')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                    $result['poetryrating']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetryRating')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                } else
+                    throw $this->createNotFoundException('No user or poetry found for login:'.$this->session->get('login'). ' login_id:'.$this->session->get('login_id').' poetry_id:'.$poetry);
+            }
+        }
+        //VarDumper::dump(array('1'=>1));
+        //если не получили данные по пользователю или стихотворению выбрасываем исключение
+        /*
+        if (!$result['user'] || !$result['poetry']) {
+            throw $this->createNotFoundException('No user or poetry found for email:'.$this->session->get('login'));
+        }
+        */
+        //VarDumper::dump(array('$result["user"]'=>$result['user'],'$result["poetry"]'=>$result['poetry'],'$result["poetrybackgroundimage"]'=>$result['poetrybackgroundimage']));
+        $poetryresult['userid']=$user;
+        $poetryresult['poetryowneruserid']=$poetryowneruser;
+        if (!empty($result['poetryrepost']))
+            $poetryresult['reposted']=$result['poetryrepost']->getRepostedAt()->format('Y-m-d H:i:s');
+        else
+            $poetryresult['reposted']='';
+        $poetryresult['title']=$result['poetry']->getPoetryTitle();
+        $poetryresult['created']=$result['poetry']->getPoetryCreatedAt()->format('Y-m-d H:i:s');//->date
+        $poetryresult['body']=$result['poetry']->getPoetryBodyText();//$result['poetry']->getPoetryBody();
+        $poetryresult['comment']=$result['poetry']->getPoetryDescription();//$result['poetry']->getPoetryBody();        
+        $poetryresult['like']=$result['poetryrating']->getIpoetryPoetryRatingValueUp();
+        $poetryresult['dislike']=$result['poetryrating']->getIpoetryPoetryRatingValueDown();
+        if ($retvaltype=='TEMPLATE'){
+            //данные по тегам
+            $poetryresult['tags']=$result['poetry']->getIpoetryTagsTags();
+            //данные по создателю стихотворения
+            $poetryresult['uname']=$result['user']->getUserName();
+            $poetryresult['ulastname']=$result['user']->getUserLastname();
+            $poetryresult['uphotourl']=$result['user']->getUserPhoto()->getUserPhotoUrl();
+        }
+        if ($retvaltype=='JSON') {
+            //$poetryresult['tags']=$result['poetry']->getIpoetryTagsTags();        
+            $poetryresult['tags_only']=array();
+            $poetryresult['poetry_id']=$originalpoetryid;
+            $poetryresult['poetryoriginal_id']=$result['poetry']->getPoetryId();
+            foreach ($result['poetry']->getIpoetryTagsTags() as $poetryresultitem) {
+                //$IpoetryTags=new IpoetryTags();
+                //$IpoetryTags=$poetryresultitem;
+                $poetryresult['tags_only'][]=array('tagid'=>$poetryresultitem->getIpoetryTagsTagsId(),'tagtext'=>$poetryresultitem->getTagsText(),'moderated'=>$poetryresultitem->getModerated());//$IpoetryTags;
+            }
+            $poetryresult['uname']=$result['user']->getUserName();
+            $poetryresult['ulastname']=$result['user']->getUserLastname();
+            $poetryresult['uphotourl']=$result['user']->getUserPhoto()->getUserPhotoUrl();
+            if (!empty($result['userowner'])){
+                $poetryresult['owneruname']=$result['userowner']->getUserName();
+                $poetryresult['ownerulastname']=$result['userowner']->getUserLastname();
+                $poetryresult['owneruphotourl']=$result['userowner']->getUserPhoto()->getUserPhotoUrl();                
+            } else {
+                $poetryresult['owneruname']='';
+                $poetryresult['ownerulastname']='';
+                $poetryresult['owneruphotourl']='';                
+            }
+
+        }
+        //$poetryresult['tags_id']=$result['poetry']->getIpoetryTagsTags()->getIpoetryTagsTagsId();
+        //готовим пути для сохранения бинарных (фото,текста стиха) данных
+        //$rand=rand(1,9999999999);
+        $uploadtmpfile=$uploadtmp.'/poetry_data_'.$poetryowneruser.'_'.$poetry.'.jpeg';
+        $urltmpfile=$this->request->server->get('BASE').'/uploadtmp/poetry_data_'.$poetryowneruser.'_'.$poetry.'.jpeg';
+        //тольков в случае если такого файла нет пишем в него данные из базы
+        if (!file_exists ($uploadtmpfile) && !empty($result['poetrybackgroundimage'])){
+            //Vardumper::dump(array('imgfile'=>'Z:/domains/ipoetry/standard-edition-master/web/uploadtmp/poetry_background'.rand(1,9999999999).'.png','request content'=>$udl));        
+            $fp=fopen($uploadtmpfile, 'w+');
+            $bytes = @fwrite($fp,$result['poetrybackgroundimage']->getIpoetryBackgroundImage());
+            if ($bytes === false || $bytes <= 0)
+                throw new NotFoundHttpException();
+            fclose($fp);
+        }
+        $poetryresult['image']=$urltmpfile;
+        //VarDumper::dump(array('$poetry'=>$poetryresult,'tags'=>$poetryresult['tags_only']));
+        if ($retvaltype=='TEMPLATE') {
+            //получаем данные по пользователю для шапки страницы
+            $userheaderInfo=$this->UserHeaderInfo($request);
+
+            $reposters=$this->GetPoetryReposterPeople($request,$poetryowneruser,$user,$poetry,$retvaltype);
+            VarDumper::dump(array('$reposters'=>$reposters,'$userheaderInfo'=>$userheaderInfo[0]));
+            $comments=$this->AddBlogPosts($request,$poetryowneruser,$poetry,'TEMPLATE');
+            return $this->render('IpoetryBundle:uRoom:poem.html.twig',
+            array('poetry'=>$poetryresult,'CommentsCnt'=>$comments[0],//'CommentsBodies'=>$comments[1],
+                'reposters'=>$reposters,
+                'CommentsHeader'=>$this->translator->trans('Comments',array(),'unewsfeedentity'),
+                'MadeHeader'=>$this->translator->trans('They Made Reposts.',array(),'unewsfeedentity'),
+                'repostbtntext'=>$this->translator->trans('Repost poetry to your feed',array(),'unewsfeedentity'),
+                'userheaderInfo'=>$userheaderInfo[0],
+                'poemcommentslimit'=>$this->getParameter('ipoetry.uprofilecommentslimit')));
+        } else if ($retvaltype=='JSON')
+            return $poetryresult;
+    }
+    //ответ на загруженную фоновую картинку
+    public function FileUploadAjaxAnswer($request,$source){
+        $this->request=$request;
+        //директория для хранения временных файлов
+        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/uploadtmp';
+
+        //тип файла для хранения данных
+        $filetype;
+        switch ($request->headers->get('content-type')){
+            case 'image/png':
+                $filetype='png';
+                break;
+            case 'image/jpeg':
+                $filetype='jpeg';
+                break;
+            case 'image/jpg':
+                $filetype='jpg';
+                break;
+            case 'image/gif':
+                $filetype='gif';
+                break;
+            case 'image/ico':                
+                $filetype='ico';
+                break;
+            case 'text/plain':
+                $filetype='txt';
+                break;                
+            default: $filetype='tmp';
+        } 
+        //путь к временному файлу с картинкой
+        if (strtoupper($source)=='POETRY')
+            $uploadtmpfile=$uploadtmp.'/poetry_data'.rand(1,9999999999).'.'.$filetype;
+        if (strtoupper($source)=='POETRYCOMMENT')
+            $uploadtmpfile=$uploadtmp.'/poetrycomment_data'.rand(1,9999999999).'.'.$filetype;
+        if (strtoupper($source)=='NEWPOETRYCOMMENT')
+            $uploadtmpfile=$uploadtmp.'/newpoetrycomment_data'.rand(1,9999999999).'.'.$filetype;
+                
+        Vardumper::dump(array('request'=>$request,'file'=>$request->files->get('files')[0],'conent type'=>$request->headers->get('content-type')));
+        //$StreamedResponse=new StreamedResponse(null,200,array($request->headers->get('content-disposition'),
+        //    $request->headers->get('content-length'),
+        //    $request->headers->get('content-type')));
+        $udl=$request->getContent(false);
+        //Vardumper::dump(array('imgfile'=>'Z:/domains/ipoetry/standard-edition-master/web/uploadtmp/poetry_background'.rand(1,9999999999).'.png','request content'=>$udl));        
+        $fp=fopen($uploadtmpfile, 'w+');
+        $bytes = @fwrite($fp,$udl);
+        if ($bytes === false || $bytes <= 0)
+            throw new NotFoundHttpException();
+        fclose($fp);
+        /*
+        $StreamedResponse->setCallback(function () use ($udl) {
+           $fp=fopen ($request->get('baseUrl').'/uploadtmp/udl'.rand(1,9999).'.png', 'w+');
+           $bytes = @fwrite($fp);
+            if ($bytes === false || $bytes <= 0)
+                throw new NotFoundHttpException();
+            fclose($fp);
+        });
+         
+         */
+        //Vardumper::dump(array('StreamedResponse'=>$StreamedResponse->getContent()));
+        //подготавливаем данные для записи в базу+картинка если есть
+        //читаем путь файла в сессию
+        if ($request->hasSession()) {
+            $this->session=$request->getSession();
+            if (strtoupper($source)=='POETRY') {
+                if ($filetype=='txt') {
+                    $this->session->set('poetry_body',$uploadtmpfile );
+                }
+                else {
+                    $this->session->set('poetry_background_image',$uploadtmpfile );
+                }
+                $this->session->set('poetry_resource_ext',$filetype );                               
+            }
+            //комментарии пользователей к существующему стиху
+            if (strtoupper($source)=='POETRYCOMMENT') {
+                if ($filetype=='txt') {
+                    $this->session->set('poetrycomment_body',$uploadtmpfile );
+                }
+                $this->session->set('poetrycomment_resource_ext',$filetype );                               
+            }
+            //комментарий автора к новому стиху
+            if (strtoupper($source)=='NEWPOETRYCOMMENT') {
+                if ($filetype=='txt') {
+                    $this->session->set('newpoetrycomment_body',$uploadtmpfile );
+                }
+                $this->session->set('newpoetrycomment_resource_ext',$filetype );                               
+            }
+            if (strtoupper($source)=='USERPROFILE') {
+                $this->session->set('user_profile_image',$uploadtmpfile );
+            }
+        }
+        return 1;
+    }
+    //построение списка комментариев
+    public function AddBlogPosts (Request $request,$user,$poetry,$retvaltype='TEMPLATE'){
+        
+        //вытаскиваем массив JSON с комментариями к стиху
+        //Проверяем есть ли комментарии у данного стихотворения
+        $this->request=$request;
+        //директория для хранения временных файлов
+        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/uploadtmp';
+        //читаем данные по стихотворению по данным в параметрах url
+        $stmt='';
+        //проверяем что пришло в сессии
+        $this->GetCache($request);
+
+        if ($request->hasSession()) {
+
+            //VarDumper::dump(array('cache'=>$this->cacheDriver,'user'=>$user,'poetry='=>$poetry));
+
+            $this->session=$request->getSession();
+            //если есть обновленные поля то обновляем их
+            //пишем обновленные данные в базу
+            //$unewsfeedentity = $this->getDoctrine()->getManager();
+            if ($this->session->has('login') && $this->session->has('login_id')){
+                //получаем связанные таблицы для показа данных
+                //получаем кол-во записей
+                $poetryposts = $this->getDoctrine()->getEntityManager();
+                $query=$poetryposts->createQuery('SELECT COUNT(iub.ipoetryUserBlogPostPoetryId) FROM IpoetryBundle\Entity\IpoetryUserBlogPost iub WHERE iub.ipoetryUserBlogPostPoetryId=?1');// usr usr.userId=?1 and 
+                $query->setParameter(1,$poetry );//$this->session->has('login_id')
+                //VarDumper::dump(array('sql'=>$query->getSQL()));
+                $poetrypostscnt=$query->getResult();
+                //VarDumper::dump(array('$usersubscribedcnt'=>$usersubscribedcnt));
+
+                //$poetrypostscnt[0][1];
+                //Если есть комментарии то вытаскиваем данные по ним
+                if ($poetrypostscnt[0][1]>0) {
+                    $query=$poetryposts->createQuery('SELECT iub.ipoetryUserBlogPostId,iub.ipoetryUserBlogPostParentId,iub.ipoetryUserBlogPostText,ipu.userName,ipu.userLastname,iub.ipoetryUserBlogPostCreatedAt,ipuphoto.userPhotoUrl,iubrat.ipoetryBlogPostRatingValueUp,iubrat.ipoetryBlogPostRatingValueDown FROM IpoetryBundle\Entity\IpoetryUserBlogPost iub JOIN iub.ipoetryUserUser ipu JOIN ipu.userPhoto ipuphoto JOIN iub.ipoetryBlogPostRating iubrat WHERE iub.ipoetryUserBlogPostPoetryId=?1');// usr usr.userId=?1 and 
+                    $query->setParameter(1,$poetry );//$this->session->has('login_id')
+                    //VarDumper::dump(array('sql'=>$query->getSQL()));
+                    $poetryposts=$query->getResult();
+                    VarDumper::dump(array('poetryposts'=>$poetryposts,'$poetry'=>$poetry));
+
+                    return array($poetrypostscnt[0][1],$poetryposts);
+                    //$result['user']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$user));
+                    //$result['poetry']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetry')->findOneBy(array('poetryId'=>$poetry));
+                    //$result['poetrybackgroundimage']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryBackgroundImages')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                    //$result['poetryrating']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetryRating')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                } else
+                    return 0;//throw $this->createNotFoundException('No user or poetry found for login:'.$this->session->get('login'));
+            }
+        }
+        
+    }
+    //AJAX ответ закрытие сессии пользователя
+    public function setUserSessionClosedAjaxAnswer($authorization_parameters,$request){
+        if ($request->hasSession()) {
+            //закрываем выход из сессии пользователя
+            $inactivity=getdate($this->session->getMetadataBag()->getLastUsed()-$this->session->getMetadataBag()->getCreated());
+            VarDumper::dump( array('lastupdated'=>$this->session->getMetadataBag()->getLastUsed(),'inactivity'=>$this->session->getMetadataBag()->getCreated(),'inactivity_min'=>$inactivity['minutes']) );
+            $this->session->invalidate();
+             //$eventDispatcher = $this->get('event_dispatcher');
+            //$customusercloseevent=new CloseUserSessionEvent();
+            //$customusercloseevent->setCode('CLOSEUSERSESSION');
+            //$eventDispatcher->dispatch('custom.event.CLOSEUSERSESSION',$customusercloseevent);
+            return 1;
+        } else
+            return 0;
+    }
+    //выводим в шаблоне unewsfeedentity
+    //раздел "Сделали репост"
+    public function GetPoetryReposterPeople($request,$poetryowneruser=0,$user,$poetry,$retvaltype='TEMPLATE'){
+        $unewsfeedentity = $this->getDoctrine()->getManager();
+        //получаем связанные таблицы для показа данных
+        //получаем кол-во записей
+        $userspoetry = $this->getDoctrine()->getEntityManager();
+
+        if ($poetryowneruser==0){
+            $query=$userspoetry->createQuery('SELECT COUNT(DISTINCT pr.userId) FROM IpoetryBundle\Entity\PoetryRepostToOwnFeed pr WHERE pr.poetryId=?1');
+                //пока убираем лимит на вывод 
+                // ->setMaxResults(20);
+            $query->setParameter(1,$poetry );
+        }
+        $usersubscribedcnt=$query->getResult();
+        //если есть подписчики у стиха то формируем их вывод
+        if ($usersubscribedcnt[0][1]>0){
+            //выбираем данные по пользователям подписантам на стих
+            $query=$userspoetry->createQuery('SELECT usr.userId,usr.userName,usr.userLastname,usrphoto.userPhotoUrl,CONCAT(\''.$this->getParameter('ipoetry.UserProfileUrl').'\',usr.userId) AS reposterurl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto WHERE usr.userId IN (SELECT DISTINCT pr.userId FROM IpoetryBundle\Entity\PoetryRepostToOwnFeed pr WHERE pr.poetryId=?1 ORDER BY pr.repostedAt DESC)');
+                //пока убираем лимит на вывод 
+                // ->setMaxResults(20);
+            $query->setParameter(1,$poetry );
+        }
+        $usersubscribed=$query->getResult();
+        if (isset($usersubscribed[0][1])){
+            if ($usersubscribed[0][1]==0){
+                unset($usersubscribed);
+                $usersubscribed[0]=array('userId'=>'','userName'=>'','userLastname'=>'','userPhotoUrl'=>'','reposterurl'=>'');                
+            }
+        }
+        return $usersubscribed;
+    }
+    //подключаем транслятор для шаблонов
+    public function GetTranslator(Request $request){
+        $this->translator = new Translator($this->request->getLocale(), new MessageSelector());
+        $this->translator->addLoader('yaml',new YamlFileLoader());
+        $this->translator->addResource('yaml',$this->request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations/unewsfeedentity.ru.yml', 'ru_RU','unewsfeedentity');
+        $this->translator->addResource('yaml',$this->request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations/users.ru.yml', 'ru_RU','users');
+        //VarDumper::dump(array($this->translator,$this->translator->trans('Comments',array(),'unewsfeedentity')));
+    }
+
+    //AJAX проверяем что пользователь является владельцем профиля
+    public function GetUserOwnprofileAjaxAnswer($authorization_parameters,$session){
+        if ($session->hasSession()) {
+            $session=$session->getSession();
+        }
+        return $this->urlsession($authorization_parameters,$session);
+    }
+
+    public function PoetryRepostAllowed($authorization_parameters,$session){
+        //VarDumper::dump(array('$session->hasSession()'=>$session->hasSession()));
+        if ($session->hasSession()) {
+            $session=$session->getSession();
+        }
+        return $this->urlsession($authorization_parameters,$session);
+    }
+    
+    public function urlsession($authorization_parameters,$session){
+        //проверяем что пришло в сессии
+        //$this->GetCache($session);
+        varDumper::dump(array('$authorization_parameters["user"]'=>$authorization_parameters['user'],'session'=>$session->get('login_id'),'has login_id'=>$session->has('login_id')));
+        if ($session->has('login_id')){
+            if ($authorization_parameters['user']==$session->get('login_id') )
+                return 1;
+            else
+                return 0;                
+        } else
+            return 0;
+
+    }
+    //функция выборки данных по пользователю в шапку страницы
+    public function UserHeaderInfo($request) {
+        if ($request->hasSession()) {
+
+            $this->session=$request->getSession();
+
+            if ($this->session->has('login') && $this->session->has('login_id')) {
+                //проверяем что пришло в сессии
+                $this->GetCache($request);
+
+                $usersfeed = $this->getDoctrine()->getEntityManager();
+                //проверяем существование пользователя
+                $query=$usersfeed->createQuery('SELECT COUNT(usr.userId) FROM IpoetryBundle\Entity\IpoetryUser usr WHERE usr.userId=?1');
+                $query->setParameter(1,$this->session->get('login_id'));
+
+                $usersfeedcnt=$query->getResult();
+
+                //вытаскиваем пользователя
+                if ($usersfeedcnt[0][1]>0){
+                $query=$usersfeed->createQuery('SELECT DISTINCT usr.userId,usr.userName,usr.userLastname,usrphoto.userPhotoUrl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto WHERE usr.userId=?1');
+                $query->setParameter(1,$this->session->get('login_id'));
+                $user=$query->getResult();
+                return $user;                
+                } else {
+                    return array(0=>array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined'));
+                }
+            } else
+                return array(0=>array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined'));
+        } else {
+            return array(0=>array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined'));
+        }
+
+    }
+    //функция выборки данных по пользователю из url страницы
+    public function UserURLInfo($request,$user=null) {
+            if (!empty($user)) {
+                //проверяем что пришло в сессии
+                $this->GetCache($request);
+
+                $usersfeed = $this->getDoctrine()->getEntityManager();
+                //проверяем существование пользователя
+                $query=$usersfeed->createQuery('SELECT COUNT(usr.userId) FROM IpoetryBundle\Entity\IpoetryUser usr WHERE usr.userId=?1');
+                $query->setParameter(1,$user);
+
+                $usersfeedcnt=$query->getResult();
+
+                //вытаскиваем пользователя
+                if ($usersfeedcnt[0][1]>0){
+                    $query=$usersfeed->createQuery('SELECT DISTINCT usr.userId,usr.userName,usr.userLastname,usrphoto.userPhotoUrl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto WHERE usr.userId=?1');
+                    $query->setParameter(1,$user);
+                    $user=$query->getResult();
+                    return $user;                
+                } else {
+                    return array(0=>array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined'));
+                }
+            } else
+                return array(0=>array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined'));
+    }
+    public function array_datetime_fomatter(&$item, $key,$keyname)
+    {
+        if ($key==$keyname)
+            $item->format('Y-m-d H:i:s');
+    }
+
 }

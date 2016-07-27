@@ -1,13 +1,6 @@
 IpoetryBundle\Entity\IpoetryUserBlogPostIpoetryUserRelation:
     type: entity
     table: ipoetry_user_blog_post_ipoetry_user_relation
-    indexes:
-        fk_ipoetry_user_has_ipoetry_user_blog_post_ipoetry_user_blo_idx:
-            columns:
-                - ipoetry_user_blog_post_ipoetry_user_blog_post_id
-        fk_ipoetry_user_has_ipoetry_user_blog_post_ipoetry_user1_idx:
-            columns:
-                - ipoetry_user_user_id
     id:
         ipoetryUserBlogPostIpoetryUserId:
             type: integer

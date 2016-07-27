@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * IpoetryUserBlogPostIpoetryUserRelation
  *
- * @ORM\Table(name="ipoetry_user_blog_post_ipoetry_user_relation", indexes={@ORM\Index(name="fk_ipoetry_user_has_ipoetry_user_blog_post_ipoetry_user_blo_idx", columns={"ipoetry_user_blog_post_ipoetry_user_blog_post_id"}), @ORM\Index(name="fk_ipoetry_user_has_ipoetry_user_blog_post_ipoetry_user1_idx", columns={"ipoetry_user_user_id"})})
+ * @ORM\Table(name="ipoetry_user_blog_post_ipoetry_user_relation")
  * @ORM\Entity
  */
 class IpoetryUserBlogPostIpoetryUserRelation
@@ -17,7 +17,7 @@ class IpoetryUserBlogPostIpoetryUserRelation
      *
      * @ORM\Column(name="ipoetry_user_blog_post_ipoetry_user_id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $ipoetryUserBlogPostIpoetryUserId;
 

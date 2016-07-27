@@ -137,23 +137,20 @@ function Dimension () {
 	}
 }
 
-function gotopage(Page){
-	switch (Page)
-	{
-	case 0:
-		window.location.href = "http://"+location.host+"/index.php";
-		break;
-	case 1:
-		window.location.href = "http://"+location.host+"/news.php";
-		break;
-	case 2:
-		window.location.href = "http://"+location.host+"/rentrules.php";
-		break;
-	case 3:
-		window.location.href = "http://"+location.host+"/cars.php";
-		break;
-    case 4:
-		window.location.href = "http://"+location.host+"/contact.php";
-		break;
-	};
+function ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror){
+
+    $.ajax({
+    url: url,
+    type: type,
+    data: ajaxdata,
+    //HTTP='login='+$('#login_login').val()+'&password='+$('#login_password').val()
+    //JSON='{"login":"'+$('#login_login').val()+'","password":"'+$('#login_password').val()+'"}'
+    dataType: dataType,
+    beforeSend: function() {},
+    complete: function() {},
+    success: onsuccess,
+    error: onerror
+    });
+
 }
+//

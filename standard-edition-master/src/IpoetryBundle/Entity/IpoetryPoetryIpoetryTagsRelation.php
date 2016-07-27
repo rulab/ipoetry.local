@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * IpoetryPoetryIpoetryTagsRelation
  *
- * @ORM\Table(name="ipoetry_poetry_ipoetry_tags_relation", indexes={@ORM\Index(name="fk_ipoetry_poetry_tags_relation_ipoetry_tags1_idx", columns={"ipoetry_tags_tags_id"}), @ORM\Index(name="fk_ipoetry_poetry_tags_relation_ipoetry_poetry1_idx", columns={"ipoetry_poetry_poetry_id"})})
+ * @ORM\Table(name="ipoetry_poetry_ipoetry_tags_relation")
  * @ORM\Entity
  */
 class IpoetryPoetryIpoetryTagsRelation
@@ -43,7 +43,7 @@ class IpoetryPoetryIpoetryTagsRelation
      *
      * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryTags")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="ipoetry_tags_tags_id", referencedColumnName="tags_id")
+     *   @ORM\JoinColumn(name="ipoetry_tags_tags_id", referencedColumnName="ipoetry_tags_tags_id")
      * })
      */
     private $ipoetryTagsTags;
