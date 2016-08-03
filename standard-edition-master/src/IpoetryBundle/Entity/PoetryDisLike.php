@@ -21,6 +21,15 @@ class PoetryDisLike {
     /**
      * @var integer
      *
+     * @ORM\Column(name="dislike_id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $dislikeId;
+
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="user_id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -33,6 +42,30 @@ class PoetryDisLike {
      * @ORM\Column(name="poetry_id", type="integer", nullable=false)
      */
     private $poetryId;
+
+    /**
+     * Set userId
+     *
+     * @param integer $userId
+     *
+     * @return PoetryLike
+     */
+    public function setDislikeId($dislikeId)
+    {
+        $this->dislikeId = $dislikeId;
+
+        return $this;
+    }
+    
+    /**
+     * Get dislikeId
+     *
+     * @return integer
+     */
+    public function getDislikeId()
+    {
+        return $this->dislikeId;
+    }    
 
     /**
      * Set userId

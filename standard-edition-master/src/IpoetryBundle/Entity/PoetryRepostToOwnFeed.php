@@ -10,10 +10,11 @@ use Doctrine\ORM\Mapping as ORM;
  * @author d.krasavin
  * 
  * @ORM\Table(name="poetryrepost")
+ * @ORM\Entity(repositoryClass="IpoetryBundle\Entity\Repository\PoetryRepostToOwnFeedRepository")
  */
 class PoetryRepostToOwnFeed {
     /**
-     * @var integer
+     * @var string
      *
      * @ORM\Column(name="poetryrepost_id", type="string", nullable=false)
      * @ORM\Id
@@ -50,7 +51,7 @@ class PoetryRepostToOwnFeed {
     /**
      * Set poetryRepostId
      *
-     * @param integer $poetryRepostId
+     * @param string $poetryRepostId
      *
      * @return PoetryRepostToOwnFeed
      */
@@ -62,17 +63,13 @@ class PoetryRepostToOwnFeed {
     }
 
     /**
-     * Set poetryRepostId
-     *
-     * @param integer $poetryRepostId
+     * Get poetryRepostId
      *
      * @return PoetryRepostToOwnFeed
      */
-    public function getPoetryRepostId($poetryRepostId)
+    public function getPoetryRepostId()
     {
-        $this->poetryRepostId = $poetryRepostId;
-
-        return $this;
+        return $this->poetryRepostId;
     }
 
     /**

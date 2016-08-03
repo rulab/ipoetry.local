@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="ipoetry_poetry_rating")
  * @ORM\Entity
+ * @ORM\Entity(repositoryClass="IpoetryBundle\Entity\Repository\IpoetryPoetryRatingRepository")
  */
 class IpoetryPoetryRating {
 

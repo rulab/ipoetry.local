@@ -127,8 +127,8 @@ usersApp.controller('UsersController', function($scope,$http) {
     }
 */
     $scope.addCities = function(){
-                
-            $http.post($scope.ajaxurls,{type:"get_cities"}).success(function(response)
+            config={cache:true};
+            $http.post($scope.ajaxurls,{type:"get_cities"},config).success(function(response)
             {
                 if (response.result == 1)
                 {

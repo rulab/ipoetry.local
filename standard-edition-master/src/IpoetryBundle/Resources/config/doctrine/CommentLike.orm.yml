@@ -1,6 +1,7 @@
 IpoetryBundle\Entity\CommentLike:
     type: entity
     table: commentlike
+    repositoryClass: IpoetryBundle\Entity\Repository\CommentLikeRepository
     id:
         likeId:
             type: integer

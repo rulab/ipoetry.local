@@ -42,6 +42,19 @@ class CommentDisLike {
     private $commentId;
 
     /**
+     * Set userId
+     *
+     * @param integer $userId
+     *
+     * @return PoetryLike
+     */
+    public function setDislikeId($dislikeId)
+    {
+        $this->dislikeId = $dislikeId;
+
+        return $this;
+    }
+    /**
      * Get dislikeId
      *
      * @return integer
@@ -49,7 +62,7 @@ class CommentDisLike {
     public function getDislikeId()
     {
         return $this->dislikeId;
-    }    
+    }
     /**
      * Set userId
      *

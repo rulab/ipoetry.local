@@ -58,7 +58,6 @@ poemApp.controller('PoemCommentsController', function($scope,$http) {
             {
                     if (response.result >= 1)
                     {
-                        //если собственная страница пользователя сессии то делаем кнопки "убрать из подписчиков" неактивными
                         console.log(response.commentslist);
                         $scope.comments_part_count = response.commentslist.length;
                         //заполняем элементы данными
@@ -70,42 +69,54 @@ poemApp.controller('PoemCommentsController', function($scope,$http) {
                     }
                     else
                     {
-                        //$('#getusersblockbtn').fadeOut();
+                        $('#getcommentsblockbtn').fadeOut();
                         // $scope.loginError = response.error;
                     }
             });
     };
     //еще комметарии
     $scope.moreComments = function(){
-            console.log($scope.ajaxurls+' '+$scope.page+' '+$scope.userid+' '+$scope.poemid+' '+$scope.elements_on_page);  
-            $http.post($scope.ajaxurls,{type:"get_poetry_comments_info",user:$scope.userid,poetry:$scope.poemid,'datapart':$scope.page,}).success(function(response)
-            {
-                    if (response.result == 1)
-                    {
-                        //если собственная страница пользователя сессии то делаем кнопки "убрать из подписчиков" неактивными
-                        console.log(response.userslist+' '+response.ownuser);
-                        $scope.comments_part_count = response.comments.length;
-                        //заполняем элементы данными
-                        $scope.comments_count=response.commentscount;
-                        $scope.comments=response.comments;
-                        console.log($scope.comments);
-                    }
-                    else
-                    {
-                        //$('#getusersblockbtn').fadeOut();
-                        // $scope.loginError = response.error;
-                    }
-            });
-
+        console.log($scope.ajaxurls+' '+$scope.page+' '+$scope.userid+' '+$scope.poemid+' '+$scope.elements_on_page);  
+        $http.post($scope.ajaxurls,{type:"get_poetry_comments_info",user:$scope.userid,poetry:$scope.poemid,'datapart':$scope.page,}).success(function(response)
+        {
+                if (response.result >= 1)
+                {
+                    console.log(response.commentslist);
+                    $scope.comments_part_count = response.commentslist.length;
+                    //заполняем элементы данными
+                    $scope.comments_count=response.commentscount;
+                    $scope.comments=$scope.comments.concat(response.commentslist);
+                    $scope.page++;
+                    //$scope.$apply();
+                }
+                else
+                {
+                    $('#getcommentsblockbtn').fadeOut();
+                    // $scope.loginError = response.error;
+                }
+        });
     };
     $scope.Likefunc=function(commentid,option){
-        console.log(option,commentid.currentTarget.getAttribute("commentid"));
+        //console.log(option,commentid.currentTarget.getAttribute("commentid"));
 
         var oReq = new XMLHttpRequest();
         oReq.onreadystatechange = function() {
             if (oReq.readyState == 4 && oReq.status == 200) {
                 response=JSON.parse(oReq.response);
-                console.log(response.result+'sendLike|Dislike done');
+                console.log(response.commentlike+' '+response.commentdislike+' sendLike|Dislike done');
+                //$scope.like=response.commentlike;
+                //$scope.dislike=response.commentdislike;
+                if (typeof response.commentlike!== 'undefined' && typeof response.commentdislike!== 'undefined') {
+                    for(i=0;i<$scope.comments.length;i++){
+                        //console.log($scope.comments[i].ipoetryUserBlogPostId,commentid.currentTarget.getAttribute("commentid"))
+                        if ($scope.comments[i].ipoetryUserBlogPostId===Number(commentid.currentTarget.getAttribute("commentid"))){
+                            $scope.comments[i].ipoetryBlogPostRatingValueUp=response.commentlike;
+                            $scope.comments[i].ipoetryBlogPostRatingValueDown=response.commentdislike;
+                        }
+                    };
+                    $scope.$apply();
+                    //console.log($scope.comments[i],$scope.comments.length);
+                }
             }
         };
         //шлем доппараметры как json
@@ -116,12 +127,43 @@ poemApp.controller('PoemCommentsController', function($scope,$http) {
         oReq.send(JSON.stringify({type:"commentlikerequest", poetry:$scope.poemid,user:$scope.userid,commentid:commentid.currentTarget.getAttribute("commentid"),updown:option}));
 
     };
+    $scope.AddComment=function(){
+        var oReq = new XMLHttpRequest();
+        oReq.onreadystatechange = function() {
+            //console.log(JSON.parse(oReq.responseText));
+            if (oReq.readyState == 4 && oReq.status == 200) {
+                response=JSON.parse(oReq.response);
+                if (response.result===1){
+                    oReq.onreadystatechange = function() {
+                        //console.log(JSON.parse(oReq.responseText));
+                        if (oReq.readyState == 4 && oReq.status == 200) {
+                            response=JSON.parse(oReq.response);
+                            console.log(response);
+                            $scope.comments=$scope.comments.concat(response.commentslist);
+                            $scope.$apply();
+                        }
+                    }
+                    //шлем доппараметры как json
+                    //отправляем доп инфо по стихотворению
+                    oReq.open("POST", $scope.ajaxurls,true);
+                    oReq.setRequestHeader("Content-Type", "application/json");
+                    console.log("login_json="+JSON.stringify({type:"add_poetry_comment",poetry:$scope.poemid,user:$scope.userid}));
+                    oReq.send(JSON.stringify({type:"add_poetry_comment",poetry:$scope.poemid,user:$scope.userid}));                    
+                }
+            }
+        };
+        //console.log($('#UserPoetryCreation_poetry').val());
+        //шлем blob тест комментария
+        oReq.open("POST", $scope.ajaxurls, true);
+        var blob = new Blob([$('#CommentText').val()], {type: 'text/plain'});
+        console.log(blob);
+        oReq.setRequestHeader("Content-Type", "text/plain");
+        oReq.send(blob);
+        //return 1;
+    };
     //функция наблюдения
     $scope.$watch(function($scope){
 
     },true);
 
 });
-
-
-

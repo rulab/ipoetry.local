@@ -2,14 +2,21 @@ IpoetryBundle\Entity\PoetryDisLike:
     type: entity
     table: poetrydislike
     id:
+        dislikeId:
+            type: integer
+            nullable: false
+            strategy: IDENTITY
+            options:
+                unsigned: false
+            id: true
+            column: dislike_id
+    fields:
         userId:
             type: integer
             nullable: false
             options:
                 unsigned: false
-            id: true
             column: user_id
-    fields:
         poetryId:
             type: integer
             nullable: false

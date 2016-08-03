@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
  * IpoetryPoetryRating
  *
  * @ORM\Table(name="ipoetry_blogpost_rating")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="IpoetryBundle\Entity\Repository\IpoetryBlogPostRatingRepository")
  */
 class IpoetryBlogPostRating {
 

@@ -1,6 +1,7 @@
 IpoetryBundle\Entity\IpoetryBlogPostRating:
     type: entity
     table: ipoetry_blogpost_rating
+    repositoryClass: IpoetryBundle\Entity\Repository\IpoetryBlogPostRatingRepository
     id:
         ipoetryBlogPostRatingId:
             type: integer

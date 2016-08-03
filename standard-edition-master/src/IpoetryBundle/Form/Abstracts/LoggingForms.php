@@ -135,5 +135,12 @@ abstract class LoggingForms extends AbstractType{
             );
         return $option;
     }
-
+    public function getTranslatorPath($request){
+        if ($request->server->get('SERVER_NAME')==='ipoetry.local')
+            return $request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations';
+        else if ($request->server->get('SERVER_NAME')==='www.ipoetry.ru' || $request->server->get('SERVER_NAME')==='ipoetry.ru')
+            return '/var/www/ipoetryadm/data/www/ipoetry.ru/standard-edition-master/src/IpoetryBundle/Resources/translations';
+        else
+            return $request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations';         
+    }
 }

@@ -343,6 +343,7 @@ abstract class LoggingController extends Controller{
                 'reposters'=>$reposters,
                 'CommentsHeader'=>$this->translator->trans('Comments',array(),'unewsfeedentity'),
                 'MadeHeader'=>$this->translator->trans('They Made Reposts.',array(),'unewsfeedentity'),
+                'More comments'=>$this->translator->trans('More comments',array(),'unewsfeedentity'),
                 'repostbtntext'=>$this->translator->trans('Repost poetry to your feed',array(),'unewsfeedentity'),
                 'userheaderInfo'=>$userheaderInfo[0],
                 'poemcommentslimit'=>$this->getParameter('ipoetry.uprofilecommentslimit')));
@@ -543,8 +544,8 @@ abstract class LoggingController extends Controller{
     public function GetTranslator(Request $request){
         $this->translator = new Translator($this->request->getLocale(), new MessageSelector());
         $this->translator->addLoader('yaml',new YamlFileLoader());
-        $this->translator->addResource('yaml',$this->request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations/unewsfeedentity.ru.yml', 'ru_RU','unewsfeedentity');
-        $this->translator->addResource('yaml',$this->request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations/users.ru.yml', 'ru_RU','users');
+        $this->translator->addResource('yaml',$this->getTranslatorPath($this->request).'/unewsfeedentity.ru.yml', 'ru_RU','unewsfeedentity');
+        $this->translator->addResource('yaml',$this->getTranslatorPath($this->request).'/users.ru.yml', 'ru_RU','users');
         //VarDumper::dump(array($this->translator,$this->translator->trans('Comments',array(),'unewsfeedentity')));
     }
 
@@ -640,5 +641,13 @@ abstract class LoggingController extends Controller{
         if ($key==$keyname)
             $item->format('Y-m-d H:i:s');
     }
-
+    public function getTranslatorPath($request){
+        if ($request->server->get('SERVER_NAME')==='ipoetry.local')
+            return $request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations';
+        else if ($request->server->get('SERVER_NAME')==='www.ipoetry.ru' || $request->server->get('SERVER_NAME')==='ipoetry.ru')
+            return '/var/www/ipoetryadm/data/www/ipoetry.ru/standard-edition-master/src/IpoetryBundle/Resources/translations';
+        else
+            return $request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations';
+    }
+   
 }

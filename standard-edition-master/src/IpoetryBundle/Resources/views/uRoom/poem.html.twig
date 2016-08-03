@@ -178,7 +178,11 @@
                                         </div>
                                     </div>
                                 {#{% endfor %}#}
+                                <div style="clear:both;"></div>
 
+                                <button id="getcommentsblockbtn" type="submit" class="btn-blue-bg" ng-click="moreComments()" style="left: 70px;position: relative;">
+                                                    <span>{% trans %}%More comments%{% endtrans %}</span>
+                                </button>
 				<div class="get-your-comment clearfix">
 					<form>
 						<div class="comment-item-img-wrap">
@@ -186,7 +190,7 @@
 						</div>
 						<div class="comments-item-text-wrap">
 							<textarea id="CommentText" cols="70" rows="5" placeholder="Оставьте ваш комментарий"></textarea>
-							<button type="button" id="PoetryAddCommentbtn" class="btn-blue-bg">Отправить</button>
+							<button type="button" id="PoetryAddCommentbtn" class="btn-blue-bg" ng-click="AddComment();">Отправить</button>
 						</div>
 					</form>
 				</div>
@@ -198,8 +202,8 @@
 	</div>    
 
 </div>    
-
-        <h2 id="commentsheader">{{CommentsHeader}}</h2>
+<!--
+        <h2 id="commentsheader">{#{{CommentsHeader}}#}</h2>
             <div style="clear:both;"></div>
             <button id="getusercommentsbtn" type="submit" class="btn btn-primary start">
                 <i class="glyphicon glyphicon-upload"></i>
@@ -211,6 +215,11 @@
             <textarea id="CommentText" cols="70" rows="5" style="display:block;"></textarea>
             <button type="button" id="PoetryAddCommentbtn" class="btn btn-sm btn-primary" style="display:inline;">Отправить</button>
             </div>
+-->
+
+    <input id="datapartnum" type="hidden" value="1"/>
+<!-- Подвал -->
+        {{ include('IpoetryBundle::basefooter.html.twig') }}
 {% endblock %}
 {% block javascripts %}
 {% javascripts '@IpoetryBundle/Resources/public/js/jquery-1.11.0.min.js'
@@ -264,7 +273,7 @@
         dataType='json';
         onsuccess=function(json) {
             console.log(json['result']);
-            if (json['result']>0) {
+            if (json['result']===1) {
                 console.log('AJAX_PoetryRepostToOwnFeed result='+json['result']);
             }
         };
@@ -285,7 +294,8 @@
         dataType='json';
         onsuccess=function(json) {
             console.log(json['result']);
-            if (json['result']>0) {
+            //если 1 то скррываем кнопку репоста, т.к. пользователь владелец стиха
+            if (json['result']===1) {
                 $('#PoetryRepostbtn').fadeOut();
             } else {
                 console.log('AJAX_PoetryRepostAllowed result='+json['result']);
@@ -307,9 +317,11 @@
         dataType='json';
         onsuccess=function(json) {
             console.log(json['result']);
-            if (json['result']>0) {
-                console.log('AJAX_PoetryLike result='+json['result']);
-            }
+            //if (json['result']===1) {
+                $('#Poetrylikebtn').text(json['poetrylike']);
+                $('#Poetrydislikebtn').text(json['poetrydislike']);
+                //console.log('AJAX_PoetryLike result='+json['result']);
+            //}
         };
         onerror=function(jqXHR, textStatus, errorThrown) {
             console.log('error AJAX_PoetryLike result ' + textStatus);
@@ -321,6 +333,7 @@
         {% block documentReady %}
             PoetryRepostAllowed();
             //комментарий к стиху
+            /*
             $('#PoetryAddCommentbtn').on('click',function () {
                 var oReq = new XMLHttpRequest();
                 oReq.onreadystatechange = function() {
@@ -330,7 +343,7 @@
                 };
                 //console.log($('#UserPoetryCreation_poetry').val());
                 //шлем blob тест комментария
-                oReq.open("POST", "{{ path('IpoetryBundle_unewsfeedentityajax') }}", false);
+                oReq.open("POST", "{#{{ path('IpoetryBundle_unewsfeedentityajax') }}#}", false);
                 var blob = new Blob([$('#CommentText').val()], {type: 'text/plain'});
                 console.log(blob);
                 oReq.setRequestHeader("Content-Type", "text/plain");
@@ -338,13 +351,14 @@
                 //return 1;
                 //шлем доппараметры как json
                 //отправляем доп инфо по стихотворению
-                oReq.open("POST", "{{ path('IpoetryBundle_unewsfeedentityajax') }}",true);
+                oReq.open("POST", "{#{{ path('IpoetryBundle_unewsfeedentityajax') }}#}",true);
                 oReq.setRequestHeader("Content-Type", "application/json");
-                console.log("login_json="+JSON.stringify({type:"add_poetry_comment", poetry:"{{app.request.attributes.get('_route_params')['poetry']}}",user:"{{app.request.attributes.get('_route_params')['user']}}"}));
-                //"login_json={type:"add_poetry_comment", poetry:"{{app.request.attributes.get('_route_params')['poetry']}}",user:"{{app.request.attributes.get('_route_params')['user']}}"}'
-                //JSON.stringify({type:"add_poetry_comment", poetry:"{{app.request.attributes.get('_route_params')['poetry']}}",user:"{{app.request.attributes.get('_route_params')['user']}}"})
-                oReq.send(JSON.stringify({type:"add_poetry_comment", poetry:"{{app.request.attributes.get('_route_params')['poetry']}}",user:"{{app.request.attributes.get('_route_params')['user']}}"}));
+                console.log("login_json="+JSON.stringify({type:"add_poetry_comment", poetry:"{#{{app.request.attributes.get('_route_params')['poetry']}}#}",user:"{#{{app.request.attributes.get('_route_params')['user']}}#}"}));
+                //"login_json={type:"add_poetry_comment", poetry:"{#{{app.request.attributes.get('_route_params')['poetry']}}#}",user:"{#{{app.request.attributes.get('_route_params')['user']}}#}"}'
+                //JSON.stringify({type:"add_poetry_comment", poetry:"{#{{app.request.attributes.get('_route_params')['poetry']}}#}",user:"{#{{app.request.attributes.get('_route_params')['user']}}#}"})
+                oReq.send(JSON.stringify({type:"add_poetry_comment", poetry:"{#{{app.request.attributes.get('_route_params')['poetry']}}#}",user:"{#{{app.request.attributes.get('_route_params')['user']}}#}"}));
             });
+                */
             //комментарий к комментарию
             $('a[name="PoetryAddCommentCommentbtn"]').each(function (index){
                 $(this).on('click',function (event) {

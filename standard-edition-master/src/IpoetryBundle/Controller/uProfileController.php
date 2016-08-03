@@ -96,7 +96,11 @@ class uProfileController extends LoggingController {
     private $sql_array=array('add_ipoetry_user_post'=>'CALL add_ipoetry_user_post(:ipoetry_user_email,:ipoetry_user_post_title,:ipoetry_user_post,:ipoetry_user_post_text,:ipoetry_user_post_image,:ipoetry_user_post_ext,:ipoetry_user_post_tags,:ipoetry_user_post_tags_text,:ipoetry_comment)',
                             'add_ipoetry_user_follower'=>'CALL add_ipoetry_user_follower(:ipoetry_user_login,:ipoetry_user_follower)',
                             'del_ipoetry_user_follower'=>'CALL del_ipoetry_user_follower(:ipoetry_user_login,:ipoetry_user_follower)',
-                            'add_ipoetry_user_comment'=>'CALL add_ipoetry_user_comment(:ipoetry_user_id,:ipoetry_user_comment_text,:ipoetry_user_comment_ext,:ipoetry_poetry_id,:ipoetry_comment_parent_id)');
+                            'add_ipoetry_user_comment'=>'CALL add_ipoetry_user_comment(:ipoetry_user_id,:ipoetry_user_comment_text,:ipoetry_user_comment_ext,:ipoetry_poetry_id,:ipoetry_comment_parent_id)',
+                            'add_ipoetry_poem_comment_like'=>'CALL add_ipoetry_poem_comment_like(:ipoetry_user_id,:ipoetry_poem_id,\'UP\')',
+                            'add_ipoetry_poem_comment_dislike'=>'CALL add_ipoetry_poem_comment_like(:ipoetry_user_id,:ipoetry_poem_id,\'DOWN\')',
+                            'add_ipoetry_poetry_like'=>'CALL add_ipoetry_poetry_like(:ipoetry_user_id,:ipoetry_poetry_id,\'UP\')',
+                            'add_ipoetry_poetry_dislike'=>'CALL add_ipoetry_poetry_like(:ipoetry_user_id,:ipoetry_poetry_id,\'DOWN\')');
 
     public function uProfileAction (Request $request){
         $options=array();
@@ -128,7 +132,7 @@ class uProfileController extends LoggingController {
         $userheaderInfo=$this->UserHeaderInfo($request);
         $translator = new Translator($request->getLocale(), new MessageSelector());
         $translator->addLoader('yaml',new YamlFileLoader());
-        $translator->addResource('yaml',$request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations/poetrycreation.ru.yml', 'ru_RU','poetrycreation');
+        $translator->addResource('yaml',$this->getTranslatorPath($request).'/poetrycreation.ru.yml', 'ru_RU','poetrycreation');
 
         /*
         $upload_handler = new UploadHandler(array(
@@ -142,13 +146,12 @@ class uProfileController extends LoggingController {
         for ($i=0;$i<count($result['tagsselect']);$i++){
             $options['data'][$result['tagsselect'][$i]->getIpoetryTagsTagsId()]=$result['tagsselect'][$i]->getTagsText();//array($key,$value->get('tagstext'));
         }
-        VarDumper::dump(array($options,count($result['tagsselect'])));
+        VarDumper::dump(array($request->server->get('DOCUMENT_ROOT'),$translator,$options,count($result['tagsselect'])));
         //выводим форму
         $IpoetryUserBlogPost=new IpoetryUserBlogPost();
         $UserPoetryCreationType=new UserPoetryCreationType($this->get('router'),$this->session,$request);
         $form =$this->createForm($UserPoetryCreationType, null, $options);
         $form->handleRequest($request);
-        
         return $this->render('IpoetryBundle:uRoom:addpoem.html.twig',array('poetry_creation_form' => $form->createView(),'userheaderInfo'=>$userheaderInfo[0],));
     }
 
@@ -253,7 +256,7 @@ class uProfileController extends LoggingController {
             if (isset($authorization_parameters['type']))
                 switch ($authorization_parameters['type']){
                         case 'add_poetry_comment':
-                                    $mas['result']=$this->AddPoetryCommentAjaxAnswer($authorization_parameters,$request);
+                                    $mas=$this->AddPoetryCommentAjaxAnswer($authorization_parameters,$request);
                                     break;
                         case 'get_poetry_comments_info':
                                     $mas=$this->GetPoetryCommentsAjaxAnswer($authorization_parameters,$request);
@@ -268,10 +271,10 @@ class uProfileController extends LoggingController {
                                     $mas['result']=$this->PoetryRepostToOwnFeed($authorization_parameters,$request);
                                     break;
                         case 'poetrylikerequest':
-                                    $mas['result']=$this->PoetryLikeRequest($authorization_parameters,$request,'POETRY');
+                                    $mas=$this->PoetryLikeRequest($authorization_parameters,$request,'POETRY');
                                     break;
                         case 'commentlikerequest':
-                                    $mas['result']=$this->PoetryLikeRequest($authorization_parameters,$request,'COMMENT');
+                                    $mas=$this->PoetryLikeRequest($authorization_parameters,$request,'COMMENT');
                                     break;
 
                 }
@@ -280,16 +283,13 @@ class uProfileController extends LoggingController {
                 $mas['result']=$this->FileUploadAjaxAnswer($request,'poetrycomment');
         } else
             $mas['result']=0;
-        //VarDumper::dump($mas);
+        VarDumper::dump($mas);
         $response = new JsonResponse();
         $response->setData($mas);
         return $response;
     }
     //Добавление нового комментария 
     public function AddPoetryCommentAjaxAnswer($authorization_parameters,$request) {
-        
-        //$poetrytags='';
-        //$poetrynewtags='';
         //заводим новый пост, через хранимую процедуру
         $stmt = $this->getDoctrine()
                      ->getConnection()
@@ -307,11 +307,28 @@ class uProfileController extends LoggingController {
         if (isset($authorization_parameters['parent']))
             $stmt->bindValue(':ipoetry_comment_parent_id',$authorization_parameters['parent']);            
         else
-            $stmt->bindValue(':ipoetry_comment_parent_id',0);            
-            
+            $stmt->bindValue(':ipoetry_comment_parent_id',0);
+        //$stmt->bindValue(':new_ipoetry_comment_id',$new_ipoetry_comment_id);
         $stmt->execute();
-
-        return 1;        
+        VarDumper::dump(array($stmt));
+        $retval=$stmt->fetch();
+        VarDumper::dump(array($retval,$retval['new_poertycomment_id']));
+        $stmt=$this->getDoctrine()->resetManager();
+        //получаем добавленный комментарий
+        $poetryposts = $this->getDoctrine()->getEntityManager();
+        //получаем список комментов
+        $query=$poetryposts->createQuery('SELECT iub.ipoetryUserBlogPostId,iub.ipoetryUserBlogPostParentId,iub.ipoetryUserBlogPostText,ipu.userName,ipu.userLastname,ipuphoto.userPhotoUrl,iub.ipoetryUserBlogPostCreatedAt,iub.ipoetryUserBlogPostUpdatedAt,ibpr.ipoetryBlogPostRatingValueUp,ibpr.ipoetryBlogPostRatingValueDown FROM IpoetryBundle\Entity\IpoetryUserBlogPost iub JOIN iub.ipoetryBlogPostRating ibpr JOIN iub.ipoetryUserUser ipu JOIN ipu.userPhoto ipuphoto WHERE iub.ipoetryUserBlogPostId=?1');
+        $query->setParameter(1,$retval['new_poertycomment_id']);
+        $poetrycomment=$query->getResult();
+        //в виду того что ангуляр не может переварить формат данных doctrine
+        array_walk_recursive($poetrycomment, function (&$item, $key){
+            if ($item instanceof \DateTime){
+                $item=$item->format('Y-m-d H:i:s');
+                VarDumper::dump(array($item));            
+            }
+        });
+        return array('result'=>1,
+                     'commentslist'=>$poetrycomment);
     }
     //возвращаем AJAX данные по наличию комментариев стиха пользователя
     //для вывода их под стихом
@@ -357,13 +374,12 @@ class uProfileController extends LoggingController {
                     }
                     //в виду того что ангуляр не может переварить формат данных doctrine
 
-                    array_walk_recursive($poetrycomment, function (&$item, $key)
-    {
-        if ($item instanceof \DateTime){
-            $item=$item->format('Y-m-d H:i:s');
-            VarDumper::dump(array($item));            
-        }
-    });
+                    array_walk_recursive($poetrycomment, function (&$item, $key){
+                        if ($item instanceof \DateTime){
+                            $item=$item->format('Y-m-d H:i:s');
+                            //VarDumper::dump(array($item));            
+                        }
+                    });
                     VarDumper::dump(array('$poetrypostscnt'=>$poetrypostscnt[0][1],
                         'uprofilecommentslimit'=>$this->getParameter('ipoetry.uprofilecommentslimit'),
                         '$userfeedpoetry'=>$poetrycomment,
@@ -707,17 +723,13 @@ class uProfileController extends LoggingController {
             //пишем обновленные данные в базу
             if ($this->session->has('login') && $this->session->has('login_id')){
                 //Vardumper::dump(array('1'=>1));               
-                $PoetryRepost = $this->getDoctrine()->getRepository('IpoetryBundle:PoetryRepostToOwnFeed');
+                //$PoetryRepost = $this->getDoctrine()->getRepository('IpoetryBundle:PoetryRepostToOwnFeed');
                 //Vardumper::dump(array('2'=>2,'login_id'=>$this->session->get('login_id')));  
                 //проверяем есть ли уже запись в базе
                 //согласно переписке в скайп с Романом,Сергеем,Мишей у нас можно делать бесконечное кол-во репостов 
                 //одного и тогоже стиха
-                $query=$PoetryRepost->createQueryBuilder('pr')
-                        ->where('pr.userId= :userid AND pr.poetryId= :poetryid')
-                        ->setParameter('userid',$this->session->get('login_id') )
-                        ->setParameter('poetryid',$authorization_parameters['poetry'])
-                        ->getQuery();
-                $PoetryRepostResult=$query->getResult();
+                $PoetryRepost  = $this->getDoctrine()->getEntityManager();
+                $PoetryRepostResult=$PoetryRepost->getRepository('IpoetryBundle:PoetryRepostToOwnFeed')->getPoetryReposts($this->session->get('login_id'),$authorization_parameters['poetry']);
                 Vardumper::dump(array('$PoetryRepostResult'=>$PoetryRepostResult));
                 //если записи нет то добавляем новую запись
                 if (!isset($PoetryRepostResult[0]) || isset($PoetryRepostResult[0]))
@@ -729,7 +741,7 @@ class uProfileController extends LoggingController {
                     $PoetryRepostToOwnFeed->setPoetryId($authorization_parameters['poetry']);
                     $PoetryRepostToOwnFeed->setUserPoetryOwnerId($authorization_parameters['user']);
                     $poetryrepostat=new \DateTime("now");
-                    $PoetryRepostToOwnFeed->setRepostedAt($poetryrepostat);
+                    $PoetryRepostToOwnFeed->setRepostedAt($poetryrepostat->format('Y-m-d H:i:s'));
                     $PoetryRepost->persist($PoetryRepostToOwnFeed);
                     $PoetryRepost->flush();
                     Vardumper::dump(array('$PoetryRepostToOwnFeed'=>$PoetryRepostToOwnFeed));
@@ -760,11 +772,19 @@ class uProfileController extends LoggingController {
                     $resultlike=$plike->getRepository('IpoetryBundle:CommentLike')->findOneBy(array('userId'=>$this->session->get('login_id'),'commentId'=>$authorization_parameters['commentid']));
                     $resultdislike=$plike->getRepository('IpoetryBundle:CommentDisLike')->findOneBy(array('userId'=>$this->session->get('login_id'),'commentId'=>$authorization_parameters['commentid']));
                 }
-
+                VarDumper::dump(array($resultlike,$resultdislike));
                 if (strtoupper($up)=='UP'){
                     if (empty($resultlike) && empty($resultdislike)){
                         //добавляем запись что такой пользователь уже голосовал
                         if (strtoupper($source=='POETRY')){
+                            $stmt = $this->getDoctrine()
+                                        ->getConnection()
+                                        ->prepare($this->sql_array['add_ipoetry_poetry_like']);
+                            $stmt->bindValue(':ipoetry_user_id',$this->session->get('login_id'));
+                            $stmt->bindValue(':ipoetry_poetry_id',$authorization_parameters['poetry']);
+                            $stmt->execute();
+
+                            /*
                             $result=new PoetryLike();
                             $result->setPoetryId($authorization_parameters['poetry']);
                             $result->setUserId($this->session->get('login_id'));
@@ -775,27 +795,55 @@ class uProfileController extends LoggingController {
                             $result->setIpoetryPoetryRatingValueUp($result->getIpoetryPoetryRatingValueUp()+1);
                             $plike->merge($result);
                             $plike->flush();
-                            return 1;
+                            */
+                            //получаем связанные таблицы для обновления данных
+                            $result=$plike->getRepository('IpoetryBundle:IpoetryPoetryRating')->findOneBy(array('ipoetryPoetryPoetryId'=>$authorization_parameters['poetry']));
+                            $result->setIpoetryPoetryRatingValueUp($result->getIpoetryPoetryRatingValueUp()+1);
+                            $plike->merge($result);
+                            $plike->flush();
+                            //количество дизлайков и отправляем обратно клиенту для вывода
+                            $result=$plike->getRepository('IpoetryBundle:IpoetryPoetryRating')->getPoetryLikes($authorization_parameters['poetry']);
+                            return $result[0];                            
                         }
                         if (strtoupper($source=='COMMENT')){
-                            $result=new CommentLike();
-                            $result->setCommentId($authorization_parameters['commentid']);
-                            $result->setUserId($this->session->get('login_id'));
-                            $plike->persist($result);
-                            $plike->flush();
+                            //заводим новый пост, через хранимую процедуру
+                            $stmt = $this->getDoctrine()
+                                        ->getConnection()
+                                        ->prepare($this->sql_array['add_ipoetry_poem_comment_like']);
+                            $stmt->bindValue(':ipoetry_user_id',$this->session->get('login_id'));
+                            $stmt->bindValue(':ipoetry_poem_id',$authorization_parameters['commentid']);
+                            $stmt->execute();
+                            //$result=new CommentLike();
+                            //$result->getLikeId();
+                            //$result->setLikeId($result->getLatestlikeId());
+                            //$result->setCommentId($authorization_parameters['commentid']);
+                            //$result->setUserId($this->session->get('login_id'));
+                            //$plike->persist($result);
+                            //$plike->flush();
+
                             //получаем связанные таблицы для обновления данных
                             $result=$plike->getRepository('IpoetryBundle:IpoetryBlogPostRating')->findOneBy(array('ipoetryBlogPostPoetryId'=>$authorization_parameters['commentid']));
                             $result->setIpoetryBlogPostRatingValueUp($result->getIpoetryBlogPostRatingValueUp()+1);
                             $plike->merge($result);
                             $plike->flush();
-                            return 1;
+                            //количество дизлайков и отправляем обратно клиенту для вывода
+                            $result=$plike->getRepository('IpoetryBundle:IpoetryBlogPostRating')->getBlogPostLikes($authorization_parameters['commentid']);
+                            return $result[0];
                         }
-                    }
+                    } else
+                        return 0;
                 }
                 if (strtoupper($up)=='DOWN'){
                     if (empty($resultlike) && empty($resultdislike)){
                         //добавляем запись что такой пользователь уже голосовал
                         if (strtoupper($source=='POETRY')){
+                            $stmt = $this->getDoctrine()
+                                        ->getConnection()
+                                        ->prepare($this->sql_array['add_ipoetry_poetry_dislike']);
+                            $stmt->bindValue(':ipoetry_user_id',$this->session->get('login_id'));
+                            $stmt->bindValue(':ipoetry_poetry_id',$authorization_parameters['poetry']);
+                            $stmt->execute();
+                            /*
                             $result=new PoetryDisLike();
                             $result->setPoetryId($authorization_parameters['poetry']);
                             $result->setUserId($this->session->get('login_id'));
@@ -807,23 +855,43 @@ class uProfileController extends LoggingController {
                             $result->setIpoetryPoetryRatingValueDown($result->getIpoetryPoetryRatingValueDown()+1);
                             $plike->merge($result);
                             $plike->flush();
+                             */
+                            //получаем связанные таблицы для обновления данных
+                            $result=$plike->getRepository('IpoetryBundle:IpoetryPoetryRating')->findOneBy(array('ipoetryPoetryPoetryId'=>$authorization_parameters['poetry']));
+                            $result->setIpoetryPoetryRatingValueDown($result->getIpoetryPoetryRatingValueDown()+1);
+                            $plike->merge($result);
+                            $plike->flush();
+                            //количество дизлайков и отправляем обратно клиенту для вывода
+                            $result=$plike->getRepository('IpoetryBundle:IpoetryPoetryRating')->getPoetryLikes($authorization_parameters['poetry']);
+                            return $result[0];                            
+                            
                             return 1;                            
                         }
                         if (strtoupper($source=='COMMENT')){
-                            $result=new CommentDisLike();
-                            $result->setCommentId($authorization_parameters['commentid']);
-                            $result->setUserId($this->session->get('login_id'));
-                            $plike->persist($result);
-                            $plike->flush();
+                            //заводим новый пост, через хранимую процедуру
+                            $stmt = $this->getDoctrine()
+                                        ->getConnection()
+                                        ->prepare($this->sql_array['add_ipoetry_poem_comment_dislike']);
+                            $stmt->bindValue(':ipoetry_user_id',$this->session->get('login_id'));
+                            $stmt->bindValue(':ipoetry_poem_id',$authorization_parameters['commentid']);
+                            $stmt->execute();
+
+                            //$result=new CommentDisLike();
+                            //$result->setCommentId($authorization_parameters['commentid']);
+                            //$result->setUserId($this->session->get('login_id'));
+                            //$plike->persist($result);
+                            //$plike->flush();
                             //получаем связанные таблицы для обновления данных
                             $result=$plike->getRepository('IpoetryBundle:IpoetryBlogPostRating')->findOneBy(array('ipoetryBlogPostPoetryId'=>$authorization_parameters['commentid']));
                             $result->setIpoetryBlogPostRatingValueDown($result->getIpoetryBlogPostRatingValueDown()+1);
                             $plike->merge($result);
                             $plike->flush();
-                            return 1;
+                            //количество дизлайков и отправляем обратно клиенту для вывода
+                            $result=$plike->getRepository('IpoetryBundle:IpoetryBlogPostRating')->getBlogPostLikes($authorization_parameters['commentid']);
+                            return $result[0];
                         }
-
-                    }
+                    } else
+                        return 0;
                 }
 
             //}

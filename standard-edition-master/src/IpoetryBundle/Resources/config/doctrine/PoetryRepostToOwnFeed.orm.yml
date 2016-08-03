@@ -1,6 +1,7 @@
 IpoetryBundle\Entity\PoetryRepostToOwnFeed:
     type: entity
     table: poetryrepost
+    repositoryClass: IpoetryBundle\Entity\Repository\PoetryRepostToOwnFeedRepository
     id:
         poetryRepostId:
             type: string

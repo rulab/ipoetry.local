@@ -18,6 +18,16 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="poetrylike")
  */
 class PoetryLike {
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="like_id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $likeId;
+    
     /**
      * @var integer
      *
@@ -33,6 +43,29 @@ class PoetryLike {
      * @ORM\Column(name="poetry_id", type="integer", nullable=false)
      */
     private $poetryId;
+
+    /**
+     * Set LlkeId
+     *
+     * @param integer $likeId
+     *
+     * @return PoetryLike
+     */
+    public function setLikeId($LikeId)
+    {
+        $this->LikeId = $LikeId;
+
+        return $this;
+    }    
+    /**
+     * Get likeId
+     *
+     * @return integer
+     */
+    public function getLikeId()
+    {
+        return $this->likeId;
+    }
 
     /**
      * Set userId

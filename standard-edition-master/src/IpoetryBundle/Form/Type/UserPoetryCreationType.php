@@ -72,7 +72,7 @@ class UserPoetryCreationType extends LoggingForms{
        
         $translator = new Translator($this->request->getLocale(), new MessageSelector());
         $translator->addLoader('yaml',new YamlFileLoader());
-        $translator->addResource('yaml',$this->request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations/poetrycreation.ru.yml', 'ru_RU','poetrycreation');
+        $translator->addResource('yaml',$this->getTranslatorPath($this->request).'/poetrycreation.ru.yml', 'ru_RU','poetrycreation');
         VarDumper::dump(array($translator,$this->request,$translator->trans('PoetryTitle',array(),'poetrycreation')));
         //$CaptchaType = new CaptchaType($this->c_session,$generator,$translator,$this->option);
         //$validator = $this->get('validator');

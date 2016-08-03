@@ -9,13 +9,18 @@
 namespace IpoetryBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\NativeQuery;
+use Doctrine\ORM\EntityManagerInterface;
 /**
  * Description of CommentLike
  *
  * @author d.krasavin
  * 
  * @ORM\Table(name="commentlike")
+ * @ORM\Entity(repositoryClass="IpoetryBundle\Entity\Repository\CommentLikeRepository")
  */
 class CommentLike {
     /**
@@ -40,6 +45,19 @@ class CommentLike {
      * @ORM\Column(name="comment_id", type="integer", nullable=false)
      */
     private $commentId;
+    /**
+     * Set LlkeId
+     *
+     * @param integer $likeId
+     *
+     * @return CommentLike
+     */
+    public function setLikeId($LikeId)
+    {
+        $this->LikeId = $LikeId;
+
+        return $this;
+    }    
     /**
      * Get likeId
      *
@@ -97,5 +115,4 @@ class CommentLike {
     {
         return $this->commentId;
     }
-
 }
