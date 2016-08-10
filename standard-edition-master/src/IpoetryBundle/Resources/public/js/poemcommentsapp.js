@@ -23,7 +23,7 @@ poemApp.controller('PoemCommentsController', function($scope,$http) {
     $scope.userid;
     $scope.poemid;
     $scope.ajaxurls;
-    //карточки подписчиков
+    //массив комментариев
     $scope.comments = [
     ];
     $scope.plusPage = function()

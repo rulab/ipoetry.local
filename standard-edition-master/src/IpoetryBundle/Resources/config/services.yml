@@ -5,6 +5,29 @@ services:
     ipoetry.custom.user_provider:
         class:        IpoetryBundle\Security\Core\User\iPoetryVkontakteUserProvider
         arguments: [@doctrine, 'ipoetry_user',{vkontakte: 5465145}]
-        
+
+    ipoetry.exception_listener:
+        class: IpoetryBundle\EventListener\ExceptionListener
+        arguments: [%ipoetry.redirectafterunsuccoauthlogin%]
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
+
+    ipoetry.session_listener:
+        class: IpoetryBundle\EventListener\SessionListener
+        arguments: [%ipoetry.sessiontimeout%]
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, priority: 100, method: onKernelRequest }
+
+    ipoetry.twig_extension:
+        class: IpoetryBundle\Twig\IpoetryBundleTwigExtension
+        public: false
+        tags:
+             - { name: 'twig.extension' }        
+    #twig.extension.trans:
+    #  class: IpoetryBundle\Twig\AppTranslationExtension
+    #  public: false
+    #  arguments: ['@translator']
+    #  tags:
+    #    - { name: twig.extension }
     #hwi_oauth.resource_owner.vkontakte:
     #    class:  HWI\Bundle\OAuthBundle\ResourceOwner\VkontakteResourceOwner

@@ -19,6 +19,8 @@ class DailyPoetryRatingRepository extends EntityRepository {
     public function getLatestRating($limit = null,$period=null)
         {
         $where='1=1';
+        if (strtoupper($period)=='DAY')
+            $where='dpr.cDate>= ADDDATE(now(),INTERVAL -1 DAY)';
         if (strtoupper($period)=='WEEK')
             $where='dpr.cDate>= ADDDATE(now(),INTERVAL -7 DAY)';
         if (strtoupper($period)=='MONTH')
@@ -27,7 +29,7 @@ class DailyPoetryRatingRepository extends EntityRepository {
             $where='dpr.cDate>= ADDDATE(now(),INTERVAL -365 DAY)';
 
             $qb = $this->createQueryBuilder('dpr')
-                    ->select('dpr.poetryId','ROUND(SUM(dpr.poetryRating)/COUNT(dpr.cDate),1) poetryRating','ipr.poetryTitle','SUM(ippr.ipoetryPoetryRatingValueUp) poetrylike','iprbackgrimg.ipoetryBackgroundImage')//                       ->select('dpr.poetryId','ROUND(SUM(dpr.poetryRating)/COUNT(dpr.cDate),1) poetryRating','ipr.poetryTitle','SUM(ippr.ipoetryPoetryRatingValueUp) poetrylike')//
+                    ->select('dpr.poetryId','ROUND(SUM(dpr.poetryRating)/COUNT(dpr.cDate),1) poetryRating','ipr.poetryTitle','SUM(ippr.ipoetryPoetryRatingValueUp) poetrylike','SUM(ippr.ipoetryPoetryRatingValueDown) poetrydislike','iprbackgrimg.ipoetryBackgroundImage')//                       ->select('dpr.poetryId','ROUND(SUM(dpr.poetryRating)/COUNT(dpr.cDate),1) poetryRating','ipr.poetryTitle','SUM(ippr.ipoetryPoetryRatingValueUp) poetrylike')//
                     ->join('IpoetryBundle\Entity\IpoetryPoetry','ipr','WITH','ipr.poetryId=dpr.poetryId' )
                     ->leftjoin('IpoetryBundle\Entity\IpoetryPoetryRating','ippr','WITH','ipr.poetryId=ippr.ipoetryPoetryPoetryId')
                     ->leftjoin('IpoetryBundle\Entity\IpoetryBackgroundImages','iprbackgrimg','WITH','iprbackgrimg.ipoetryPoetryPoetry=ipr.poetryId')

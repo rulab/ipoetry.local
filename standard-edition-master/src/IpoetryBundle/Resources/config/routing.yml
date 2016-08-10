@@ -12,6 +12,41 @@ IpoetryBundle_root:
     requirements:
         _method:  GET|POST
         _locale: en|ru
+#страница подписчиков
+IpoetryBundle_subscribers:
+    path:     /subscribers/{user}
+    defaults: { _controller: IpoetryBundle:Index:subscribers }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+        user: "\d+"
+#Страница вывода фильтра по рейтингу пользователей
+IpoetryBundle_UserRating:
+    path: /urating
+    defaults: { _controller: IpoetryBundle:Index:userrating }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+IpoetryBundle_mainratingsajax:
+    path: /mainratingsajax
+    defaults: { _controller: IpoetryBundle:Index:mainratingsajax }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#Страница вывода фильтра по рейтингу стихов
+IpoetryBundle_PoetryRating:
+    path: /prating
+    defaults: { _controller: IpoetryBundle:Index:poetryrating }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#Страница поиска по стихам и комментариям
+IpoetryBundle_psearch:
+    path:     /psearch
+    defaults: { _controller: IpoetryBundle:Index:psearch }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
 #Форма логина сущ. пользователя
 IpoetryBundle_login:
     path:     /login
@@ -47,8 +82,7 @@ IpoetryBundle_changepwdajax:
     requirements:
         _method:  GET|POST
         _locale: en|ru
-
-#ЛК пользователя
+#ЛК пользователя. настройка аккаунта
 IpoetryBundle_uroom:
     path:     /uroom
     defaults: { _controller: IpoetryBundle:uRoom:uroom }
@@ -69,10 +103,106 @@ IpoetryBundle_loginajax:
     requirements:
         _method:  GET|POST
         _locale: en|ru
-
+#проверка логина вконтакте
 IpoetryBundle_checkvk:
     path: /checkvk
     defaults: { _controller: IpoetryBundle:LoginVk:checkvk }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#профиль пользователя, вид для других пользователей
+IpoetryBundle_addpoem:
+    path: /add-poem
+    defaults: { _controller: IpoetryBundle:uProfile:addpoem }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#профиль пользователя, вид для других пользователей
+IpoetryBundle_uprofile:
+    path: /uprofile
+    defaults: { _controller: IpoetryBundle:uProfile:uprofile }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#AJAX запросы в формах создания стиха....
+IpoetryBundle_uprofileajax:
+    path: /uprofileajax
+    defaults: { _controller: IpoetryBundle:uProfile:uprofileajax }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#AJAX запрос добавления комментария в новом стихе
+IpoetryBundle_newpoetrycommentajax:
+    path: /newpoetrycommentajax
+    defaults: { _controller: IpoetryBundle:uProfile:newpoetrycommentajax }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#AJAX запрос добавления комментария в новом стихе
+IpoetryBundle_newmessageajax:
+    path: /newmessageajax
+    defaults: { _controller: IpoetryBundle:uProfile:newmessageajax }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+
+#AJAX запросы комментарии к просмотру стиха
+IpoetryBundle_unewsfeedentityajax:
+    path: /unewsfeedentityajax
+    defaults: { _controller: IpoetryBundle:uProfile:unewsfeedentityajax }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru    
+#AJAX запросы в формах просмотра ленты новостей
+IpoetryBundle_mainajax:
+    path: /mainajax
+    defaults: { _controller: IpoetryBundle:Index:mainajax }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#лента новостей стихов пользователей
+IpoetryBundle_unewsfeedall:
+    path: /unewsfeed/all
+    defaults: { _controller: IpoetryBundle:Index:unewsfeedall }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#лента новостей стихов подписантов пользователя
+IpoetryBundle_unewsfeedsubscribed:
+    path: /unewsfeed/subscribe/{user}
+    defaults: { _controller: IpoetryBundle:uProfile:unewsfeedsubscribed }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+        user: "\d+|()"
+#лента новостей стихов пользователя
+IpoetryBundle_unewsfeed:
+    path: /user-profile/{user}
+    defaults: { _controller: IpoetryBundle:uProfile:unewsfeed }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+        user: "\d+"
+#читать стих пользователя
+IpoetryBundle_unewsfeedentity:
+    path: /unewsfeedentity/{user}_{poetry}
+    defaults: { _controller: IpoetryBundle:uProfile:unewsfeedentity }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+        user: "\d+"
+        poetry: "\d+"
+#Страница выполнения вычислений по дневному рейтингу стихов
+IpoetryBundle_DailyPoetryRating:
+    path: /dailypoetryrating
+    defaults: { _controller: IpoetryBundle:Index:dailypoetryrating }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#Страница выполнения вычислений по дневному рейтингу пользователей
+IpoetryBundle_DailyUserRating:
+    path: /dailyuserrating
+    defaults: { _controller: IpoetryBundle:Index:dailyuserrating }
     requirements:
         _method:  GET|POST
         _locale: en|ru

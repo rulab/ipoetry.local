@@ -90,10 +90,10 @@ class UserPoetryCreationType extends LoggingForms{
 
             $builder
                 ->setMethod('POST')
-                ->add('poetrytitle',TextType::class,array('attr' => array('maxlength' => 255,'required' => true,'placeholder'=>$translator->trans('PoetryTitle',array(),'poetrycreation')),'label' => false))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('poetry',TextareaType::class,array('attr' => array('maxlength' => 4294967296,'required' => true,'placeholder'=>$translator->trans('Write your poetry',array(),'poetrycreation'),'class'=>'big-area'),'label' => false))//array('attr' => array('maxlength' => 50,'required' => true)))'cols'=>"50",'rows'=>"10",
-                ->add('poetrytag',TextType::class,array('attr' => array('maxlength' => 20,'required' => false,'placeholder'=>$translator->trans('AddTags',array(),'poetrycreation')),'label' => false))//$translator->trans('AddTags')
-                ->add('poetrycomment',TextareaType::class,array('attr' => array('maxlength' => 1024,'required' => true,'placeholder'=>$translator->trans('Comment',array(),'poetrycreation'),'class'=>'big-area'),'label' => false))//array('attr' => array('maxlength' => 50,'required' => true)))'cols'=>"50",'rows'=>"10",
+                ->add('poetrytitle',TextType::class,array('attr' => array('maxlength' => 255,'placeholder'=>$translator->trans('PoetryTitle',array(),'poetrycreation')),'label' => false,'required' => true))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('poetry',TextareaType::class,array('attr' => array('maxlength' => 4294967296,'placeholder'=>$translator->trans('Write your poetry',array(),'poetrycreation'),'class'=>'big-area'),'label' => false,'required' => true))//array('attr' => array('maxlength' => 50,'required' => true)))'cols'=>"50",'rows'=>"10",
+                ->add('poetrytag',TextType::class,array('attr' => array('maxlength' => 20,'placeholder'=>$translator->trans('AddTags',array(),'poetrycreation')),'label' => false,'required' => false))//$translator->trans('AddTags')
+                ->add('poetrycomment',TextareaType::class,array('attr' => array('maxlength' => 1024,'placeholder'=>$translator->trans('Comment',array(),'poetrycreation'),'class'=>'big-area'),'label' => false,'required' => true))//array('attr' => array('maxlength' => 50,'required' => true)))'cols'=>"50",'rows'=>"10",
                 ->add('Selectfromlist', ChoiceType::class, array(
                         'attr'=>array(
                         'placeholder'=>$translator->trans('Tags',array(),'poetrycreation')),

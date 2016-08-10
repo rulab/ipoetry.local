@@ -94,6 +94,7 @@ use IpoetryBundle\Controller\Abstracts\LoggingController;
 class uProfileController extends LoggingController {
     //массив запросов к БД
     private $sql_array=array('add_ipoetry_user_post'=>'CALL add_ipoetry_user_post(:ipoetry_user_email,:ipoetry_user_post_title,:ipoetry_user_post,:ipoetry_user_post_text,:ipoetry_user_post_image,:ipoetry_user_post_ext,:ipoetry_user_post_tags,:ipoetry_user_post_tags_text,:ipoetry_comment)',
+                            'add_ipoetry_user_message'=>'CALL add_ipoetry_user_message(:ipoetry_user_email,:ipoetry_message,:ipoetry_message_ext)',
                             'add_ipoetry_user_follower'=>'CALL add_ipoetry_user_follower(:ipoetry_user_login,:ipoetry_user_follower)',
                             'del_ipoetry_user_follower'=>'CALL del_ipoetry_user_follower(:ipoetry_user_login,:ipoetry_user_follower)',
                             'add_ipoetry_user_comment'=>'CALL add_ipoetry_user_comment(:ipoetry_user_id,:ipoetry_user_comment_text,:ipoetry_user_comment_ext,:ipoetry_poetry_id,:ipoetry_comment_parent_id)',
@@ -160,11 +161,9 @@ class uProfileController extends LoggingController {
       //по полученном параметрам делаем запрос в базу узнать что такой пользователь существует
         $mas=array();
         $this->request=$request;
-
         if ($this->has('session')){
             $this->request->setSession($this->get('session'));
         }
-
         $authorization_parameters=@json_decode($request->get('login_json'),true);
         Vardumper::dump(array('$request'=>json_decode($request->get('login_json')),'isset_auth_parameter'=>isset($authorization_parameters),'authorization_parameters'=>$authorization_parameters));
         if (isset($authorization_parameters)){
@@ -176,6 +175,9 @@ class uProfileController extends LoggingController {
                 case 'new_poetry':
                             $mas['result']=$this->NewPoetryAjaxAnswer($authorization_parameters,$request);
                             break;
+                case 'new_message':
+                            $mas['result']=$this->NewMessageAjaxAnswer($authorization_parameters,$request);
+                            break;
                 case 'get_user_feed_info':
                             $mas=$this->getUserFeedInfoAjaxAnswer($authorization_parameters,$request);
                             break;
@@ -184,7 +186,7 @@ class uProfileController extends LoggingController {
                             break;
                 case 'get_user_subscribed_status':
                             $mas['result']=$this->GetUserSubscribedStatusAjaxAnswer($authorization_parameters,$request);
-                            break;                    
+                            break;
                 case 'add_you_followedby_profileowner':
                             $mas['result']=$this->AddYouFollowedbyProfileowner($authorization_parameters,$request);
                             break;
@@ -239,6 +241,22 @@ class uProfileController extends LoggingController {
         return $response;
     }
     //распределитель ajax логики
+    public function NewMessageAjaxAction (Request $request){
+        //по полученном параметрам делаем запрос в базу узнать что такой пользователь существует
+        $mas=array();
+        $this->request=$request;
+        Vardumper::dump(array('$request'=>$request->getContent()));
+        if ($this->request->headers->has('content-type')) {
+            $mas['result']=$this->FileUploadAjaxAnswer($this->request,'NEWMESSAGE');
+        } else
+            $mas['result']=0;
+        VarDumper::dump($mas);
+        $response = new JsonResponse();
+        $response->setData($mas);
+        return $response;
+    }
+
+    //распределитель ajax логики
     public function uNewsFeedEntityAjaxAction (Request $request){
       //по полученном параметрам делаем запрос в базу узнать что такой пользователь существует
         $mas=array();
@@ -276,7 +294,9 @@ class uProfileController extends LoggingController {
                         case 'commentlikerequest':
                                     $mas=$this->PoetryLikeRequest($authorization_parameters,$request,'COMMENT');
                                     break;
-
+                        case 'get_user_feed_info':
+                                    $mas=$this->getUserFeedInfoAjaxAnswer($authorization_parameters,$request);
+                                    break;
                 }
         } else if ($request->headers->has('Content-Type')) {
             if ($request->headers->get('Content-Type')=='text/plain')
@@ -405,11 +425,14 @@ class uProfileController extends LoggingController {
 
     //ответ на введенный пост|стих
     public function NewPoetryAjaxAnswer($authorization_parameters,$request) {
-        $poetrytags='';
-        $poetrynewtags='';
+        $poetrytags=null;
+        $poetrynewtags=null;
         //проверяем что стих отправил зарегистирированный пользователь
         //array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined')
         $loggeduser=$this->UserHeaderInfo($request);
+        //если нет картинки то ставим по умолчанию дефолтную
+        if (!$this->session->has('poetry_background_image'))
+            $this->session->set('poetry_background_image',$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/images/post-bg.jpg');
         if ($loggeduser[0]['userId']==-1 || !$this->session->has('poetry_body') || !$this->session->has('poetry_background_image')) {
             return 0;            
         }
@@ -427,16 +450,16 @@ class uProfileController extends LoggingController {
             foreach ( $authorization_parameters as $auth_par_item_key=>$auth_par_item_val ){
                 if ($cnt==2 && $auth_par_item_key>=0)
                     $poetrytags.=$auth_par_item_key;
-                if ($cnt>2 && $auth_par_item_key>=0 && $poetrytags=='')
+                if ($cnt>2 && $auth_par_item_key>=0 && $poetrytags==null)
                     $poetrytags.=$auth_par_item_key;
-                elseif ($cnt>2 && $auth_par_item_key<>-1 && $poetrytags!='')
+                elseif ($cnt>2 && $auth_par_item_key<>-1 && $poetrytags<>null)
                     $poetrytags.=':'.$auth_par_item_key;                    
 
                 if ($cnt==2 && $auth_par_item_key<0)
                     $poetrynewtags.='(\''.$auth_par_item_val.'\')';
-                if ($cnt>2 && $auth_par_item_key<0 && $poetrynewtags=='')
+                if ($cnt>2 && $auth_par_item_key<0 && $poetrynewtags==null)
                     $poetrynewtags.='(\''.$auth_par_item_val.'\')';
-                else if ($cnt>2 && $auth_par_item_key<0 && $poetrynewtags!='')
+                else if ($cnt>2 && $auth_par_item_key<0 && $poetrynewtags<>null)
                     $poetrynewtags.=',(\''.$auth_par_item_val.'\')';
                 
                 $cnt++;
@@ -458,25 +481,50 @@ class uProfileController extends LoggingController {
 
         return 1;
     }
+    //собщение в стену профиля пользователя
+    public function NewMessageAjaxAnswer($authorization_parameters,$request) {
+        if ($request->hasSession()) {
+            $this->session=$request->getSession();
+        }
+        //проверяем что сообщение отправил зарегистирированный пользователь
+        $loggeduser=$this->UserHeaderInfo($request);
+        //проверяем что только владелец профиля может оставить в нем сообщение
+        $profileowner=$this->GetUserOwnprofileAjaxAnswer($authorization_parameters,$request);
+        if ($loggeduser[0]['userId']===-1 || !$this->session->has('newmessage_body') || $profileowner===0) {
+            return 0;
+        }
+        //заводим новый пост, через хранимую процедуру
+        $stmt = $this->getDoctrine()
+                     ->getConnection()
+                     ->prepare($this->sql_array['add_ipoetry_user_message']);
+        
+        $stmt->bindValue(':ipoetry_user_email',$this->session->get('login'));
+        $stmt->bindValue(':ipoetry_message',addslashes(file_get_contents($this->session->get('newmessage_body'))));
+        $stmt->bindValue(':ipoetry_message_ext',$this->session->get('newmessage_resource_ext'));
+        $stmt->execute();
+
+        return 1;
+    }
+
     //возвращаем AJAX данные по наличию стихов/комментариев у пользователя
     //для вывода в его ленте
     public function getUserFeedInfoAjaxAnswer($authorization_parameters,$request){
-        $this->request=$request;
+        //$this->request=$request;
         //читаем данные по стихотворению по данным в параметрах url
         $stmt='';
         $feedlist=array();
         $poetryid=0;
         $userid=0;
         //проверяем что пришло в сессии
-        $this->GetCache($request);
+        $this->GetCache($this->request);
 
-        if ($request->hasSession()) {
+        if ($this->request->hasSession()) {
 
-            VarDumper::dump(array('cache'=>$this->cacheDriver,'user'=>$authorization_parameters['user'],'datapart'=>$authorization_parameters['datapart'],'request_uri'=>$authorization_parameters['url']));
+            VarDumper::dump(array('cache'=>$this->cacheDriver,'user'=>$authorization_parameters['user'],'datapart'=>$authorization_parameters['datapart']));//,'request_uri'=>$authorization_parameters['url']
 
-            $this->session=$request->getSession();
+            $this->session=$this->request->getSession();
             $unewsfeed = $this->getDoctrine()->getEntityManager();
-            if ($this->session->has('login')){
+            if ($this->session->has('login') && $this->session->has('login_id')){
                 //смотрим кол-во репостов стихов в свою ленту
                 //$query=$unewsfeed->createQuery('SELECT COUNT(pr.poetryId) FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.userId=?1');
                 //$query->setParameter(1,$authorization_parameters['user'] );
@@ -536,7 +584,9 @@ class uProfileController extends LoggingController {
                     */
 
                     return array('result'=>$datapart,
-                                 'newsfeed'=>$feedlist);
+                                 'newsfeed'=>$feedlist,
+                                 'unewsfeedlist'=>$feedlist,
+                                 'unewsfeedlistcnt'=>$userfeedcnt[0][1]);
                 } else
                     return array('result'=>false);
             }
@@ -694,7 +744,6 @@ class uProfileController extends LoggingController {
 
                 $stmt->execute();
                 return -1;
-
             } else
                 return 0;
         } else
@@ -712,7 +761,104 @@ class uProfileController extends LoggingController {
     }
     // просмотр ленты стихов и комментариев в своем профиле    
     public function uNewsFeedAction(Request $request,$user){
-        return $this->render('IpoetryBundle:uRoom:unewsfeed.html.twig');
+        //количество стихов в своей ленте
+        $userfeedcnt=array(0=>array(1=>0));
+        //данные по подписчикам и подписантам
+        $subscribers=array();
+        $followers=array();
+        //получаем данные по пользователю для шапки страницы
+        $userheaderInfo=$this->UserHeaderInfo($request);
+        //получаем данные по пользователю владельцу профайла
+        $this->request=$request;
+        //получаем перевод всех элементов интерфейса
+        $this->GetTranslator($request);
+        //директория для хранения временных файлов
+        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/uploadtmp';        
+        //читаем данные по стихотворению по данным в параметрах url
+        $stmt='';
+        //проверяем что пришло в сессии
+        $this->GetCache($request);
+
+        if ($request->hasSession()) {
+
+            VarDumper::dump(array('user'=>$user));
+
+            $this->session=$request->getSession();
+            //$userentity = $this->getDoctrine()->getManager();
+            if ($this->session->has('login') && $this->session->has('login_id')){
+                //получаем связанные таблицы для показа данных
+                //получаем кол-во записей
+                $userentity = $this->getDoctrine()->getEntityManager();
+
+                $query=$userentity->createQuery('SELECT COUNT(usr.userId) FROM IpoetryBundle\Entity\IpoetryUser usr WHERE usr.userId=?1')
+                     ->setMaxResults(1);
+                $query->setParameter(1,$user );
+                $userentitycnt=$query->getResult();
+                //если есть такой пользователь то формируем вывод данных по нему
+                if ($userentitycnt[0][1]==1){
+                    //выбираем данные по пользователям подписантам на стих
+                    $query=$userentity->createQuery('SELECT usr.userId,usr.userName,usr.userLastname,usrAge.ipoetryUserAge,usrCity.cityName,usrWebsite.ipoetryUserWebsite,usrphoto.userPhotoUrl,CONCAT(\''.$this->getParameter('ipoetry.UserProfileUrl').'\',usr.userId) AS reposterurl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto JOIN usr.userCity usrCity JOIN usr.userAge usrAge JOIN usr.userWebsite usrWebsite WHERE usr.userId=?1');
+                    $query->setParameter(1,$user );
+                    $userentities=$query->getResult();
+                    //получаем кол-во записей своих стихов в свою ленту
+                    $query=$userentity->createQuery('SELECT COUNT(pr.poetryId) FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.userId=?1');
+                    $query->setParameter(1,$user );
+                    $userfeedcnt=$query->getResult();
+                    VarDumper::dump(array('userfeedcnt'=>$userfeedcnt[0][1]));
+                    //unset($userentity);
+                    //выбираем подписантов
+                    $authorization_parameters=array('usertype'=>'SUBSCRIBERS','user'=>$user,'datapart'=>1);
+                    $subscribers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
+                    //выбираем подписчиков
+                    $authorization_parameters=array('usertype'=>'FOLLOW','user'=>$user,'datapart'=>1);
+                    $followers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
+                    //выбираем рейтинг стихов
+                    $authorization_parameters=array('period'=>'day');
+                    $poetryrating=$this->GetPoetriesRatingsAjaxAnswer($authorization_parameters,$request);
+                }
+            }
+        }
+        if (!isset($userentities[0])) {
+            $userentities[0]["userId"] = -1;
+            $userentities[0]["userName"] = "undefined";
+            $userentities[0]["userLastname"] = "undefined";
+            $userentities[0]["userPhotoUrl"] = "undefined";
+            $userentities[0]["reposterurl"] =  "undefined";
+            $userentities[0]["ipoetryUserAge"] =  "undefined";
+            $userentities[0]["cityName"] =  "undefined";
+            $userentities[0]["ipoetryUserWebsite"] =  "undefined";
+        }
+        if ($subscribers['result']===0){
+            $subscribers['userslist'][0]['userId']=0;
+            $subscribers['userslist'][0]['userName']='';
+            $subscribers['userslist'][0]['userLastname']='';
+            $subscribers['userslist'][0]['cityName']='';
+            $subscribers['userslist'][0]['userPhotoUrl']='';
+            $subscribers['userscount']=0;
+        }
+        if ($followers['result']===0){
+            $followers['userslist'][0]['userId']=0;
+            $followers['userslist'][0]['userName']='';
+            $followers['userslist'][0]['userLastname']='';
+            $followers['userslist'][0]['cityName']='';
+            $followers['userslist'][0]['userPhotoUrl']='';
+            $followers['userscount']=0;
+        }
+        if ($poetryrating['result']<>0){
+            $poetryrating['poetriesratings']=array_slice($poetryrating['poetriesratings'], 0, 5);
+        }
+        $poetryratingcnt=count($poetryrating['poetriesratings']);
+        VarDumper::dump(array('subscribers'=>$subscribers,'poetryrating'=>$poetryrating));
+        $uprofilenewsfeedlimit=$this->getParameter('ipoetry.uprofilenewsfeedlimit');
+        return $this->render('IpoetryBundle:uRoom:user-profile.html.twig',array('userheaderInfo'=>$userheaderInfo[0],
+            'userprofileowner'=>$userentities[0],
+            'uprofilenewsfeedlimit'=>$uprofilenewsfeedlimit,
+            'MoreFeeds'=>$this->translator->trans('More comments',array(),'userprofile'),
+            'userfeedcnt'=>$userfeedcnt[0][1],
+            'subscribers'=>$subscribers,
+            'followers'=>$followers,
+            'poetryrating'=>$poetryrating,
+            'poetryratingcnt'=>$poetryratingcnt));
     }
     // перепост стиха к себе в ленту
     public function PoetryRepostToOwnFeed($authorization_parameters,$request){
@@ -863,9 +1009,7 @@ class uProfileController extends LoggingController {
                             $plike->flush();
                             //количество дизлайков и отправляем обратно клиенту для вывода
                             $result=$plike->getRepository('IpoetryBundle:IpoetryPoetryRating')->getPoetryLikes($authorization_parameters['poetry']);
-                            return $result[0];                            
-                            
-                            return 1;                            
+                            return $result[0];                          
                         }
                         if (strtoupper($source=='COMMENT')){
                             //заводим новый пост, через хранимую процедуру

@@ -252,6 +252,12 @@
     
     //отправка стихотворения
     function sendpoetryupload() {
+                //проверяем есть ли хоть один тег выбран
+                if ($('div[name="poetrytag"]').length===0){
+                    $('#UserPoetryCreation_Selectfromlist').css('background-color','red');
+                    $('#UserPoetryCreation_poetrytag').css('background-color','red');
+                    return 0;
+                }
                 var oReq = new XMLHttpRequest();
                 oReq.onreadystatechange = function() {
                     //console.log(JSON.parse(oReq.responseText));
@@ -261,7 +267,7 @@
                         if (response.result===1){
                             //готовим по наличию теги
                             if ($('div[name="poetrytag"]').length){
-                                    var poetrytag='';
+                                var poetrytag='';
                                 $('div[name="poetrytag"]').each(function(){
                                     poetrytag+=',"'+$(this).attr('dbid')+'":"'+$(this).text()+'"';
                                 });
@@ -289,7 +295,7 @@
                                     console.log('AJAX_user_new_poetry result='+json['result']);
                                     location.href='{{ path('IpoetryBundle_uroom') }}';
                                 } else {
-                                    location.href='{{ path('IpoetryBundle_root') }}';                
+                                    //location.href='{{ path('IpoetryBundle_root') }}';                
                                 }
                             },
                             error: function(jqXHR, textStatus, errorThrown) {
@@ -300,7 +306,6 @@
                             return 0;
                     }
                 };
-                ///console.log($('#UserPoetryCreation_poetry').val());
                 oReq.open("POST", '{{ path('IpoetryBundle_uprofileajax') }}', true);
                 var blob = new Blob([$('#UserPoetryCreation_poetry').val()], {type: 'text/plain'});
                 oReq.setRequestHeader("Content-Type", "text/plain");
@@ -392,15 +397,21 @@
                 console.log($('#UserPoetryCreation_Selectfromlist :selected').text());
                 event.preventDefault();
                 //если дефолтный выбор то не добавляем теги
-                if ($('#UserPoetryCreation_Selectfromlist :selected').text()!=='Добавить теги')
+                if ($('#UserPoetryCreation_Selectfromlist :selected').text()!=='Добавить теги'){
+                    $('#UserPoetryCreation_Selectfromlist').css('background-color','white');
+                    $('#UserPoetryCreation_poetrytag').css('background-color','white');                    
                     addPoetryTag();
+                }
             });
             $('#UserPoetryCreation_addNewtag').on('click', function (event) {
                 console.log('UserPoetryCreation_addNewtag_click');
                 console.log($('#UserPoetryCreation_poetrytag').val());
                 event.preventDefault();
-                if ($('#UserPoetryCreation_poetrytag').val()!=='')
+                if ($('#UserPoetryCreation_poetrytag').val()!==''){
+                    $('#UserPoetryCreation_Selectfromlist').css('background-color','white');
+                    $('#UserPoetryCreation_poetrytag').css('background-color','white'); 
                     addNewPoetryTag();
+                }
             });
             //клик по кнопке вызывает клик по скрытому input
             $('#fileuploadbtn').on('click',function(){
