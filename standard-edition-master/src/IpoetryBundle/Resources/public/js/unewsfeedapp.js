@@ -176,7 +176,7 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
            $('#getunewsfeedblockbtn').fadeOut();          
         };
       };
-      //$scope.$apply();      
+      $scope.$apply();      
       $scope.propertyName = propertyName;
     };
     $scope.Likefunc=function(postid,option){
