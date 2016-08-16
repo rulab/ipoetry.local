@@ -153,4 +153,28 @@ function ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror){
     });
 
 }
-//
+function InputCheck(){
+html='<div id="infomessage" style="position:absolute;margin-top:20px;margin-left:25px;font-family: Arial, Helvetica, sans-serif;font-size:16px;">Точно удалить?</div>';
+//выводим сообщение               
+$.fancybox ({
+            width : 300,
+            height : 70,
+            overlayOpacity:0,
+            autoSize:false,
+            closeBtn:true,
+            content: html,
+            scrolling: 'no',
+            'beforeShow': function () {
+            },
+            'afterShow': function() {
+            },                                    
+            'afterClose': function() {
+
+            },
+            helpers : {
+                overlay : {
+                css : { 'overflow' : 'hidden' }
+                }
+            }
+});
+};

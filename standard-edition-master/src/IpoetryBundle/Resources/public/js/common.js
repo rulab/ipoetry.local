@@ -24,16 +24,11 @@ $(function() {
 	//Продвинуть стих
 	$(".poem-app").click(function() {
 		$(".poem-app-popup-wrap").stop().fadeToggle();
-		return false
+		return false;
 	});
+        
 	$(".poem-app-popup button").click(function() {
 		$(".poem-app-popup-wrap").fadeOut();
-	});
-
-	//Дополнительные опции
-	$(".show-more-details-inner-wrap").hide();
-	$(".main-post-more-details").hover(function() {
-		$(this).find(".show-more-details-inner-wrap").stop().fadeToggle();
 	});
 
 	//Плагиат

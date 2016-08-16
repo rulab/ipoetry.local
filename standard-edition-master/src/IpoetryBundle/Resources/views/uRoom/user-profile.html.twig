@@ -187,6 +187,8 @@
 					</form>
 				</div>
 				<!-- Добавить пост конец -->
+<!--контроллер angular-->
+<div ng-controller="unewsfeedController" ng-init="init({{app.request.attributes.get('_route_params')['user']}},{{uprofilenewsfeedlimit}},'{{ path('IpoetryBundle_unewsfeedentityajax') }}','{{app.request.getRequestUri}}')">
 
 				<!-- Настройки ленты -->
 				<div class="feed-sorting clearfix">
@@ -197,21 +199,19 @@
 						<div class="feed-sorting-item date-sorting-item">время
 							<div class="sorting-popup time-sorting">
 								<ul class="time-sorting-list">
-									<li style="list-style-type: none"><a href="#">Лучшее за неделю</a></li>
-									<li style="list-style-type: none"><a href="#">Лучшее за месяц</a></li>
-									<li style="list-style-type: none"><a href="#">Лучшее за все время</a></li>
+									<li style="list-style-type: none"><a href="#" ng-click="sortBy('poetrydailyrating.poetryRating','7',true);">Лучшее за неделю</a></li>
+									<li style="list-style-type: none"><a href="#" ng-click="sortBy('poetrydailyrating.poetryRating','30',true);">Лучшее за месяц</a></li>
+									<li style="list-style-type: none"><a href="#" ng-click="sortBy('poetrydailyrating.poetryRating','365',true);">Лучшее за все время</a></li>
 								</ul>
 							</div>
 						</div>
 					</div>
 				</div>
 				<!-- Настройки ленты конец-->
-<!--контроллер angular-->
-<div ng-controller="unewsfeedController" ng-init="init({{app.request.attributes.get('_route_params')['user']}},{{uprofilenewsfeedlimit}},'{{ path('IpoetryBundle_unewsfeedentityajax') }}','{{app.request.getRequestUri}}')">
-                            <div ng-repeat="unewsfeeditem in unewsfeed" postid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" name="unewsfeedblock">
+                            <div ng-repeat="unewsfeeditem in unewsfeed | orderBy:propertyName:reverse" postid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" name="unewsfeedblock">
 
 				<!-- Пост в ленте пользователя-->
-				<div class="main-post-item">
+				<div class="main-post-item" rating="{% verbatim %}{{unewsfeeditem.poetrydailyrating.poetryRating}}{% endverbatim %}">
 					<div class="main-post-item-top" style="background-image: url({% verbatim %}{{unewsfeeditem.image}}{% endverbatim %});background-repeat: no-repeat;background-position: center;-webkit-background-size: contain;-moz-background-size: contain;-o-background-size: contain;background-size: contain;">
 						<div class="main-post-item-top-inner">
 							<div class="main-post-category">
@@ -228,9 +228,9 @@
 								<div class="main-post-item-info-item post-views">155</div>
 								<a href="#" class="main-post-item-info-item post-comments">{% verbatim %}{{unewsfeeditem.poetrypostscnt}}{% endverbatim %}</a>
 							</div>
-							<div class="main-post-more-details">
+							<div class="main-post-more-details" ng-mouseover="shbutton($event);" ng-mouseleave="delbutton($event);">
 								<div class="show-more-details-inner-wrap" style="display: none; opacity: 1;">
-									<button class="btn-white-border">Удалить</button>
+									<button postid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="btn-white-border" ng-click="delelement($event);">Удалить</button>
 								</div>
 							</div>
 							<div class="plagiat" style="display: none; opacity: 1;">Плагиат</div>
@@ -278,6 +278,8 @@
                             <span>Subscribe</span>
         </button>
         -->
+        <!--
+        
         <div style="clear:both;"></div>
         <button id="getuserfeedinfobtn" type="submit" class="btn btn-primary start" style="display:none;">
                             <i class="glyphicon glyphicon-upload"></i>
@@ -287,6 +289,7 @@
                             <i class="glyphicon glyphicon-upload"></i>
                             <span>Repost It</span>
         </button>
+        -->
 
         <input id="datapartnum" type="hidden" value="1"/>
 <!-- Подвал -->
@@ -296,6 +299,8 @@
 '@IpoetryBundle/Resources/public/bootstrap/dist/js/bootstrap.min.js'
 '@IpoetryBundle/Resources/public/bootstrap/dist/js/bootstrap.min.js'
 '@IpoetryBundle/Resources/public/js/angular.min.js'
+'@IpoetryBundle/Resources/public/js/angular-animate.min.js'
+'@IpoetryBundle/Resources/public/js/fancybox/jquery.fancybox.pack.js'
 '@IpoetryBundle/Resources/public/js/unewsfeedapp.js'
 '@IpoetryBundle/Resources/public/js/w_load.js'
 '@IpoetryBundle/Resources/public/js/libs.js'
@@ -422,6 +427,11 @@
             if (json['result']==1) {
                //скрываем кнопку если это собственный профиль пользователя
                $('#setusersubscriptionbtn').fadeOut();
+            } else {
+               //скрываем блок с вводом сообщения
+               $('.add-post-wrap').eq(0).fadeOut();
+               //скрываем кнопки удалить в элементах стены
+               $('.main-post-more-details').fadeOut();
             }
                 
         },

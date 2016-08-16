@@ -45,6 +45,30 @@ class DailyPoetryRatingRepository extends EntityRepository {
             return $qb->getQuery()
                       ->getResult();
         }
+    public function findOneByPeriod($poetryid = null,$period=null)
+        {
+        $where='1=1';
+        if (strtoupper($period)=='DAY')
+            $where='dpr.cDate>= ADDDATE(now(),INTERVAL -1 DAY) AND dpr.poetryId=:poetryid';
+        if (strtoupper($period)=='WEEK')
+            $where='dpr.cDate>= ADDDATE(now(),INTERVAL -7 DAY) AND dpr.poetryId=:poetryid';
+        if (strtoupper($period)=='MONTH')
+            $where='dpr.cDate>= ADDDATE(now(),INTERVAL -30 DAY) AND dpr.poetryId=:poetryid';
+        if (strtoupper($period)=='YEAR')
+            $where='dpr.cDate>= ADDDATE(now(),INTERVAL -365 DAY) AND dpr.poetryId=:poetryid';
+
+            $qb = $this->createQueryBuilder('dpr')
+                    ->select('dpr.poetryId','ROUND(SUM(dpr.poetryRating)/COUNT(dpr.cDate),0) poetryRating')
+                    ->join('IpoetryBundle\Entity\IpoetryPoetry','ipr','WITH','ipr.poetryId=dpr.poetryId' )
+                    ->where($where)
+                    ->groupBy('dpr.poetryId')
+                    ->addOrderBy('dpr.poetryRating', 'DESC')
+                    ->setParameter(':poetryid',$poetryid);
+            VarDumper::dump(array($qb->getQuery()));
+            return $qb->getQuery()
+                      ->getResult();
+        }
+
     public function getCountRating($poetryid=null)
         {
         if (!is_null($poetryid)){

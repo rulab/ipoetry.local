@@ -97,7 +97,7 @@ class DailyPoetryRating {
      */
     public function getPoetryRating()
     {
-        return $this->poetryRating;
+        return round($this->poetryRating);
     }
 
 }

@@ -97,6 +97,7 @@ class uProfileController extends LoggingController {
                             'add_ipoetry_user_message'=>'CALL add_ipoetry_user_message(:ipoetry_user_email,:ipoetry_message,:ipoetry_message_ext)',
                             'add_ipoetry_user_follower'=>'CALL add_ipoetry_user_follower(:ipoetry_user_login,:ipoetry_user_follower)',
                             'del_ipoetry_user_follower'=>'CALL del_ipoetry_user_follower(:ipoetry_user_login,:ipoetry_user_follower)',
+                            'del_ipoetry_user_post'=>'CALL del_ipoetry_user_post(:ipoetry_poetry_id)',
                             'add_ipoetry_user_comment'=>'CALL add_ipoetry_user_comment(:ipoetry_user_id,:ipoetry_user_comment_text,:ipoetry_user_comment_ext,:ipoetry_poetry_id,:ipoetry_comment_parent_id)',
                             'add_ipoetry_poem_comment_like'=>'CALL add_ipoetry_poem_comment_like(:ipoetry_user_id,:ipoetry_poem_id,\'UP\')',
                             'add_ipoetry_poem_comment_dislike'=>'CALL add_ipoetry_poem_comment_like(:ipoetry_user_id,:ipoetry_poem_id,\'DOWN\')',
@@ -297,6 +298,10 @@ class uProfileController extends LoggingController {
                         case 'get_user_feed_info':
                                     $mas=$this->getUserFeedInfoAjaxAnswer($authorization_parameters,$request);
                                     break;
+                        case 'del_user_post':
+                                    $mas['result']=$this->delUserPostAjaxAnswer($authorization_parameters,$request);
+                                    break;
+
                 }
         } else if ($request->headers->has('Content-Type')) {
             if ($request->headers->get('Content-Type')=='text/plain')
@@ -545,7 +550,7 @@ class uProfileController extends LoggingController {
                     $datapart+=$ostatok_1;
                     //получаем список стихов
                     //Doctrine не имеет поддержки контрукции CASE WHEN из-за этого приходится использовать логику в PHP
-                    $query=$unewsfeed->createQuery('SELECT pr.userId,pr.poetryRepostId,pr.poetryId,pr.userPoetryownerId FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.userId=?1')
+                    $query=$unewsfeed->createQuery('SELECT pr.userId,pr.poetryRepostId,pr.poetryId,pr.userPoetryownerId FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.userId=?1 ORDER BY pr.createdAt DESC')
                             ->setFirstResult((($this->getParameter('ipoetry.uprofilenewsfeedlimit')*$authorization_parameters['datapart'])-$this->getParameter('ipoetry.uprofilenewsfeedlimit')))
                             ->setMaxResults($this->getParameter('ipoetry.uprofilenewsfeedlimit'));
                     $query->setParameter(1,$authorization_parameters['user'] );
