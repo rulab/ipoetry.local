@@ -228,7 +228,7 @@
 								<div class="main-post-item-info-item post-views">155</div>
 								<a href="#" class="main-post-item-info-item post-comments">{% verbatim %}{{unewsfeeditem.poetrypostscnt}}{% endverbatim %}</a>
 							</div>
-							<div class="main-post-more-details" ng-mouseover="shbutton($event);" ng-mouseleave="delbutton($event);">
+							<div class="main-post-more-details" ng-mouseover="shbutton($event);" ng-mouseleave="delbutton($event);" ng-show="ownershow">
 								<div class="show-more-details-inner-wrap" style="display: none; opacity: 1;">
 									<button postid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="btn-white-border" ng-click="delelement($event);">Удалить</button>
 								</div>
@@ -431,7 +431,7 @@
                //скрываем блок с вводом сообщения
                $('.add-post-wrap').eq(0).fadeOut();
                //скрываем кнопки удалить в элементах стены
-               $('.main-post-more-details').fadeOut();
+               //$('.main-post-more-details').fadeOut();
             }
                 
         },

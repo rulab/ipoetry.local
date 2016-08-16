@@ -27,7 +27,8 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
     $scope.reverse = false;
     $scope.propertyName = 'created';
     $scope.filterset=false;
-    $scope.filtersetperiod=365;    
+    $scope.filtersetperiod=365;
+    $scope.ownershow=true;
     //карточки ленты стихов
     $scope.unewsfeed = [
     ];
@@ -73,7 +74,7 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
                         if ($scope.page==1)
                             $scope.page++;
                         if (response.ownprofile===0)
-                            $('.main-post-more-details').fadeOut();
+                            $scope.ownershow=false;
                     }
                     else
                     {
@@ -98,7 +99,7 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
                         $scope.sortBy($scope.propertyName,$scope.filtersetperiod,false);
                     $scope.page++;
                         if (response.ownprofile===0)
-                            $('.main-post-more-details').fadeOut();
+                            $scope.ownershow=false;
                 }
                 else
                 {
