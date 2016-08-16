@@ -124,28 +124,30 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
         {
             if (response.result === 1)
             {
-                console.log(response.unewsfeedlist);
-                $scope.unewsfeed_part_count = response.unewsfeedlistcnt;
                 //заполняем элементы данными
-                $scope.unewsfeed_count=response.unewsfeedcount;
+                $scope.unewsfeed_count=($scope.unewsfeed_count-1);
                 for(i=0;i<$scope.unewsfeed.length;i++){
                   //console.log(unewsfeeddate,'#',curdate,(unewsfeeddate<curdate));
-                  if ($scope.unewsfeed[i].poetry_id===element.currentTarget.getAttribute("postid")){
+                  if (Number($scope.unewsfeed[i].poetry_id)===Number(element.currentTarget.getAttribute("postid"))){
                       indx=i;
                       break;
                   };
                 };
                 if (typeof indx !== 'undefined')
                     $scope.unewsfeed.splice(indx, 1);
-                if ($scope.filterset===true)
-                    $scope.sortBy($scope.propertyName,$scope.filtersetperiod,false);
+                $scope.$apply(); 
+                //if ($scope.filterset===true)
+                //    $scope.sortBy($scope.propertyName,$scope.filtersetperiod,false);
             }
         });
         
     };
     $scope.sortBy = function(propertyName,period,reverse) {
-      //$scope.reverse=reverse;
-      $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;      
+        if ($scope.filterset===false)
+            $scope.reverse=true;
+        else
+            $scope.reverse=reverse;
+      //$scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;      
       if (Number($scope.filtersetperiod)<Number(period) && $scope.filterset===true){
          console.log((Number($scope.filtersetperiod)<Number(period)));          
          $scope.addunewsfeed();
@@ -154,10 +156,9 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
       };
       if (Number($scope.filtersetperiod)>=Number(period) || (Number($scope.filtersetperiod)>Number(period) && ($scope.filterset===false))){
          console.log(Number($scope.filtersetperiod),Number(period),(Number($scope.filtersetperiod)>Number(period)));
-         $scope.filterset=true;
          $scope.filtersetperiod=period;
       };
-
+         $scope.filterset=true;
       if (Number(period)!==365){
         curdate=new Date();
         curdate.setDate(curdate.getDate() - period);
@@ -175,6 +176,7 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
            $('#getunewsfeedblockbtn').fadeOut();          
         };
       };
+      $scope.$apply();      
       $scope.propertyName = propertyName;
     };
     $scope.Likefunc=function(postid,option){
