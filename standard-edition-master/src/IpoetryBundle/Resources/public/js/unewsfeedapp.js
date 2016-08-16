@@ -72,6 +72,8 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
                         //защита от множественных ajax
                         if ($scope.page==1)
                             $scope.page++;
+                        if (response.ownprofile===0)
+                            $('.main-post-more-details').fadeOut();
                     }
                     else
                     {
@@ -95,6 +97,8 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
                     if ($scope.filterset===true)
                         $scope.sortBy($scope.propertyName,$scope.filtersetperiod,false);
                     $scope.page++;
+                        if (response.ownprofile===0)
+                            $('.main-post-more-details').fadeOut();
                 }
                 else
                 {
@@ -137,7 +141,7 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
             }
         });
         
-    }
+    };
     $scope.sortBy = function(propertyName,period,reverse) {
       //$scope.reverse=reverse;
       $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;      

@@ -591,7 +591,8 @@ class uProfileController extends LoggingController {
                     return array('result'=>$datapart,
                                  'newsfeed'=>$feedlist,
                                  'unewsfeedlist'=>$feedlist,
-                                 'unewsfeedlistcnt'=>$userfeedcnt[0][1]);
+                                 'unewsfeedlistcnt'=>$userfeedcnt[0][1],
+                                 'ownprofile'=>$this->GetUserOwnprofileAjaxAnswer($authorization_parameters,$this->request));
                 } else
                     return array('result'=>false);
             }
