@@ -135,7 +135,7 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
                 };
                 if (typeof indx !== 'undefined')
                     $scope.unewsfeed.splice(indx, 1);
-                $scope.$apply(); 
+                //$scope.$apply(); 
                 //if ($scope.filterset===true)
                 //    $scope.sortBy($scope.propertyName,$scope.filtersetperiod,false);
             }
