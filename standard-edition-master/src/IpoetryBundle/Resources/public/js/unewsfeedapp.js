@@ -171,12 +171,16 @@ unewsfeedApp.controller('unewsfeedController', function($scope,$http,$filter) {
               break;
           };
         };
-        $scope.unewsfeed.splice(indx, ($scope.unewsfeed.length-indx));
+        if (typeof indx !== 'undefined')
+            $scope.unewsfeed.splice(indx, ($scope.unewsfeed.length-indx));
         if ($('#getunewsfeedblockbtn').length<=$scope.unewsfeed_part_count){
            $('#getunewsfeedblockbtn').fadeOut();          
         };
       };
-      $scope.$apply();      
+      $scope.$apply(function() {
+        $scope.unewsfeed = $scope.unewsfeed;
+      });
+      //$scope.$apply();      
       $scope.propertyName = propertyName;
     };
     $scope.Likefunc=function(postid,option){
