@@ -12,6 +12,15 @@ IpoetryBundle_root:
     requirements:
         _method:  GET|POST
         _locale: en|ru
+
+IpoetryBundle_modal:
+    path:     /modal/{user}_{poetry}
+    defaults: { _controller: IpoetryBundle:Index:modal }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+        user: "\d+"
+        poetry: "\d+"
 #страница подписчиков
 IpoetryBundle_subscribers:
     path:     /subscribers/{user}

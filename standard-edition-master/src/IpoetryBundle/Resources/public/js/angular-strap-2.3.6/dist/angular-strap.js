@@ -2562,6 +2562,7 @@
       backdrop: true,
       keyboard: true,
       html: false,
+      delpoetryid:0,
       show: true
     };
     this.$get = [ '$window', '$rootScope', '$bsCompiler', '$animate', '$timeout', '$sce', 'dimensions', function($window, $rootScope, $bsCompiler, $animate, $timeout, $sce, dimensions) {
@@ -2631,6 +2632,7 @@
         $modal.show = function() {
           if ($modal.$isShown) return;
           var parent, after;
+          console.log(angular.isElement(options.container));
           if (angular.isElement(options.container)) {
             parent = options.container;
             after = options.container[0].lastChild ? angular.element(options.container[0].lastChild) : null;
@@ -2796,7 +2798,8 @@
           element: element,
           show: false
         };
-        angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'contentTemplate', 'placement', 'backdrop', 'keyboard', 'html', 'container', 'animation', 'backdropAnimation', 'id', 'prefixEvent', 'prefixClass' ], function(key) {
+        angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'contentTemplate', 'placement', 'backdrop', 'keyboard', 'html', 'container', 'animation', 'backdropAnimation', 'id', 'prefixEvent', 'prefixClass','delpoetryid' ], function(key) {
+          console.log(attr[key],options[key]);  
           if (angular.isDefined(attr[key])) options[key] = attr[key];
         });
         var falseValueRegExp = /^(false|0|)$/i;

@@ -222,7 +222,7 @@ abstract class LoggingController extends Controller{
         if ($request->hasSession()) {
             $this->session=$request->getSession();
             if ($this->session->has('login') && $this->session->has('login_id')){
-                VarDumper::dump(array('cache'=>$this->cacheDriver,'$poetryowneruser'=>$poetryowneruser,'user'=>$user,'poetry='=>$poetry));
+                //VarDumper::dump(array('cache'=>$this->cacheDriver,'$poetryowneruser'=>$poetryowneruser,'user'=>$user,'poetry='=>$poetry));
 
                 $this->session=$request->getSession();
                 //если есть обновленные поля то обновляем их
@@ -250,7 +250,7 @@ abstract class LoggingController extends Controller{
 
                     //VarDumper::dump(array('sql'=>$query->getSQL()));                
                     $usersubscribedcnt=$query->getResult();
-                    VarDumper::dump(array('$usersubscribedcnt'=>$usersubscribedcnt,'$query'=>$query->getDQL()));
+                    //VarDumper::dump(array('$usersubscribedcnt'=>$usersubscribedcnt,'$query'=>$query->getDQL()));
                     $poetry=$usersubscribedcnt[0]['poetryId'];
                     //$usersubscribedcnt[0][1];
                     if ($usersubscribedcnt[0][1]==1) {
@@ -349,7 +349,7 @@ abstract class LoggingController extends Controller{
             //VarDumper::dump(array('$poetry'=>$poetryresult,'tags'=>$poetryresult['tags_only']));
             if ($retvaltype=='TEMPLATE') {
                 $reposters=$this->GetPoetryReposterPeople($request,$poetryowneruser,$user,$poetry,$retvaltype);
-                VarDumper::dump(array('$reposters'=>$reposters,'$userheaderInfo'=>$userheaderInfo[0]));
+                //VarDumper::dump(array('$reposters'=>$reposters,'$userheaderInfo'=>$userheaderInfo[0]));
                 $comments=$this->AddBlogPosts($request,$poetryowneruser,$poetry,'TEMPLATE');
                 if (empty($comments))
                     $comments=array(0);
@@ -409,7 +409,7 @@ abstract class LoggingController extends Controller{
         if (strtoupper($source)=='NEWMESSAGE')
             $uploadtmpfile=$uploadtmp.'/newmessage_data'.rand(1,9999999999).'.'.$filetype;
                 
-        Vardumper::dump(array('request'=>$request,'file'=>$request->files->get('files')[0],'conent type'=>$request->headers->get('content-type')));
+        //Vardumper::dump(array('request'=>$request,'file'=>$request->files->get('files')[0],'conent type'=>$request->headers->get('content-type')));
         //$StreamedResponse=new StreamedResponse(null,200,array($request->headers->get('content-disposition'),
         //    $request->headers->get('content-length'),
         //    $request->headers->get('content-type')));
@@ -510,7 +510,7 @@ abstract class LoggingController extends Controller{
                     $query->setParameter(1,$poetry );//$this->session->has('login_id')
                     //VarDumper::dump(array('sql'=>$query->getSQL()));
                     $poetryposts=$query->getResult();
-                    VarDumper::dump(array('poetryposts'=>$poetryposts,'$poetry'=>$poetry));
+                    //VarDumper::dump(array('poetryposts'=>$poetryposts,'$poetry'=>$poetry));
 
                     return array($poetrypostscnt[0][1],$poetryposts);
                     //$result['user']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$user));
@@ -528,7 +528,7 @@ abstract class LoggingController extends Controller{
         if ($request->hasSession()) {
             //закрываем выход из сессии пользователя
             $inactivity=getdate($this->session->getMetadataBag()->getLastUsed()-$this->session->getMetadataBag()->getCreated());
-            VarDumper::dump( array('lastupdated'=>$this->session->getMetadataBag()->getLastUsed(),'inactivity'=>$this->session->getMetadataBag()->getCreated(),'inactivity_min'=>$inactivity['minutes']) );
+            //VarDumper::dump( array('lastupdated'=>$this->session->getMetadataBag()->getLastUsed(),'inactivity'=>$this->session->getMetadataBag()->getCreated(),'inactivity_min'=>$inactivity['minutes']) );
             $this->session->invalidate();
              //$eventDispatcher = $this->get('event_dispatcher');
             //$customusercloseevent=new CloseUserSessionEvent();
@@ -599,7 +599,7 @@ abstract class LoggingController extends Controller{
     public function urlsession($authorization_parameters,$session){
         //проверяем что пришло в сессии
         //$this->GetCache($session);
-        varDumper::dump(array('$authorization_parameters["user"]'=>$authorization_parameters['user'],'session'=>$session->get('login_id'),'has login_id'=>$session->has('login_id')));
+        //varDumper::dump(array('$authorization_parameters["user"]'=>$authorization_parameters['user'],'session'=>$session->get('login_id'),'has login_id'=>$session->has('login_id')));
         if ($session->has('login_id')){
             if ($authorization_parameters['user']==$session->get('login_id') )
                 return 1;
@@ -730,7 +730,7 @@ abstract class LoggingController extends Controller{
                     if (!empty($authorization_parameters['cityfilter'])){
                         $query->setParameter(2,$authorization_parameters['cityfilter']);
                     }
-                    VarDumper::dump(array($query->getSQL(),$cityfilter,$userfilter));
+                    //VarDumper::dump(array($query->getSQL(),$cityfilter,$userfilter));
                     $users=$query->getResult();
                     
                     //VarDumper::dump(array($this->session->get('login_id'),$this->urlsession($authorization_parameters,$this->session)));
@@ -747,7 +747,7 @@ abstract class LoggingController extends Controller{
     }
     //рейтинг пользователей
     public function GetUsersRatingsAjaxAnswer($authorization_parameters,$request){
-        VarDumper::dump(array('result'=>1,'usersratings'=>1));
+        //VarDumper::dump(array('result'=>1,'usersratings'=>1));
         //в request может приходить день,месяц,год
         $this->request=$request;
         //читаем данные по стихотворению по данным в параметрах url
@@ -767,7 +767,7 @@ abstract class LoggingController extends Controller{
                 if ($uratingcnt[0][1]){
                     $uratings=$urating->getRepository('IpoetryBundle:DailyUserRating')
                     ->getLatestRating($this->getParameter('ipoetry.userratinglimit'),$authorization_parameters['period']);
-                    Vardumper::dump(array('$uratings'=>$uratings));
+                    //Vardumper::dump(array('$uratings'=>$uratings));
                     return array('result'=>1,'usersratings'=>$uratings);
                 }
             } else
@@ -776,7 +776,7 @@ abstract class LoggingController extends Controller{
     }
     //рейтинг стихов
     public function GetPoetriesRatingsAjaxAnswer($authorization_parameters,$request){
-        VarDumper::dump(array('result'=>1,'poetriesratings'=>1));
+        //VarDumper::dump(array('result'=>1,'poetriesratings'=>1));
         //в request может приходить день,месяц,год
         $this->request=$request;
         //читаем данные по стихотворению по данным в параметрах url
@@ -827,11 +827,11 @@ abstract class LoggingController extends Controller{
     public function delUserPostAjaxAnswer($authorization_parameters,$request) {
         try {
         $this->GetCache($request);
-        VarDumper::dump(array('cache'=>$this->cacheDriver,
+        /*VarDumper::dump(array('cache'=>$this->cacheDriver,
             'request'=>$request,'login='=>$this->session->get('login'),
             'poetry='=>$authorization_parameters['poetry'],
             'del_ipoetry_user_post'=>$this->sql_array['del_ipoetry_user_post']));
-
+        */
         if ($request->hasSession()) {
             //пишем обновленные данные в базу
             if ($this->session->has('login') && $this->session->has('login_id')){

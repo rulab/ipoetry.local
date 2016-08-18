@@ -177,18 +177,18 @@
 			<div class="content">
 
 				<a href="#" class="post-counter"><span>{{userfeedcnt}}</span> запись(и)</a>
+                        <!--контроллер angular-->
+                        <div ng-controller="unewsfeedController" ng-init="init({{app.request.attributes.get('_route_params')['user']}},{{uprofilenewsfeedlimit}},'{{ path('IpoetryBundle_unewsfeedentityajax') }}','{{app.request.getRequestUri}}')">
 
 				<!-- Добавить пост -->
 				<div class="add-post-wrap">
 					<form class="clearfix">
 						<textarea id="poetrymessage" placeholder="Добавить запись"></textarea>
 						<!--<div class="btn-add-post-img">Добавить фото</div>-->
-						<button id="poetrymessagebtn" class="btn-blue-bg">Написать</button>
+						<button id="poetrymessagebtn" class="btn-blue-bg" ng-click="addMessage('{{ path('IpoetryBundle_newmessageajax') }}');">Написать</button>
 					</form>
 				</div>
 				<!-- Добавить пост конец -->
-<!--контроллер angular-->
-<div ng-controller="unewsfeedController" ng-init="init({{app.request.attributes.get('_route_params')['user']}},{{uprofilenewsfeedlimit}},'{{ path('IpoetryBundle_unewsfeedentityajax') }}','{{app.request.getRequestUri}}')">
 
 				<!-- Настройки ленты -->
 				<div class="feed-sorting clearfix">
@@ -220,7 +220,7 @@
 								</div>
 								<a href="#"></a>
 							</div>
-                                                    <a href="#" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
+                                                    <a href="../unewsfeedentity/{{app.request.attributes.get('_route_params')['user']}}_{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
 							<div ng-repeat="tag in unewsfeeditem.tags_only" class="main-post-tags" style="display:inline;width:80px;">
 								<a href="#" tagid="{% verbatim %}{{tag.tagid}}{% endverbatim %}">#{% verbatim %}{{tag.tagtext}}{% endverbatim %}</a>
 							</div>
@@ -230,7 +230,7 @@
 							</div>
 							<div class="main-post-more-details" ng-mouseover="shbutton($event);" ng-mouseleave="delbutton($event);" ng-show="ownershow">
 								<div class="show-more-details-inner-wrap" style="display: none; opacity: 1;">
-									<button postid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="btn-white-border" ng-click="delelement($event);">Удалить</button>
+									<button postid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="btn-white-border" ng-click="showModal($event);">Удалить</button> <!--ng-click="delelement($event);"-->
 								</div>
 							</div>
 							<div class="plagiat" style="display: none; opacity: 1;">Плагиат</div>
@@ -300,13 +300,15 @@
 '@IpoetryBundle/Resources/public/bootstrap/dist/js/bootstrap.min.js'
 '@IpoetryBundle/Resources/public/js/angular.min.js'
 '@IpoetryBundle/Resources/public/js/angular-animate.min.js'
+'@IpoetryBundle/Resources/public/js/angular-route.min.js'
 '@IpoetryBundle/Resources/public/js/fancybox/jquery.fancybox.pack.js'
 '@IpoetryBundle/Resources/public/js/unewsfeedapp.js'
 '@IpoetryBundle/Resources/public/js/w_load.js'
 '@IpoetryBundle/Resources/public/js/libs.js'
 '@IpoetryBundle/Resources/public/js/common.js'
-'@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.min.js'
+'@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.js'
 '@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.tpl.min.js'
+'@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/src/modal/modal.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie-emulation-modes-warning.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie10-viewport-bug-workaround.js'
 %}
@@ -329,6 +331,7 @@
         str = str.replace(/\\\\/g, '\\');
         return str;
     }
+    /*
     function addMessage(){
         var oReq = new XMLHttpRequest();
         oReq.onreadystatechange = function() {
@@ -347,6 +350,7 @@
                     complete: function() {},
                     success: function(json) {
                         if (json['result']===1) {
+                            $('#poetrymessage').val('');
                             console.log('AJAX_user_new_message result='+json['result']);
                             return 1;
                         } else {
@@ -368,6 +372,7 @@
         oReq.setRequestHeader("Content-Type", "text/plain");
         oReq.send(blob);        
     }
+    */
     function addUserSubscription(){
         
         //делаем запрос на добавление подписки на данного владельца профиля
@@ -643,7 +648,7 @@
               if ($('#poetrymessage').val()==='') {
                 return 0;
               } else {
-                addMessage();
+                //addMessage();
               }
             });
             checkOwnProfile();

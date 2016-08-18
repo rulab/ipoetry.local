@@ -90,6 +90,10 @@ class IndexController extends LoggingController
             $retval=$this->render('IpoetryBundle:Default:index.html.twig');
          return $retval;
     }
+    public function modalAction(Request $request,$user,$poetry){
+        $retval=$this->render('IpoetryBundle::modaldemo.html.twig',array('userid'=>$user,'poetryid'=>$poetry));
+        return $retval;
+    }
     //распределитель ajax логики
     public function MainAjaxAction (Request $request){
       //по полученном параметрам делаем запрос в базу узнать что такой пользователь существует

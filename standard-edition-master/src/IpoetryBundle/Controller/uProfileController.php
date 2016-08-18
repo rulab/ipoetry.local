@@ -298,6 +298,9 @@ class uProfileController extends LoggingController {
                         case 'get_user_feed_info':
                                     $mas=$this->getUserFeedInfoAjaxAnswer($authorization_parameters,$request);
                                     break;
+                        case 'new_message':
+                                    $mas['result']=$this->NewMessageAjaxAnswer($authorization_parameters,$request);
+                                    break;
                         case 'del_user_post':
                                     $mas['result']=$this->delUserPostAjaxAnswer($authorization_parameters,$request);
                                     break;
