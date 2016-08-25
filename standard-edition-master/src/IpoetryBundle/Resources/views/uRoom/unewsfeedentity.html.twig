@@ -328,7 +328,7 @@
                   PoetryLike({{app.request.attributes.get('_route_params')['user']}},
                   {{app.request.attributes.get('_route_params')['poetry']}},'down');
             });
-
+        {{ include('IpoetryBundle::basejs.html.twig') }}
         {% endblock documentReady %}
     });
 </script>

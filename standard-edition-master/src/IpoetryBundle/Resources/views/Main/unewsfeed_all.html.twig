@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru"  ng-app="unewsfeedallApp">
 <head>
 <title>ipoetry-просмотр ленты</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
@@ -21,25 +21,168 @@
     {% endblock %}            
 </head>
 <body id="body_container" style="position: absolute; width:100%;height:100%;max-width:100%;max-height:100%;"> <!--//onload="javascript:Dimension();" width: 1160px; height: 800px;visibility:hidden;-->
+            {{ include('IpoetryBundle::baseheader.html.twig',{'userheaderInfo':userheaderInfo}) }}
+<div class="wrapper">
+    <div ng-controller="unewsfeedallController" ng-init="init({{uprofilenewsfeedlimit}},'{{ path('IpoetryBundle_mainajax') }}','{{app.request.getRequestUri}}')">
+
+		<!-- Верхняя информационная панель -->
+		<div class="top-info-panel gray-bg">
+			<div class="container clearfix">
+				<div class="feed-sorting">
+					<div class="feed-sorting-items-wrap tabs">
+						<div class="feed-sorting-item tab active">Общая лента</div>
+						<!--<div class="feed-sorting-item tab">Лента сообществ</div>-->
+						<div class="feed-sorting-item tab">Лента подписчиков</div>
+						<div class="feed-sorting-item tab">Моя лента</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Верхняя информационная панель конец -->
+
+		<!-- Главный контейнер -->
+		<div class="main-wrap">
+			<div class="container clearfix">
+
+				<!-- Контент -->
+				<div class="content">
+
+					<!-- Что нового? -->
+					<div class="whats-new">
+        				    <button id="addpoembtn" class="btn-blue-bg">Добавить стихотворение</button>
+					</div>
+					<!-- Что нового? конец-->
+
+					<!-- Результаты фильтрации -->
+					<div class="tab_content">
+
+						<!-- Вкладка -->
+						<div class="tab_item" style="display: block;">
+
+                                                    <div ng-repeat="unewsfeeditem in unewsfeed | orderBy:propertyName:reverse" postid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" name="unewsfeedblock">
+
+                                                        <!-- Пост в ленте пользователя-->
+                                                        <div class="main-post-item" rating="{% verbatim %}{{unewsfeeditem.poetrydailyrating.poetryRating}}{% endverbatim %}">
+                                                                <div class="main-post-item-top" style="background-image: url({% verbatim %}{{unewsfeeditem.image}}{% endverbatim %});background-repeat: no-repeat;background-position: center;-webkit-background-size: contain;-moz-background-size: contain;-o-background-size: contain;background-size: contain;">
+                                                                        <div class="main-post-item-top-inner">
+                                                                                <div class="main-post-category">
+                                                                                        <div class="main-post-category-ico">
+                                                                                                <img src="img/ico-heart.png" alt="alt">
+                                                                                        </div>
+                                                                                        <a href="#"></a>
+                                                                                </div>
+                                                                            <a href="../unewsfeedentity/{% verbatim %}{{unewsfeeditem.poetryowneruserid}}{% endverbatim %}_{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
+                                                                                <div ng-repeat="tag in unewsfeeditem.tags_only" class="main-post-tags" style="display:inline;width:80px;">
+                                                                                        <a href="#" tagid="{% verbatim %}{{tag.tagid}}{% endverbatim %}">#{% verbatim %}{{tag.tagtext}}{% endverbatim %}</a>
+                                                                                </div>
+                                                                                <div class="main-post-item-info">
+                                                                                        <div class="main-post-item-info-item post-views">155</div>
+                                                                                        <a href="#" class="main-post-item-info-item post-comments">{% verbatim %}{{unewsfeeditem.poetrypostscnt}}{% endverbatim %}</a>
+                                                                                </div>
+                                                                                <div class="main-post-more-details" ng-mouseover="shbutton($event);" ng-mouseleave="delbutton($event);" ng-show="ownershow">
+                                                                                        <div class="show-more-details-inner-wrap" style="display: none; opacity: 1;">
+                                                                                                <button postid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="btn-white-border" ng-click="showModal($event);">Удалить</button> <!--ng-click="delelement($event);"-->
+                                                                                        </div>
+                                                                                </div>
+                                                                                <div class="plagiat" style="display: none; opacity: 1;">Плагиат</div>
+                                                                        </div>
+                                                                </div>
+                                                                <div class="main-post-item-bottom clearfix">
+                                                                        <div class="main-post-item-author">
+                                                                                <a href="#" class="main-post-item-author-img-wrap">
+                                                                                    <img src="{% verbatim %}{{unewsfeeditem.owneruphotourl}}{% endverbatim %}" alt="alt">
+                                                                                </a>
+                                                                                <div class="main-post-item-text clearfix">
+                                                                                        <a href="#" class="main-post-item-author-name">{% verbatim %}{{unewsfeeditem.owneruname}} {{unewsfeeditem.ownerulastname}}{% endverbatim %}</a>
+                                                                                        <div class="main-post-item-time">{% verbatim %}{{unewsfeeditem.created}}{% endverbatim %}</div>
+                                                                                </div>
+                                                                        </div>
+                                                                        <div class="main-post-item-social-panel clearfix">
+                                                                                <a href="#" class="post-social-item"><i class="fa fa-odnoklassniki" aria-hidden="true"></i></a>
+                                                                                <a href="#" class="post-social-item"><i class="fa fa-vk" aria-hidden="true"></i></a>
+                                                                                <a href="#" class="post-social-item"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                                                                                <a href="#" class="post-social-item"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                                                                        </div>
+                                                                        <div class="clearfix"></div>
+                                                                        <div class="main-post-poem-text clearfix">{% verbatim %}{{unewsfeeditem.comment}}{% endverbatim %}
+                                                                        </div>
+                                                                        <div class="main-post-likes-wrap">
+                                                                            <div class="like" poetryid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" ng-click="Likefunc($event,'up');">{% verbatim %}{{unewsfeeditem.like}}{% endverbatim %}</div>
+                                                                            <div class="dislike" poetryid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" ng-click="Likefunc($event,'down');">{% verbatim %}{{unewsfeeditem.dislike}}{% endverbatim %}</div>
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                        <!-- Пост в ленте пользователя конец -->
+						</div>
+						<!-- Вкладка конец -->
+					</div>
+					<!-- Результаты фильтрации конец-->
+				</div>
+                                <button id="getunewsfeedblockbtn" type="submit" class="btn-blue-bg" ng-click="moreuNewsfeed()">
+                                <span>{% trans %}%MoreFeeds%{% endtrans %}</span>
+                                </button>
+				<!-- Контент конец -->
+			</div>
+				<!-- Боковая панель -->
+				<aside>
+
+					<!-- Виджет боковой панели -->
+					<div class="aside-widget week-author-widget">
+
+						<!-- Автор недели -->
+                                                {% for userratingitem in userrating.usersratings %}
+                                                <div class="poem-item clearfix">
+                                                            <a class="aside-widget-title" href="#">Автор недели</a>
+                                                            <a href="#" class="week-author-img-wrap">
+                                                                    <img src="{{userratingitem.userPhotoUrl}}" alt="alt">
+                                                            </a>
+                                                            
+                                                            <a class="week-author-name" href="#">{{userratingitem.userName}} {{userratingitem.userLastname}}</a>
+                                                </div>
+                                                {% endfor %}
+
+						<!-- Автор недели конец -->
+
+					</div>
+					<!-- Виджет боковой панели конец-->
+
+				</aside>
+				<!-- Боковая панель конец -->
+		</div>
+		<!-- Главный контейнер конец -->
+
+	</div>
+    </div>
+</div>
     <!--    <button id="setusersubscriptionbtn" type="submit" class="btn btn-primary start">
                             <i class="glyphicon glyphicon-upload"></i>
                             <span>Subscribe</span>
         </button>
         <div style="clear:both;"></div>
     -->
-        <button id="getuserfeedinfobtn" type="submit" class="btn btn-primary start">
-                            <i class="glyphicon glyphicon-upload"></i>
-                            <span>Get user feed info</span>
-        </button>
         <input id="datapartnum" type="hidden" value="1"/>
     
+<!-- Подвал -->
+        {{ include('IpoetryBundle::basefooter.html.twig') }}    
 {% block javascripts %}
 {% javascripts '@IpoetryBundle/Resources/public/js/jquery-1.11.0.min.js'
 '@IpoetryBundle/Resources/public/bootstrap/dist/js/bootstrap.min.js'
+'@IpoetryBundle/Resources/public/bootstrap/dist/js/bootstrap.min.js'
+'@IpoetryBundle/Resources/public/js/angular.min.js'
+'@IpoetryBundle/Resources/public/js/angular-animate.min.js'
+'@IpoetryBundle/Resources/public/js/angular-route.min.js'
+'@IpoetryBundle/Resources/public/js/fancybox/jquery.fancybox.pack.js'
+'@IpoetryBundle/Resources/public/js/unewsfeedallapp.js'
 '@IpoetryBundle/Resources/public/js/w_load.js'
+'@IpoetryBundle/Resources/public/js/libs.js'
+'@IpoetryBundle/Resources/public/js/common.js'
+'@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.js'
+'@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.tpl.min.js'
+'@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/src/modal/modal.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie-emulation-modes-warning.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie10-viewport-bug-workaround.js'
 %}
+
 <script type="text/javascript" src="{{ asset_url }}"></script>
 {% endjavascripts %}
 {% endblock %}
@@ -84,12 +227,12 @@
             console.log('error AJAX_userFollowers_feed_available ' + textStatus);
         };
         ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror);
-
     }
     
     $(document).ready(function () {
         {% block documentReady %}
-            $('#getuserfeedinfobtn').on('click',function (event){
+            /*
+            $('#getunewsfeedblockbtn').on('click',function (event){
                 event = event || window.event;
 
                   if (event.preventDefault) { // если метод существует
@@ -99,9 +242,19 @@
                   }
                   GetAllNewsfeed();
             });
-
+            */
             //checkOwnProfile();
             //checkUserSubscribed();
+
+            //проверяем если это анонимный пользователь
+            //тогда скрываем лишние элементы
+            if (Number($('.topline-user-name').eq(0).attr('dbid'))==-1) {
+                $('.feed-sorting-item.tab').eq(1).fadeOut();
+                $('.feed-sorting-item.tab').eq(2).fadeOut();
+                $('#addpoembtn').fadeOut();
+            }
+            
+        {{ include('IpoetryBundle::basejs.html.twig') }}
         {% endblock documentReady %}
     });
 </script>

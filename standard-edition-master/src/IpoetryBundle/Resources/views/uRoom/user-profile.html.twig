@@ -42,7 +42,7 @@
 						</div>
 					</div>
 					<button id="setusersubscriptionbtn" class="btn-white-border">Подписаться</button>
-					<button class="btn-white-border">Смотреть ленту пользователя</button>
+					<button id="gotousernewsfeedbtn" class="btn-white-border">Смотреть ленту пользователя</button>
 				</div>
 				<a href="#" onclick="javascript:window.history.back(-1);return false;" class="back-link">Назад</a>
 			</div>
@@ -175,7 +175,6 @@
 
 			<!-- Контент -->
 			<div class="content">
-
 				<a href="#" class="post-counter"><span>{{userfeedcnt}}</span> запись(и)</a>
                         <!--контроллер angular-->
                         <div ng-controller="unewsfeedController" ng-init="init({{app.request.attributes.get('_route_params')['user']}},{{uprofilenewsfeedlimit}},'{{ path('IpoetryBundle_unewsfeedentityajax') }}','{{app.request.getRequestUri}}')">
@@ -220,7 +219,7 @@
 								</div>
 								<a href="#"></a>
 							</div>
-                                                    <a href="../unewsfeedentity/{{app.request.attributes.get('_route_params')['user']}}_{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
+                                                    <a href="../unewsfeedentity/{% verbatim %}{{unewsfeeditem.poetryowneruserid}}{% endverbatim %}_{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
 							<div ng-repeat="tag in unewsfeeditem.tags_only" class="main-post-tags" style="display:inline;width:80px;">
 								<a href="#" tagid="{% verbatim %}{{tag.tagid}}{% endverbatim %}">#{% verbatim %}{{tag.tagtext}}{% endverbatim %}</a>
 							</div>
@@ -650,6 +649,16 @@
               } else {
                 //addMessage();
               }
+            });
+            $('#gotousernewsfeedbtn').on('click',function(event){
+              event = event || window.event;
+
+              if (event.preventDefault) { // если метод существует
+                event.preventDefault(); // то вызвать его
+              } else { // иначе вариант IE8-:
+                event.returnValue = false;
+              }
+              document.location.assign('{{path('IpoetryBundle_unewsfeedall')}}');
             });
             checkOwnProfile();
             checkUserSubscribed();

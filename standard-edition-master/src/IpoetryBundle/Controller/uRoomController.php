@@ -214,7 +214,7 @@ class uRoomController extends LoggingController{
         if ($options['data']['user_photo']=='undefined')
             $options['data']['user_photo']=$this->getRequest()->getBasePath().'/images/question.jpg';
         //return new Response('тут отображается форма с данными о пользователе');                
-        return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView(),'user_photo'=>$options['data']['user_photo']));
+        return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView(),'user_photo'=>$options['data']['user_photo'],'userid'=>$result->getUserId()));
     }
 
     //распределитель ajax запросов по логированию и регистрации пользователей

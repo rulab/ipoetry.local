@@ -224,51 +224,48 @@ abstract class LoggingController extends Controller{
             if ($this->session->has('login') && $this->session->has('login_id')){
                 //VarDumper::dump(array('cache'=>$this->cacheDriver,'$poetryowneruser'=>$poetryowneruser,'user'=>$user,'poetry='=>$poetry));
 
-                $this->session=$request->getSession();
                 //если есть обновленные поля то обновляем их
                 //пишем обновленные данные в базу
                 $unewsfeedentity = $this->getDoctrine()->getManager();
-                if ($this->session->has('login') && $this->session->has('login_id')){
-                    //получаем связанные таблицы для показа данных
-                    //получаем кол-во записей
-                    $userspoetry = $this->getDoctrine()->getEntityManager();
+            //получаем связанные таблицы для показа данных
+            //получаем кол-во записей
+            $userspoetry = $this->getDoctrine()->getEntityManager();
 
-                    if (is_string($poetry) && $poetryowneruser<>0){
-                        $query=$userspoetry->createQuery('SELECT COUNT(pr.poetryId),pr.poetryId FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.poetryRepostId=?1')
-                             ->setMaxResults(1);
-                        $query->setParameter(1,$poetry );
-                    } else {
-                        $query=$userspoetry->createQuery('SELECT COUNT(ip.poetryId),ip.poetryId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr WHERE usr.userId=?1 and ip.poetryId=?2');// usr usr.userId=?1 and
-                        //если это не стих репост
-                        if ($poetryowneruser<>0)
-                            $query->setParameter(1,$poetryowneruser );//$this->session->has('login_id')
-                        else
-                            $query->setParameter(1,$user );//$this->session->has('login_id')
+            if (is_string($poetry) && $poetryowneruser<>0){
+                $query=$userspoetry->createQuery('SELECT COUNT(pr.poetryId),pr.poetryId FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.poetryRepostId=?1')
+                     ->setMaxResults(1);
+                $query->setParameter(1,$poetry );
+            } else {
+                $query=$userspoetry->createQuery('SELECT COUNT(ip.poetryId),ip.poetryId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr WHERE usr.userId=?1 and ip.poetryId=?2');// usr usr.userId=?1 and
+                //если это не стих репост
+                if ($poetryowneruser<>0)
+                    $query->setParameter(1,$poetryowneruser );//$this->session->has('login_id')
+                else
+                    $query->setParameter(1,$user );//$this->session->has('login_id')
 
-                        $query->setParameter(2,$poetry );
-                    }
+                $query->setParameter(2,$poetry );
+            }
 
-                    //VarDumper::dump(array('sql'=>$query->getSQL()));                
-                    $usersubscribedcnt=$query->getResult();
-                    //VarDumper::dump(array('$usersubscribedcnt'=>$usersubscribedcnt,'$query'=>$query->getDQL()));
-                    $poetry=$usersubscribedcnt[0]['poetryId'];
-                    //$usersubscribedcnt[0][1];
-                    if ($usersubscribedcnt[0][1]==1) {
-                        $result['user']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$user));
-                        //если это не стих репост
-                        if ($poetryowneruser<>0) {
-                            $result['userowner']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$poetryowneruser));
-                            $result['poetryrepost']=$unewsfeedentity->getRepository('IpoetryBundle:PoetryRepostToOwnFeed')->findOneBy(array('userId'=>$user,'poetryId'=>$poetry));
-                            //VarDumper::dump(array('$result[poetryrepost]'=>$result['poetryrepost']));
-                        }
-                        $result['poetry']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetry')->findOneBy(array('poetryId'=>$poetry));
-                        $result['poetrybackgroundimage']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryBackgroundImages')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
-                        $result['poetryrating']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetryRating')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
-                        $period='WEEK';
-                        $result['poetrydailyrating']=$unewsfeedentity->getRepository('IpoetryBundle:DailyPoetryRating')->findOneByPeriod($poetry,$period);
-                    } else
-                        throw $this->createNotFoundException('No user or poetry found for login:'.$this->session->get('login'). ' login_id:'.$this->session->get('login_id').' poetry_id:'.$poetry);
+            //VarDumper::dump(array('sql'=>$query->getSQL()));                
+            $usersubscribedcnt=$query->getResult();
+            //VarDumper::dump(array('$usersubscribedcnt'=>$usersubscribedcnt,'$query'=>$query->getDQL()));
+            $poetry=$usersubscribedcnt[0]['poetryId'];
+            //$usersubscribedcnt[0][1];
+            if ($usersubscribedcnt[0][1]==1) {
+                $result['user']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$user));
+                //если это не стих репост
+                if ($poetryowneruser<>0) {
+                    $result['userowner']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$poetryowneruser));
+                    $result['poetryrepost']=$unewsfeedentity->getRepository('IpoetryBundle:PoetryRepostToOwnFeed')->findOneBy(array('userId'=>$user,'poetryId'=>$poetry));
+                    //VarDumper::dump(array('$result[poetryrepost]'=>$result['poetryrepost']));
                 }
+                $result['poetry']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetry')->findOneBy(array('poetryId'=>$poetry));
+                $result['poetrybackgroundimage']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryBackgroundImages')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                $result['poetryrating']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetryRating')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                $period='WEEK';
+                $result['poetrydailyrating']=$unewsfeedentity->getRepository('IpoetryBundle:DailyPoetryRating')->findOneByPeriod($poetry,$period);
+            } else
+                throw $this->createNotFoundException('No user or poetry found for login:'.$result['user']. ' login_id:'.$user.' poetry_id:'.$poetry);
             //VarDumper::dump(array('1'=>1));
             //если не получили данные по пользователю или стихотворению выбрасываем исключение
             /*
@@ -363,10 +360,140 @@ abstract class LoggingController extends Controller{
                     'userheaderInfo'=>$userheaderInfo[0],
                     'poemcommentslimit'=>$this->getParameter('ipoetry.uprofilecommentslimit')));
             } else if ($retvaltype=='JSON')
-                return $poetryresult;   
+                return $poetryresult;
             } else {
+                //VarDumper::dump(array('cache'=>$this->cacheDriver,'$poetryowneruser'=>$poetryowneruser,'user'=>$user,'poetry='=>$poetry));
+
+                //если есть обновленные поля то обновляем их
+                //пишем обновленные данные в базу
+                $unewsfeedentity = $this->getDoctrine()->getManager();
+            //получаем связанные таблицы для показа данных
+            //получаем кол-во записей
+            $userspoetry = $this->getDoctrine()->getEntityManager();
+
+            if (is_string($poetry) && $poetryowneruser<>0){
+                $query=$userspoetry->createQuery('SELECT COUNT(pr.poetryId),pr.poetryId FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.poetryRepostId=?1')
+                     ->setMaxResults(1);
+                $query->setParameter(1,$poetry );
+            } else {
+                $query=$userspoetry->createQuery('SELECT COUNT(ip.poetryId),ip.poetryId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr WHERE usr.userId=?1 and ip.poetryId=?2');// usr usr.userId=?1 and
+                //если это не стих репост
+                if ($poetryowneruser<>0)
+                    $query->setParameter(1,$poetryowneruser );//$this->session->has('login_id')
+                else
+                    $query->setParameter(1,$user );//$this->session->has('login_id')
+
+                $query->setParameter(2,$poetry );
+            }
+
+            //VarDumper::dump(array('sql'=>$query->getSQL()));                
+            $usersubscribedcnt=$query->getResult();
+            //VarDumper::dump(array('$usersubscribedcnt'=>$usersubscribedcnt,'$query'=>$query->getDQL()));
+            $poetry=$usersubscribedcnt[0]['poetryId'];
+            //$usersubscribedcnt[0][1];
+            if ($usersubscribedcnt[0][1]==1) {
+                $result['user']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$user));
+                //если это не стих репост
+                if ($poetryowneruser<>0) {
+                    $result['userowner']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$poetryowneruser));
+                    $result['poetryrepost']=$unewsfeedentity->getRepository('IpoetryBundle:PoetryRepostToOwnFeed')->findOneBy(array('userId'=>$user,'poetryId'=>$poetry));
+                    //VarDumper::dump(array('$result[poetryrepost]'=>$result['poetryrepost']));
+                }
+                $result['poetry']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetry')->findOneBy(array('poetryId'=>$poetry));
+                $result['poetrybackgroundimage']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryBackgroundImages')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                $result['poetryrating']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetryRating')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                $period='WEEK';
+                $result['poetrydailyrating']=$unewsfeedentity->getRepository('IpoetryBundle:DailyPoetryRating')->findOneByPeriod($poetry,$period);
+            } else
+                throw $this->createNotFoundException('No user or poetry found for login:'.$result['user']. ' login_id:'.$user.' poetry_id:'.$poetry);
+            //VarDumper::dump(array('1'=>1));
+            //если не получили данные по пользователю или стихотворению выбрасываем исключение
+            /*
+            if (!$result['user'] || !$result['poetry']) {
+                throw $this->createNotFoundException('No user or poetry found for email:'.$this->session->get('login'));
+            }
+            */
+            //VarDumper::dump(array('$result["user"]'=>$result['user'],'$result["poetry"]'=>$result['poetry'],'$result["poetrybackgroundimage"]'=>$result['poetrybackgroundimage']));
+            $poetryresult['userid']=$user;
+            $poetryresult['poetryowneruserid']=$poetryowneruser;
+            if (!empty($result['poetryrepost']))
+                $poetryresult['reposted']=$result['poetryrepost']->getRepostedAt()->format('Y-m-d H:i:s');
+            else
+                $poetryresult['reposted']='';
+            $poetryresult['title']=$result['poetry']->getPoetryTitle();
+            $poetryresult['created']=$result['poetry']->getPoetryCreatedAt()->format('Y-m-d H:i:s');//->date
+            $poetryresult['body']=$result['poetry']->getPoetryBodyText();//$result['poetry']->getPoetryBody();
+            $poetryresult['comment']=$result['poetry']->getPoetryDescription();//$result['poetry']->getPoetryBody();        
+            $poetryresult['like']=$result['poetryrating']->getIpoetryPoetryRatingValueUp();
+            $poetryresult['dislike']=$result['poetryrating']->getIpoetryPoetryRatingValueDown();
+            if (isset($result['poetrydailyrating'][0]))
+                $poetryresult['poetrydailyrating']=$result['poetrydailyrating'][0];
+            else
+                $poetryresult['poetrydailyrating']=array('poetryRating'=>0);
+                
+            if ($retvaltype=='TEMPLATE'){
+                //данные по тегам
+                $poetryresult['tags']=$result['poetry']->getIpoetryTagsTags();
+                //данные по создателю стихотворения
+                $poetryresult['uname']=$result['user']->getUserName();
+                $poetryresult['ulastname']=$result['user']->getUserLastname();
+                $poetryresult['uphotourl']=$result['user']->getUserPhoto()->getUserPhotoUrl();
+            }
+            if ($retvaltype=='JSON') {
+                //$poetryresult['tags']=$result['poetry']->getIpoetryTagsTags();        
+                $poetryresult['tags_only']=array();
+                $poetryresult['poetry_id']=$originalpoetryid;
+                $poetryresult['poetryoriginal_id']=$result['poetry']->getPoetryId();
+                foreach ($result['poetry']->getIpoetryTagsTags() as $poetryresultitem) {
+                    //$IpoetryTags=new IpoetryTags();
+                    //$IpoetryTags=$poetryresultitem;
+                    $poetryresult['tags_only'][]=array('tagid'=>$poetryresultitem->getIpoetryTagsTagsId(),'tagtext'=>$poetryresultitem->getTagsText(),'moderated'=>$poetryresultitem->getModerated());//$IpoetryTags;
+                }
+
+                $query=$userspoetry->createQuery('SELECT COUNT(iub.ipoetryUserBlogPostPoetryId) FROM IpoetryBundle\Entity\IpoetryUserBlogPost iub WHERE iub.ipoetryUserBlogPostPoetryId=?1');
+                $query->setParameter(1,$poetry );
+                $poetrypostscnt=$query->getResult();
+                $poetryresult['poetrypostscnt']=$poetrypostscnt[0][1];
+                $poetryresult['uname']=$result['user']->getUserName();
+                $poetryresult['ulastname']=$result['user']->getUserLastname();
+                $poetryresult['uphotourl']=$result['user']->getUserPhoto()->getUserPhotoUrl();
+                if (!empty($result['userowner'])){
+                    $poetryresult['owneruname']=$result['userowner']->getUserName();
+                    $poetryresult['ownerulastname']=$result['userowner']->getUserLastname();
+                    $poetryresult['owneruphotourl']=$result['userowner']->getUserPhoto()->getUserPhotoUrl();                
+                } else {
+                    $poetryresult['owneruname']='';
+                    $poetryresult['ownerulastname']='';
+                    $poetryresult['owneruphotourl']='';                
+                }
+
+            }
+            //$poetryresult['tags_id']=$result['poetry']->getIpoetryTagsTags()->getIpoetryTagsTagsId();
+            //готовим пути для сохранения бинарных (фото,текста стиха) данных
+            //$rand=rand(1,9999999999);
+            $uploadtmpfile=$uploadtmp.'/poetry_data_'.$poetryowneruser.'_'.$poetry.'.jpeg';
+            $urltmpfile=$this->request->server->get('BASE').'/uploadtmp/poetry_data_'.$poetryowneruser.'_'.$poetry.'.jpeg';
+            //тольков в случае если такого файла нет пишем в него данные из базы
+            if (!file_exists ($uploadtmpfile) && !empty($result['poetrybackgroundimage'])){
+                //Vardumper::dump(array('imgfile'=>'Z:/domains/ipoetry/standard-edition-master/web/uploadtmp/poetry_background'.rand(1,9999999999).'.png','request content'=>$udl));        
+                $fp=fopen($uploadtmpfile, 'w+');
+                $bytes = @fwrite($fp,$result['poetrybackgroundimage']->getIpoetryBackgroundImage());
+                if ($bytes === false || $bytes <= 0)
+                    throw new NotFoundHttpException();
+                fclose($fp);
+            }
+            $poetryresult['image']=$urltmpfile;
+            //VarDumper::dump(array('$poetry'=>$poetryresult,'tags'=>$poetryresult['tags_only']));
+            if ($retvaltype=='TEMPLATE') {
+                $reposters=$this->GetPoetryReposterPeople($request,$poetryowneruser,$user,$poetry,$retvaltype);
+                //VarDumper::dump(array('$reposters'=>$reposters,'$userheaderInfo'=>$userheaderInfo[0]));
+                $comments=$this->AddBlogPosts($request,$poetryowneruser,$poetry,'TEMPLATE');
+                if (empty($comments))
+                    $comments=array(0);
                 return $this->render('IpoetryBundle:uRoom:poemnosession.html.twig',
                 array('userheaderInfo'=>$userheaderInfo[0]));
+            } else if ($retvaltype=='JSON')
+                return $poetryresult;
             } 
         }
     }
@@ -770,8 +897,17 @@ abstract class LoggingController extends Controller{
                     //Vardumper::dump(array('$uratings'=>$uratings));
                     return array('result'=>1,'usersratings'=>$uratings);
                 }
-            } else
-                return array('result'=>0,'usersratings'=>0);
+            } else {
+                //в зависимости от полученного параметра получаем пользователи и рейтинги 
+                $uratingcnt = $urating->getRepository('IpoetryBundle:DailyUserRating')
+                    ->getCountRating();  
+                if ($uratingcnt[0][1]){
+                    $uratings=$urating->getRepository('IpoetryBundle:DailyUserRating')
+                    ->getLatestRating($this->getParameter('ipoetry.userratinglimit'),$authorization_parameters['period']);
+                    //Vardumper::dump(array('$uratings'=>$uratings));
+                    return array('result'=>1,'usersratings'=>$uratings);
+                }
+            }
         }
     }
     //рейтинг стихов

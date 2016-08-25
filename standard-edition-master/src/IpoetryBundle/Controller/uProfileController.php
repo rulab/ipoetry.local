@@ -806,8 +806,9 @@ class uProfileController extends LoggingController {
                 //если есть такой пользователь то формируем вывод данных по нему
                 if ($userentitycnt[0][1]==1){
                     //выбираем данные по пользователям подписантам на стих
-                    $query=$userentity->createQuery('SELECT usr.userId,usr.userName,usr.userLastname,usrAge.ipoetryUserAge,usrCity.cityName,usrWebsite.ipoetryUserWebsite,usrphoto.userPhotoUrl,CONCAT(\''.$this->getParameter('ipoetry.UserProfileUrl').'\',usr.userId) AS reposterurl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto JOIN usr.userCity usrCity JOIN usr.userAge usrAge JOIN usr.userWebsite usrWebsite WHERE usr.userId=?1');
+                    $query=$userentity->createQuery('SELECT usr.userId,usr.userName,usr.userLastname,usrAge.ipoetryUserAge,usrCity.cityName,usrWebsite.ipoetryUserWebsite,usrphoto.userPhotoUrl,CONCAT(?2,usr.userId) AS reposterurl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto JOIN usr.userCity usrCity JOIN usr.userAge usrAge JOIN usr.userWebsite usrWebsite WHERE usr.userId=?1');
                     $query->setParameter(1,$user );
+                    $query->setParameter(2,'\''.$this->getParameter('ipoetry.UserProfileUrl').'\'');
                     $userentities=$query->getResult();
                     //получаем кол-во записей своих стихов в свою ленту
                     $query=$userentity->createQuery('SELECT COUNT(pr.poetryId) FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.userId=?1');

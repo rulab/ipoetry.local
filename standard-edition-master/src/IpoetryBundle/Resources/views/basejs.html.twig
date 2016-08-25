@@ -1,25 +1,27 @@
 {% block baseDocumentReady %} 
     //если шапка пустая то скрываем элементы и выводим ссылку на логин/регистрацию
     //$('.topline-user-name:first').text()=='undefined'
-    console.log($('.topline-user-name:first').attr('dbid'));
-    if ($('.topline-user-name:first').attr('dbid')==-1) {
-        $('.topline-user-img-wrap:first').fadeOut();
-        $('.topline-user-name:first').fadeOut();
-        $('.topline-user-wrap:first').children('.clearfix:first').attr('href','{{path('IpoetryBundle_login')}}');
-        $('.topline-user-wrap:first').children('.clearfix:first').text('Войти');
-        $('.topline-user-wrap:first').append('<a href="{{path('IpoetryBundle_signin')}}">Регистрация</a>');
-        console.log($('.topline-user-name:eq(0)').attr('dbid'));
+    console.log($('.topline-user-name').eq(0).attr('dbid'));
+    if (Number($('.topline-user-name').eq(0).attr('dbid'))===-1) {
+        $('.topline-user-img-wrap').eq(0).fadeOut();
+        $('.topline-user-name').eq(0).fadeOut();
+        $('.topline-user-wrap').eq(0).children('.clearfix:first').attr('href','{{path('IpoetryBundle_login')}}');
+        $('.topline-user-wrap').eq(0).children('.clearfix:first').text('Войти');
+        $('.topline-user-wrap').eq(0).append('<a href="{{path('IpoetryBundle_signin')}}">Регистрация</a>');
+        //console.log($('.topline-user-name:eq(0)').attr('dbid'));
     }
     //выход из сайта
     $('#closehref').click(function(){
                 var oReq = new XMLHttpRequest();
                 oReq.onreadystatechange = function() {
                     //console.log(JSON.parse(oReq.responseText));
-                    if (oReq.readyState == 4 && oReq.status == 200) {
+                    if (oReq.readyState === 4 && oReq.status === 200) {
                         response=JSON.parse(oReq.response);
                         //console.log(response.result);
                         if (response.result===1){
                             console.log('user dislogged');
+                            //обновляем страницу
+                            location.replace('{{ path('IpoetryBundle_root') }}');
                             return 1;
                         } else
                             return 0;

@@ -225,7 +225,49 @@ class IndexController extends LoggingController
                         '$feedlist'=>$feedlist));
                     
                     return array('result'=>$datapart,
-                                 'newsfeed'=>$feedlist);
+                                 'newsfeed'=>$feedlist,
+                                 'unewsfeedcount'=>$userfeedcnt[0][1],
+                                 'unewsfeedlist'=>$feedlist);
+                } else
+                    return array('result'=>false);
+            } else {
+                //получаем кол-во записей
+                $query=$unewsfeed->createQuery('SELECT COUNT(ip.poetryId) FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr');
+                    
+                $userfeedcnt=$query->getResult();
+                
+                //Если спросили большим значением возвращаем оставшее кол-во записей
+                $intervals=ceil($userfeedcnt[0][1]/$this->getParameter('ipoetry.uprofilenewsfeedlimit'));
+                if ($authorization_parameters['datapart']>0 && $authorization_parameters['datapart']<=$intervals ){
+                    $ostatok=round($userfeedcnt[0][1]/10,0,PHP_ROUND_HALF_UP);
+                    $datapart=abs($intervals-$authorization_parameters['datapart'])*$this->getParameter('ipoetry.uprofilenewsfeedlimit');
+                    $ostatok_1=$userfeedcnt[0][1]-$datapart;
+                    $datapart+=$ostatok_1;
+                    //получаем список стихов
+                    $query=$unewsfeed->createQuery('SELECT DISTINCT ip.poetryId,usr.userId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr')
+                            ->setFirstResult((($this->getParameter('ipoetry.uprofilenewsfeedlimit')*$authorization_parameters['datapart'])-$this->getParameter('ipoetry.uprofilenewsfeedlimit')))
+                            ->setMaxResults($this->getParameter('ipoetry.uprofilenewsfeedlimit'));
+                    $userfeedpoetry=$query->getResult();
+
+                    foreach ($userfeedpoetry as $userfeedpoetryitem){
+                        $feedlist[]=$this->uNewsFeedEntityAction($request,$userfeedpoetryitem['userId'],$userfeedpoetryitem['userId'],$userfeedpoetryitem['poetryId'],'JSON');
+                    }
+                    
+                    VarDumper::dump(array('$userfeedcnt'=>$userfeedcnt[0][1],
+                        'uprofilenewsfeedlimit'=>$this->getParameter('ipoetry.uprofilenewsfeedlimit'),
+                        '$userfeedpoetry'=>$userfeedpoetry,
+                        'setFirstResult'=>(($this->getParameter('ipoetry.uprofilenewsfeedlimit')*$authorization_parameters['datapart'])-$this->getParameter('ipoetry.uprofilenewsfeedlimit')),
+                        'setMaxResults'=>$this->getParameter('ipoetry.uprofilenewsfeedlimit')*$authorization_parameters['datapart'],
+                        '$intervals'=>$intervals,
+                        'datapart'=>$authorization_parameters['datapart'],
+                        '$ostatok'=>$ostatok,
+                        'datapart_1'=>abs($intervals-$authorization_parameters['datapart'])*$this->getParameter('ipoetry.uprofilenewsfeedlimit'),
+                        '$feedlist'=>$feedlist));
+                    
+                    return array('result'=>$datapart,
+                                 'newsfeed'=>$feedlist,
+                                 'unewsfeedcount'=>$userfeedcnt[0][1],
+                                 'unewsfeedlist'=>$feedlist);
                 } else
                     return array('result'=>false);
             }
@@ -233,7 +275,49 @@ class IndexController extends LoggingController
     }
     // просмотр ленты всех стихов и комментариев
     public function uNewsFeedAllAction(Request $request){
-        return $this->render('IpoetryBundle:Main:unewsfeed_all.html.twig');
+        //количество стихов в своей ленте
+        $userfeedcnt=array(0=>array(1=>0));
+        //данные по подписчикам и подписантам
+        $subscribers=array();
+        $followers=array();
+        //получаем данные по пользователю для шапки страницы
+        $userheaderInfo=$this->UserHeaderInfo($request);
+        //получаем данные по пользователю владельцу профайла
+        $this->request=$request;
+        //получаем перевод всех элементов интерфейса
+        $this->GetTranslator($request);
+        //директория для хранения временных файлов
+        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/uploadtmp';        
+        //проверяем что пришло в сессии
+        $this->GetCache($request);
+
+        if ($request->hasSession()) {
+
+            $this->session=$request->getSession();
+            //$userentity = $this->getDoctrine()->getManager();
+            if ($this->session->has('login') && $this->session->has('login_id')){
+            }
+        }
+        //выбираем рейтинг стихов
+        $authorization_parameters=array('period'=>'week');
+        $userrating=$this->GetUsersRatingsAjaxAnswer($authorization_parameters,$request);
+        if ($userrating['result']<>0){
+            $userrating['usersratings']=array_slice($userrating['usersratings'], 0, 1);
+        }
+        $usersratingcnt=count($userrating['usersratings']);
+        VarDumper::dump(array('userrating'=>$userrating));
+        $uprofilenewsfeedlimit=$this->getParameter('ipoetry.uprofilenewsfeedlimit');
+        return $this->render('IpoetryBundle:Main:unewsfeed_all.html.twig',array('userheaderInfo'=>$userheaderInfo[0],
+            //'userprofileowner'=>$userentities[0],
+            'uprofilenewsfeedlimit'=>$uprofilenewsfeedlimit,
+            'MoreFeeds'=>$this->translator->trans('More comments',array(),'userprofile'),
+            //'userfeedcnt'=>$userfeedcnt[0][1],
+            //'subscribers'=>$subscribers,
+            //'followers'=>$followers,
+            'userrating'=>$userrating,
+            //'poetryratingcnt'=>$poetryratingcnt
+            ));
+
     }
     // страница поиска стихов и сообщений по темам и названиям
     public function pSearchAction(Request $request){

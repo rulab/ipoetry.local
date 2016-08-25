@@ -30,6 +30,7 @@ class ExceptionListener {
         $exception = $event->getException();
         $message = sprintf(
             'iPoetry Error : %s with code: %s trace: %s',
+            $exception->getFile(),
             $exception->getMessage(),
             $exception->getCode(),
             VarDumper::dump($exception->getTrace())
