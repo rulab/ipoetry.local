@@ -35,6 +35,9 @@
 						<div class="feed-sorting-item tab">Лента подписчиков</div>
 						<div class="feed-sorting-item tab">Моя лента</div>
 					</div>
+                                        <div class="feed-sorting-input-wrap">
+        				    <button id="addpoembtn" class="btn-blue-bg" style="width: 277px;height: auto;padding: 12px 15px 11px;margin-left: 360px;">Добавить стихотворение</button>
+                                        </div>
 				</div>
 			</div>
 		</div>
@@ -46,12 +49,6 @@
 
 				<!-- Контент -->
 				<div class="content">
-
-					<!-- Что нового? -->
-					<div class="whats-new">
-        				    <button id="addpoembtn" class="btn-blue-bg">Добавить стихотворение</button>
-					</div>
-					<!-- Что нового? конец-->
 
 					<!-- Результаты фильтрации -->
 					<div class="tab_content">
@@ -89,7 +86,7 @@
                                                                                 </a>
                                                                                 <div class="main-post-item-text clearfix">
                                                                                         <a href="#" class="main-post-item-author-name">{% verbatim %}{{unewsfeeditem.owneruname}} {{unewsfeeditem.ownerulastname}}{% endverbatim %}</a>
-                                                                                        <div class="main-post-item-time">{% verbatim %}{{unewsfeeditem.created}}{% endverbatim %}</div>
+                                                                                        <div class="main-post-item-time" style="display:none">{% verbatim %}{{unewsfeeditem.created}}{% endverbatim %}</div>
                                                                                 </div>
                                                                         </div>
                                                                         <div class="main-post-item-social-panel clearfix">
