@@ -14,12 +14,12 @@
 					<li><a href="#">Читать стихи</a></li>
 				</ul>
 			</nav>
-			<div class="topline-user-wrap">
-				<a href="#" class="clearfix">
-					<div class="topline-user-img-wrap">
+			<div class="topline-user-wrap" dbid="{{userheaderInfo.userId}}">
+				<a href="{{ path('IpoetryBundle_unewsfeed',{'user':userheaderInfo.userId}) }}" class="clearfix">
+					<div class="topline-user-img-wrap" dbid="{{userheaderInfo.userId}}">
 						<img src="{{userheaderInfo.userPhotoUrl}}" alt="" />
 					</div>
-					<div class="topline-user-name" dbid="{{userheaderInfo.userId}}">{{userheaderInfo.userName}} <span>{{userheaderInfo.userLastname}}</span></div>
+					<div class="topline-user-name">{{userheaderInfo.userName}} <span>{{userheaderInfo.userLastname}}</span></div>
 				</a>
 			</div>
 			<div class="topline-points-wrap">
@@ -35,7 +35,7 @@
 				<a href="{{ path('IpoetryBundle_psearch') }}" class="topline-search"></a>
 			</div>
 			<div class="topline-close-wrap">
-				<a href="#" id="closehref" class="topline-points" style="display: inline-block;position: relative;margin-top: 8px;margin-right: 200px;width: 60px;">Выход</a>
+				<a href="#" id="closehref" class="topline-points" style="display: inline-block;position: relative;margin-top: 8px;margin-right: 260px;width: 60px;">Выход</a>
 			</div>
 
 		</div>

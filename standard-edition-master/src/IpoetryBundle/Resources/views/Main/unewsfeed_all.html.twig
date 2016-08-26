@@ -71,7 +71,7 @@
                                                                                         <div class="main-post-item-info-item post-views">155</div>
                                                                                         <a href="#" class="main-post-item-info-item post-comments">{% verbatim %}{{unewsfeeditem.poetrypostscnt}}{% endverbatim %}</a>
                                                                                 </div>
-                                                                                <div class="main-post-more-details" ng-mouseover="shbutton($event);" ng-mouseleave="delbutton($event);" ng-show="ownershow">
+                                                                                <div class="main-post-more-details" ng-mouseover="shbutton($event);" ng-mouseleave="delbutton($event);" ng-show="ownershow" getbodyelem>
                                                                                         <div class="show-more-details-inner-wrap" style="display: none; opacity: 1;">
                                                                                                 <button postid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="btn-white-border" ng-click="showModal($event);">Удалить</button> <!--ng-click="delelement($event);"-->
                                                                                         </div>
@@ -251,9 +251,11 @@
 
             //проверяем если это анонимный пользователь
             //тогда скрываем лишние элементы
-            if (Number($('.topline-user-name').eq(0).attr('dbid'))==-1) {
+            if (Number($('.topline-user-wrap').eq(0).attr('dbid'))===-1) {
+                //в фильтрах оставляем только общая лента
                 $('.feed-sorting-item.tab').eq(1).fadeOut();
                 $('.feed-sorting-item.tab').eq(2).fadeOut();
+                //убираем обавление стихотворения
                 $('#addpoembtn').fadeOut();
             }
             

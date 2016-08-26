@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAnimate','ngRoute'])
-    .filter('trusted_html', ['$sce', function($sce){
+.filter('trusted_html', ['$sce', function($sce){
     return function(text) {
         return $sce.trustAsHtml(text);
     };
@@ -17,15 +17,16 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
     return momentObj[momentFn].apply(momentObj, args);
   };
 })
-.filter('momentformat', function () {
-  return function (input, momentFn /*, param1, param2, ...param n */) {
-    moment.locale('ru');
-    var args = Array.prototype.slice.call(arguments, 3),
-        momentObj = moment(input);
-    return momentObj[momentFn].apply(momentObj, args);
-  };
+.directive('getbodyelem', function () {
+  return {
+    link: function (scope, element, attrs) {
+      var documentResult = document.getElementsByClassName("main-post-more-details");
+      if (Number($('.topline-user-wrap').eq(0).attr('dbid'))===-1) {
+        angular.element(documentResult).remove();
+      }
+    }
+  }
 })
-
 .config(function($sceProvider) {
   // Completely disable SCE.  For demonstration purposes only!
   // Do not use in new projects.
@@ -52,6 +53,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
     $scope.ownershow=true;
     $scope.MyModal;
     $scope.delpoetryid;
+    $scope.delbtnvisibility=0;
     //$modal.delpoetryid;
     $scope.title = 'Подтверждение действия.';
     $scope.content = 'Hello Modal<br />This is a multiline message from a controller!';
@@ -101,7 +103,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
                         if ($scope.page==1)
                             $scope.plusPage();
                         //if ($scope.frominit===false){
-                        $scope.sortBy($scope.propertyName,$scope.filtersetperiod,$scope.reverse);                            
+                        $scope.sortBy($scope.propertyName,$scope.filtersetperiod,$scope.reverse);
                         //}
                     }
                     else
@@ -225,8 +227,9 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
       $scope.propertyName = propertyName;
     };
     $scope.Likefunc=function(postid,option){
-        //console.log(option,commentid.currentTarget.getAttribute("commentid"));
-
+      //console.log(option,commentid.currentTarget.getAttribute("commentid"));
+      //если есть логиненый пользователь то разрешаем лайк
+      if (Number($('.topline-user-wrap').eq(0).attr('dbid'))!==-1) {
         var oReq = new XMLHttpRequest();
         oReq.onreadystatechange = function() {
             if (oReq.readyState === 4 && oReq.status === 200) {
@@ -253,7 +256,8 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
         oReq.open("POST", $scope.ajaxurls,true);
         oReq.setRequestHeader("Content-Type", "application/json");
         console.log("login_json="+JSON.stringify({type:"poetrylikerequest",poetry:Number(postid.currentTarget.getAttribute("poetryid")),user:$scope.userid,updown:option}));
-        oReq.send(JSON.stringify({type:"poetrylikerequest",poetry:Number(postid.currentTarget.getAttribute("poetryid")),user:$scope.userid,updown:option}));
+        oReq.send(JSON.stringify({type:"poetrylikerequest",poetry:Number(postid.currentTarget.getAttribute("poetryid")),user:$scope.userid,updown:option}));          
+      }
     };
     $scope.addMessage=function(newmsgurl){
         

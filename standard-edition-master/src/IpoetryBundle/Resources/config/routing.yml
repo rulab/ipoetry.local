@@ -191,7 +191,7 @@ IpoetryBundle_unewsfeed:
     requirements:
         _method:  GET|POST
         _locale: en|ru
-        user: "\d+"
+        user: "\d+|-1"
 #читать стих пользователя
 IpoetryBundle_unewsfeedentity:
     path: /unewsfeedentity/{user}_{poetry}

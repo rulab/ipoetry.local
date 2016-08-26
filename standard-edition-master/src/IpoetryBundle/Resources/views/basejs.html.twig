@@ -1,8 +1,6 @@
 {% block baseDocumentReady %} 
     //если шапка пустая то скрываем элементы и выводим ссылку на логин/регистрацию
-    //$('.topline-user-name:first').text()=='undefined'
-    console.log($('.topline-user-name').eq(0).attr('dbid'));
-    if (Number($('.topline-user-name').eq(0).attr('dbid'))===-1) {
+    if (Number($('.topline-user-wrap').eq(0).attr('dbid'))===-1) {
         $('.topline-user-img-wrap').eq(0).fadeOut();
         $('.topline-user-name').eq(0).fadeOut();
         $('.topline-user-wrap').eq(0).children('.clearfix:first').attr('href','{{path('IpoetryBundle_login')}}');
