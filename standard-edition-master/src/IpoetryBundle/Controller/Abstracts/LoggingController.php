@@ -258,6 +258,9 @@ abstract class LoggingController extends Controller{
                     $result['userowner']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$poetryowneruser));
                     $result['poetryrepost']=$unewsfeedentity->getRepository('IpoetryBundle:PoetryRepostToOwnFeed')->findOneBy(array('userId'=>$user,'poetryId'=>$poetry));
                     //VarDumper::dump(array('$result[poetryrepost]'=>$result['poetryrepost']));
+                } else {
+                    $result['userowner']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$user));
+                    $result['poetryrepost']='';
                 }
                 $result['poetry']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetry')->findOneBy(array('poetryId'=>$poetry));
                 $result['poetrybackgroundimage']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryBackgroundImages')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
@@ -398,6 +401,9 @@ abstract class LoggingController extends Controller{
                     $result['userowner']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$poetryowneruser));
                     $result['poetryrepost']=$unewsfeedentity->getRepository('IpoetryBundle:PoetryRepostToOwnFeed')->findOneBy(array('userId'=>$user,'poetryId'=>$poetry));
                     //VarDumper::dump(array('$result[poetryrepost]'=>$result['poetryrepost']));
+                } else {
+                    $result['userowner']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryUser')->findOneBy(array('userId'=>$user));
+                    $result['poetryrepost']='';
                 }
                 $result['poetry']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetry')->findOneBy(array('poetryId'=>$poetry));
                 $result['poetrybackgroundimage']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryBackgroundImages')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
@@ -490,8 +496,15 @@ abstract class LoggingController extends Controller{
                 $comments=$this->AddBlogPosts($request,$poetryowneruser,$poetry,'TEMPLATE');
                 if (empty($comments))
                     $comments=array(0);
-                return $this->render('IpoetryBundle:uRoom:poemnosession.html.twig',
-                array('userheaderInfo'=>$userheaderInfo[0]));
+                return $this->render('IpoetryBundle:uRoom:poem.html.twig',
+                array('poetry'=>$poetryresult,'CommentsCnt'=>$comments[0],//'CommentsBodies'=>$comments[1],
+                    'reposters'=>$reposters,
+                    'CommentsHeader'=>$this->translator->trans('Comments',array(),'unewsfeedentity'),
+                    'MadeHeader'=>$this->translator->trans('They Made Reposts.',array(),'unewsfeedentity'),
+                    'More comments'=>$this->translator->trans('More comments',array(),'unewsfeedentity'),
+                    'repostbtntext'=>$this->translator->trans('Repost poetry to your feed',array(),'unewsfeedentity'),
+                    'userheaderInfo'=>$userheaderInfo[0],
+                    'poemcommentslimit'=>$this->getParameter('ipoetry.uprofilecommentslimit')));
             } else if ($retvaltype=='JSON')
                 return $poetryresult;
             } 

@@ -210,7 +210,7 @@ class IndexController extends LoggingController
                     $userfeedpoetry=$query->getResult();
 
                     foreach ($userfeedpoetry as $userfeedpoetryitem){
-                        $feedlist[]=$this->uNewsFeedEntityAction($request,$userfeedpoetryitem['userId'],$userfeedpoetryitem['userId'],$userfeedpoetryitem['poetryId'],'JSON');
+                        $feedlist[]=$this->uNewsFeedEntityAction($request,0,$userfeedpoetryitem['userId'],$userfeedpoetryitem['poetryId'],'JSON');
                     }
                     
                     VarDumper::dump(array('$userfeedcnt'=>$userfeedcnt[0][1],
@@ -250,7 +250,7 @@ class IndexController extends LoggingController
                     $userfeedpoetry=$query->getResult();
 
                     foreach ($userfeedpoetry as $userfeedpoetryitem){
-                        $feedlist[]=$this->uNewsFeedEntityAction($request,$userfeedpoetryitem['userId'],$userfeedpoetryitem['userId'],$userfeedpoetryitem['poetryId'],'JSON');
+                        $feedlist[]=$this->uNewsFeedEntityAction($request,0,$userfeedpoetryitem['userId'],$userfeedpoetryitem['poetryId'],'JSON');
                     }
                     
                     VarDumper::dump(array('$userfeedcnt'=>$userfeedcnt[0][1],

@@ -82,7 +82,7 @@
                                                                 <div class="main-post-item-bottom clearfix">
                                                                         <div class="main-post-item-author">
                                                                                 <a href="#" class="main-post-item-author-img-wrap">
-                                                                                    <img src="{% verbatim %}{{unewsfeeditem.owneruphotourl}}{% endverbatim %}" alt="alt">
+                                                                                    <img src="{% verbatim %}{{unewsfeeditem.uphotourl}}{% endverbatim %}" alt="alt">
                                                                                 </a>
                                                                                 <div class="main-post-item-text clearfix">
                                                                                         <a href="#" class="main-post-item-author-name">{% verbatim %}{{unewsfeeditem.owneruname}} {{unewsfeeditem.ownerulastname}}{% endverbatim %}</a>
@@ -244,7 +244,7 @@
                   } else { // иначе вариант IE8-:
                     event.returnValue = false;
                   }
-                  location.replace('{{ path('IpoetryBundle_addpoem') }}');
+                  location.assign('{{ path('IpoetryBundle_addpoem') }}');
             });
             //checkOwnProfile();
             //checkUserSubscribed();
