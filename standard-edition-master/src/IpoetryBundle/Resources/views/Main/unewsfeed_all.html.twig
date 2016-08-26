@@ -236,6 +236,16 @@
                   GetAllNewsfeed();
             });
             */
+           $('#addpoembtn').on('click',function (event){
+                event = event || window.event;
+
+                  if (event.preventDefault) { // если метод существует
+                    event.preventDefault(); // то вызвать его
+                  } else { // иначе вариант IE8-:
+                    event.returnValue = false;
+                  }
+                  location.replace('{{ path('IpoetryBundle_addpoem') }}');
+            });
             //checkOwnProfile();
             //checkUserSubscribed();
 
