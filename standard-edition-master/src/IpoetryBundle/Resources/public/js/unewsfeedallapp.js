@@ -17,6 +17,15 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
     return momentObj[momentFn].apply(momentObj, args);
   };
 })
+.filter('momentformat', function () {
+  return function (input, momentFn /*, param1, param2, ...param n */) {
+    moment.locale('ru');
+    var args = Array.prototype.slice.call(arguments, 3),
+        momentObj = moment(input);
+    return momentObj[momentFn].apply(momentObj, args);
+  };
+})
+
 .config(function($sceProvider) {
   // Completely disable SCE.  For demonstration purposes only!
   // Do not use in new projects.
