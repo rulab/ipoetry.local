@@ -79,12 +79,12 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
                         //заполняем элементы данными
                         $scope.unewsfeed_count=response.unewsfeedcount;
                         $scope.unewsfeed=response.unewsfeedlist;
-                        //if ($scope.frominit===false){
-                            $scope.sortBy($scope.propertyName,$scope.filtersetperiod,$scope.reverse);                            
-                        //}
                         //защита от множественных ajax
                         if ($scope.page==1)
-                            $scope.page++;
+                            $scope.plusPage();
+                        //if ($scope.frominit===false){
+                        $scope.sortBy($scope.propertyName,$scope.filtersetperiod,$scope.reverse);                            
+                        //}
                     }
                     else
                     {
@@ -105,11 +105,11 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
                     //заполняем элементы данными
                     $scope.unewsfeed_count=response.unewsfeedcount;
                     $scope.unewsfeed=$scope.unewsfeed.concat(response.unewsfeedlist);
+                    $scope.plusPage();
                     //if ($scope.filterset===false)
-                        $scope.sortBy($scope.propertyName,$scope.filtersetperiod,$scope.reverse);
-                    $scope.page++;
-                    if (response.ownprofile===0)
-                        $scope.ownershow=false;
+                    $scope.sortBy($scope.propertyName,$scope.filtersetperiod,$scope.reverse);
+                    //if (response.ownprofile===0)
+                    //    $scope.ownershow=false;
                     //$scope.$apply();
                 }
                 else
