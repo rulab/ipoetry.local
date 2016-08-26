@@ -204,7 +204,7 @@ class IndexController extends LoggingController
                     $ostatok_1=$userfeedcnt[0][1]-$datapart;
                     $datapart+=$ostatok_1;
                     //получаем список стихов
-                    $query=$unewsfeed->createQuery('SELECT DISTINCT ip.poetryId,usr.userId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr')
+                    $query=$unewsfeed->createQuery('SELECT DISTINCT ip.poetryId,usr.userId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr ORDER BY ip.poetryCreatedAt DESC')
                             ->setFirstResult((($this->getParameter('ipoetry.uprofilenewsfeedlimit')*$authorization_parameters['datapart'])-$this->getParameter('ipoetry.uprofilenewsfeedlimit')))
                             ->setMaxResults($this->getParameter('ipoetry.uprofilenewsfeedlimit'));
                     $userfeedpoetry=$query->getResult();

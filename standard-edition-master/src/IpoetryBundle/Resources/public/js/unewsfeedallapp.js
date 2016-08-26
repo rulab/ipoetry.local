@@ -3,11 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAnimate','ngRoute']).filter('trusted_html', ['$sce', function($sce){
-        return function(text) {
-            return $sce.trustAsHtml(text);
-        };
-    }])
+var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAnimate','ngRoute'])
+    .filter('trusted_html', ['$sce', function($sce){
+    return function(text) {
+        return $sce.trustAsHtml(text);
+    };
+}])
+.filter('moment', function () {
+  return function (input, momentFn /*, param1, param2, ...param n */) {
+    moment.locale('ru');
+    var args = Array.prototype.slice.call(arguments, 2),
+        momentObj = moment(input);
+    return momentObj[momentFn].apply(momentObj, args);
+  };
+})
 .config(function($sceProvider) {
   // Completely disable SCE.  For demonstration purposes only!
   // Do not use in new projects.

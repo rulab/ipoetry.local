@@ -65,12 +65,7 @@
                                                         <div class="main-post-item" rating="{% verbatim %}{{unewsfeeditem.poetrydailyrating.poetryRating}}{% endverbatim %}">
                                                                 <div class="main-post-item-top" style="background-image: url({% verbatim %}{{unewsfeeditem.image}}{% endverbatim %});background-repeat: no-repeat;background-position: center;-webkit-background-size: contain;-moz-background-size: contain;-o-background-size: contain;background-size: contain;">
                                                                         <div class="main-post-item-top-inner">
-                                                                                <div class="main-post-category">
-                                                                                        <div class="main-post-category-ico">
-                                                                                                <img src="img/ico-heart.png" alt="alt">
-                                                                                        </div>
-                                                                                        <a href="#"></a>
-                                                                                </div>
+                                                                            <div class="main-post-add-time">{% verbatim %}{{unewsfeeditem.created | moment: 'fromNow'}}{% endverbatim %}</div>
                                                                             <a href="../unewsfeedentity/{% verbatim %}{{unewsfeeditem.poetryowneruserid}}{% endverbatim %}_{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
                                                                                 <div ng-repeat="tag in unewsfeeditem.tags_only" class="main-post-tags" style="display:inline;width:80px;">
                                                                                         <a href="#" tagid="{% verbatim %}{{tag.tagid}}{% endverbatim %}">#{% verbatim %}{{tag.tagtext}}{% endverbatim %}</a>
@@ -178,6 +173,7 @@
 '@IpoetryBundle/Resources/public/js/common.js'
 '@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.js'
 '@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.tpl.min.js'
+'@IpoetryBundle/Resources/public/js/moment-with-locales.min.js'
 '@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/src/modal/modal.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie-emulation-modes-warning.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie10-viewport-bug-workaround.js'
