@@ -28,6 +28,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
       } else {
         //angular.element(documentmainpostmoredetails).attr('dbid',$('.topline-user-wrap').eq(0).attr('dbid'));
         angular.element(documentbtnwhiteborderdel).attr('dbid',$('.topline-user-wrap').eq(0).attr('dbid'));
+        scope.userid=Number($('.topline-user-wrap').eq(0).attr('dbid'));
       }
     }
   }
@@ -61,7 +62,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
     $scope.delbtnvisibility=0;
     //$modal.delpoetryid;
     $scope.title = 'Подтверждение действия.';
-    $scope.content = '';
+    $scope.content = 'Вы действительно хотите удалить запись?';
     $scope.delbtnname='Удалить';
     //карточки ленты стихов
     $scope.unewsfeed = [
@@ -153,7 +154,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
                $scope.delbtnname='Удалить';
             } else {
                $scope.delbtnname='Пожаловаться';
-                element.currentTarget.children[0].children[0].setAttribute("style",'width: 140px;padding-left: 15px;');
+               element.currentTarget.children[0].children[0].setAttribute("style",'width: 140px;padding-left: 15px;');
             }
         }
         //element.currentTarget.children[0].//.stop().fadeToggle();
@@ -163,8 +164,8 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
         element.currentTarget.children[0].setAttribute("style",'display: none; opacity: 1;');
     };
     $scope.delelement = function(element) {
-        //console.log($scope.ajaxurls+' '+$scope.page+' '+$scope.userid+' '+$scope.poemid+' '+$scope.elements_on_page);
-        //return false;
+        console.log($scope.ajaxurls+' '+$scope.page+' '+$scope.userid+' '+element+' '+$scope.elements_on_page);
+        return false;
         $http.post($scope.ajaxurls,{type:"del_user_post",user:$scope.userid,poetry:element}).success(function(response)
         {
             if (response.result === 1)
@@ -307,7 +308,8 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
     //MyModalController.$inject = ['$scope'];
     $scope.showModal = function(element) {
       $scope.delpoetryid=element.currentTarget.getAttribute("postid");
-      $scope.MyModal = $modal({controller: 'unewsfeedController', templateUrl: '/standard-edition-master/web/app_dev.php/modal/'+$scope.userid+'_'+$scope.delpoetryid, show: false,container: 'body',delpoetryid:$scope.delpoetryid});
+      $scope.userid=element.currentTarget.getAttribute("userid");
+      $scope.MyModal = $modal({controller: 'unewsfeedallController', templateUrl: '/standard-edition-master/web/app_dev.php/modal/'+$scope.userid+'_'+$scope.delpoetryid, show: false,container: 'body',delpoetryid:$scope.delpoetryid});
       console.log('showModal',$scope.delpoetryid,element.currentTarget.getAttribute("postid"),$scope.MyModal);
       $scope.MyModal.$promise.then($scope.MyModal.show);
     };

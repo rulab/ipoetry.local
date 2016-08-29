@@ -36,7 +36,7 @@ var unewsfeedApp = angular.module('unewsfeedApp', ['mgcrea.ngStrap','ngAnimate',
     $scope.delpoetryid;
     //$modal.delpoetryid;
     $scope.title = 'Подтверждение действия.';
-    $scope.content = 'Hello Modal<br />This is a multiline message from a controller!';
+    $scope.content = 'Вы действительно хотите удалить запись?';
 
     //карточки ленты стихов
     $scope.unewsfeed = [
