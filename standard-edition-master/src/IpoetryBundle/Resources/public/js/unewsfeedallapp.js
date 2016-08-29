@@ -20,9 +20,14 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
 .directive('getbodyelem', function () {
   return {
     link: function (scope, element, attrs) {
-      var documentResult = document.getElementsByClassName("main-post-more-details");
+      var documentmainpostmoredetails = document.getElementsByClassName("main-post-more-details");
+      var documentbtnwhiteborderdel = document.getElementsByClassName("btn-white-border del");
+      
       if (Number($('.topline-user-wrap').eq(0).attr('dbid'))===-1) {
-        angular.element(documentResult).remove();
+        angular.element(documentmainpostmoredetails).remove();
+      } else {
+        //angular.element(documentmainpostmoredetails).attr('dbid',$('.topline-user-wrap').eq(0).attr('dbid'));
+        angular.element(documentbtnwhiteborderdel).attr('dbid',$('.topline-user-wrap').eq(0).attr('dbid'));
       }
     }
   }
@@ -56,8 +61,8 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
     $scope.delbtnvisibility=0;
     //$modal.delpoetryid;
     $scope.title = 'Подтверждение действия.';
-    $scope.content = 'Hello Modal<br />This is a multiline message from a controller!';
-
+    $scope.content = '';
+    $scope.delbtnname='Удалить';
     //карточки ленты стихов
     $scope.unewsfeed = [
     ];
@@ -140,9 +145,16 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
         });
     };
     $scope.shbutton = function(element) {
-        console.log(element.currentTarget.children[0].getAttribute("style"));
-        if (element.currentTarget.children[0].getAttribute("style")==='display: none; opacity: 1;')
+        console.log(element.currentTarget.children[0].children[0].getAttribute('dbid'),element.currentTarget.children[0].children[0].getAttribute('userid'));
+        if (element.currentTarget.children[0].getAttribute("style")==='display: none; opacity: 1;'){
             element.currentTarget.children[0].setAttribute("style",'display: block; opacity: 1;');
+            //меняем кнопку удалить на пожаловаться      
+            if (element.currentTarget.children[0].children[0].getAttribute('dbid')===element.currentTarget.children[0].children[0].getAttribute('userid')){
+               $scope.delbtnname='Удалить';
+            } else {
+               $scope.delbtnname='Пожаловаться';          
+            }
+        }
         //element.currentTarget.children[0].//.stop().fadeToggle();
     };
     $scope.delbutton = function(element) {
