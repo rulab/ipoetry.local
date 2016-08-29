@@ -152,7 +152,8 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
             if (element.currentTarget.children[0].children[0].getAttribute('dbid')===element.currentTarget.children[0].children[0].getAttribute('userid')){
                $scope.delbtnname='Удалить';
             } else {
-               $scope.delbtnname='Пожаловаться';          
+               $scope.delbtnname='Пожаловаться';
+                element.currentTarget.children[0].children[0].setAttribute("style",'width: 140px;padding-left: 15px;');
             }
         }
         //element.currentTarget.children[0].//.stop().fadeToggle();
