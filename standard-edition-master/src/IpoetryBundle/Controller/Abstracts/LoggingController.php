@@ -612,6 +612,34 @@ abstract class LoggingController extends Controller{
         }
         return 1;
     }
+    //ответ на загруженную фоновую картинку
+    public function jsonFileUpload($authorization_parameters,$session,$request,$source) {
+        //$this->request=$request;
+        //директория для хранения временных файлов
+        $uploadtmp=$request['DOCUMENT_ROOT'].$request['BASE'].'/uploadtmp';
+        $filetype='txt';
+        VarDumper::dump(array($authorization_parameters,$session,$request,$source,$uploadtmp));  
+        //путь к временному файлу с картинкой
+        if (strtoupper($source)=='NEWSFEED')
+            $uploadtmpfile=$uploadtmp.'/newsfeeds_data'.rand(1,9999999999).'.'.$filetype;
+        if (strtoupper($source)=='WALLFEED')
+            $uploadtmpfile=$uploadtmp.'/wallfeeds_data'.rand(1,9999999999).'.'.$filetype;
+        $udl=serialize($authorization_parameters['scope']);
+        $fp=fopen($uploadtmpfile, 'w+');
+        $bytes = @fwrite($fp,$udl);
+        if ($bytes === false || $bytes <= 0)
+            throw new NotFoundHttpException();
+        fclose($fp);
+        //читаем путь файла в сессию
+        if (strtoupper($source)=='NEWSFEED') {
+            $session->set('lastNewsfeedDelElement',$uploadtmpfile );
+        }
+        if (strtoupper($source)=='WALLFEED') {
+            $session->set('lastWallfeedDelElement',$uploadtmpfile );
+        }
+        return 1;
+    }
+
     //построение списка комментариев
     public function AddBlogPosts (Request $request,$user,$poetry,$retvaltype='TEMPLATE'){
         
@@ -972,6 +1000,7 @@ abstract class LoggingController extends Controller{
             }
         }
     }
+
     //удаляем стих/сообщение пользователя
     public function delUserPostAjaxAnswer($authorization_parameters,$request) {
         try {
@@ -989,7 +1018,19 @@ abstract class LoggingController extends Controller{
                              ->prepare($this->sql_array['del_ipoetry_user_post']);
                 $stmt->bindValue(':ipoetry_poetry_id',$authorization_parameters['poetry']);
                 $stmt->execute();
-                return 1;
+                //читаем данные по ангуляру сохраненные ранее при открытии модального окна
+                if ($authorization_parameters['source']=='NEWSFEED'){
+                    if ($this->session->has('lastNewsfeedDelElement')){
+                        $scope=unserialize(file_get_contents($this->session->get('lastNewsfeedDelElement')));
+                    }                    
+                }
+                if ($authorization_parameters['source']=='WALLFEED'){
+                    if ($this->session->has('lastWallfeedDelElement')){
+                        $scope=unserialize(file_get_contents($this->session->get('lastWallfeedDelElement')));
+                    }                    
+                }
+
+                return $scope;
             } else
                 return 0;
         } else
@@ -998,7 +1039,7 @@ abstract class LoggingController extends Controller{
             echo 'Error in delUserPostAjaxAnswer: ',  $e->getMessage(), "\n";
         }
     }
-    
+
     public function array_datetime_fomatter(&$item, $key,$keyname)
     {
         if ($key==$keyname)

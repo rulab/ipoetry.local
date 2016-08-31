@@ -304,6 +304,10 @@ class uProfileController extends LoggingController {
                         case 'del_user_post':
                                     $mas['result']=$this->delUserPostAjaxAnswer($authorization_parameters,$request);
                                     break;
+                        case 'del_wall_element':
+                                    //Vardumper::dump(array('$request'=>$request,'ServerBag'=>$request->server->all(),'session'=>$this->session));
+                                    $mas['result']=$this->jsonFileUpload($authorization_parameters,$this->session,$request->server->all(),'WALLFEED');
+                                    break;
 
                 }
         } else if ($request->headers->has('Content-Type')) {

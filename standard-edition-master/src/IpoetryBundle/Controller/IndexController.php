@@ -90,8 +90,8 @@ class IndexController extends LoggingController
             $retval=$this->render('IpoetryBundle:Default:index.html.twig');
          return $retval;
     }
-    public function modalAction(Request $request,$user,$poetry){
-        $retval=$this->render('IpoetryBundle::modaldemo.html.twig',array('userid'=>$user,'poetryid'=>$poetry));
+    public function modalAction(Request $request){
+        $retval=$this->render('IpoetryBundle::modaldemo.html.twig');//,array('userid'=>$user,'poetryid'=>$poetry)
         return $retval;
     }
     //распределитель ajax логики
@@ -100,7 +100,7 @@ class IndexController extends LoggingController
         $mas=array();
         $this->request=$request;
         $authorization_parameters=@json_decode($request->getContent(),true);
-        Vardumper::dump(array('$request'=>$request->getContent(),'isset_auth_parameter'=>isset($authorization_parameters),'authorization_parameters'=>$authorization_parameters));
+        Vardumper::dump(array('$request'=>$request,'ServerBag'=>$request->server->all(),'isset_auth_parameter'=>isset($authorization_parameters),'authorization_parameters'=>$authorization_parameters));
         if (isset($authorization_parameters)){
             //проверяем что пришло в сессии
             $this->GetCache($request);
@@ -125,6 +125,10 @@ class IndexController extends LoggingController
                     case 'close_session':
                                 $mas=$this->CloseSessionAjaxAnswer();
                                 break;
+                    case 'del_feed_element':
+                                //Vardumper::dump(array('$request'=>$request,'ServerBag'=>$request->server->all(),'session'=>$this->session));
+                                $mas['result']=$this->jsonFileUpload($authorization_parameters,$this->session,$request->server->all(),'NEWSFEED');
+                                break; 
             }
         } else
             $mas['result']=0;
