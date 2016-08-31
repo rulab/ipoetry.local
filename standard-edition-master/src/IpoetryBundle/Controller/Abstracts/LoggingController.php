@@ -227,24 +227,24 @@ abstract class LoggingController extends Controller{
                 //если есть обновленные поля то обновляем их
                 //пишем обновленные данные в базу
                 $unewsfeedentity = $this->getDoctrine()->getManager();
-            //получаем связанные таблицы для показа данных
-            //получаем кол-во записей
-            $userspoetry = $this->getDoctrine()->getEntityManager();
+                //получаем связанные таблицы для показа данных
+                //получаем кол-во записей
+                $userspoetry = $this->getDoctrine()->getEntityManager();
 
-            if (is_string($poetry) && $poetryowneruser<>0){
-                $query=$userspoetry->createQuery('SELECT COUNT(pr.poetryId),pr.poetryId FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.poetryRepostId=?1')
-                     ->setMaxResults(1);
-                $query->setParameter(1,$poetry );
-            } else {
-                $query=$userspoetry->createQuery('SELECT COUNT(ip.poetryId),ip.poetryId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr WHERE usr.userId=?1 and ip.poetryId=?2');// usr usr.userId=?1 and
-                //если это не стих репост
-                if ($poetryowneruser<>0)
-                    $query->setParameter(1,$poetryowneruser );//$this->session->has('login_id')
-                else
-                    $query->setParameter(1,$user );//$this->session->has('login_id')
+                if (is_string($poetry) && $poetryowneruser<>0){
+                    $query=$userspoetry->createQuery('SELECT COUNT(pr.poetryId),pr.poetryId FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.poetryRepostId=?1')
+                         ->setMaxResults(1);
+                    $query->setParameter(1,$poetry );
+                } else {
+                    $query=$userspoetry->createQuery('SELECT COUNT(ip.poetryId),ip.poetryId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr WHERE usr.userId=?1 and ip.poetryId=?2');// usr usr.userId=?1 and
+                    //если это не стих репост
+                    if ($poetryowneruser<>0)
+                        $query->setParameter(1,$poetryowneruser );//$this->session->has('login_id')
+                    else
+                        $query->setParameter(1,$user );//$this->session->has('login_id')
 
-                $query->setParameter(2,$poetry );
-            }
+                    $query->setParameter(2,$poetry );
+                }
 
             //VarDumper::dump(array('sql'=>$query->getSQL()));                
             $usersubscribedcnt=$query->getResult();

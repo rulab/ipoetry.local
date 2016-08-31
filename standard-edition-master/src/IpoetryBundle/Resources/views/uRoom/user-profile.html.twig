@@ -219,7 +219,7 @@
 								</div>
 								<a href="#"></a>
 							</div>
-                                                    <a href="../unewsfeedentity/{% verbatim %}{{unewsfeeditem.poetryowneruserid}}{% endverbatim %}_{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
+                                                    <a href="../unewsfeedentity/{% verbatim %}{{unewsfeeditem.poetryowneruserid}}{% endverbatim %}_{% verbatim %}{{unewsfeeditem.poetryoriginal_id}}{% endverbatim %}" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
 							<div ng-repeat="tag in unewsfeeditem.tags_only" class="main-post-tags" style="display:inline;width:80px;">
 								<a href="#" tagid="{% verbatim %}{{tag.tagid}}{% endverbatim %}">#{% verbatim %}{{tag.tagtext}}{% endverbatim %}</a>
 							</div>
@@ -237,7 +237,7 @@
 					</div>
 					<div class="main-post-item-bottom clearfix">
 						<div class="main-post-item-author">
-							<a href="#" class="main-post-item-author-img-wrap">
+							<a href="../user-profile/{% verbatim %}{{unewsfeeditem.poetryowneruserid}}{% endverbatim %}_{% verbatim %}{{unewsfeeditem.poetryoriginal_id}}{% endverbatim %}" class="main-post-item-author-img-wrap">
                                                             <img src="{% verbatim %}{{unewsfeeditem.owneruphotourl}}{% endverbatim %}" alt="alt">
 							</a>
 							<div class="main-post-item-text clearfix">

@@ -249,7 +249,7 @@ var unewsfeedApp = angular.module('unewsfeedApp', ['mgcrea.ngStrap','ngAnimate',
            $('#getunewsfeedblockbtn').fadeOut();          
         };
       };
-      //$scope.$apply();
+      $scope.$apply();
       //$scope.$apply(function() {
       //  $scope.unewsfeed = $scope.unewsfeed;
       //});

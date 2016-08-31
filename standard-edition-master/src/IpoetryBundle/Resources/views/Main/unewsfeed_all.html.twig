@@ -63,7 +63,7 @@
                                                                 <div class="main-post-item-top" style="background-image: url({% verbatim %}{{unewsfeeditem.image}}{% endverbatim %});background-repeat: no-repeat;background-position: center;-webkit-background-size: contain;-moz-background-size: contain;-o-background-size: contain;background-size: contain;">
                                                                         <div class="main-post-item-top-inner">
                                                                             <div class="main-post-add-time">{% verbatim %}{{unewsfeeditem.created | moment: 'fromNow'}}{% endverbatim %} в {% verbatim %}{{unewsfeeditem.created | moment: "format":"LT"}}{% endverbatim %}</div>
-                                                                            <a href="../unewsfeedentity/{% verbatim %}{{unewsfeeditem.poetryowneruserid}}{% endverbatim %}_{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
+                                                                            <a href="../unewsfeedentity/{% verbatim %}{{unewsfeeditem.userid}}{% endverbatim %}_{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" class="main-post-title">{% verbatim %}{{unewsfeeditem.title}}{% endverbatim %}</a><br/>
                                                                                 <div ng-repeat="tag in unewsfeeditem.tags_only" class="main-post-tags" style="display:inline;width:80px;">
                                                                                         <a href="#" tagid="{% verbatim %}{{tag.tagid}}{% endverbatim %}">#{% verbatim %}{{tag.tagtext}}{% endverbatim %}</a>
                                                                                 </div>
@@ -81,7 +81,7 @@
                                                                 </div>
                                                                 <div class="main-post-item-bottom clearfix">
                                                                         <div class="main-post-item-author">
-                                                                                <a href="#" class="main-post-item-author-img-wrap">
+                                                                                <a href="../user-profile/{% verbatim %}{{unewsfeeditem.userid}}{% endverbatim %}" class="main-post-item-author-img-wrap">
                                                                                     <img src="{% verbatim %}{{unewsfeeditem.uphotourl}}{% endverbatim %}" alt="alt">
                                                                                 </a>
                                                                                 <div class="main-post-item-text clearfix">
