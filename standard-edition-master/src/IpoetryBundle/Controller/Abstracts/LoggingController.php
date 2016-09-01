@@ -88,7 +88,8 @@ abstract class LoggingController extends Controller{
     //кеширование запросов БД
     public $cacheDriver;
 
-    private $sql_array=array('del_ipoetry_user_post'=>'CALL del_ipoetry_user_post(:ipoetry_poetry_id)');
+    private $sql_array=array('del_ipoetry_user_post'=>'CALL del_ipoetry_user_post(:ipoetry_poetry_id)',
+        'add_poetry_view'=>'CALL add_poetry_view(:session_id,:ipoetry_poetry_id)');
     
     public function loginAction(Request $request){
         $html='';
@@ -210,7 +211,11 @@ abstract class LoggingController extends Controller{
         $this->request=$request;
         $this->GetTranslator($request);
         //директория для хранения временных файлов
-        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/uploadtmp';        
+        if (null !==$this->request->server->get('BASE'))
+            $pathpart=$this->request->server->get('BASE');
+        else
+            $pathpart='';
+        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$pathpart.'/uploadtmp';        
         //читаем данные по стихотворению по данным в параметрах url
         //$stmt='';
         $originalpoetryid=$poetry;
@@ -230,14 +235,14 @@ abstract class LoggingController extends Controller{
                 //получаем связанные таблицы для показа данных
                 //получаем кол-во записей
                 $userspoetry = $this->getDoctrine()->getEntityManager();
-
+                //репостнутые стихи
                 if (is_string($poetry) && $poetryowneruser<>0){
                     $query=$userspoetry->createQuery('SELECT COUNT(pr.poetryId),pr.poetryId FROM IpoetryBundle\Entity\IpoetryPoetryUserRepostView pr WHERE pr.poetryRepostId=?1')
                          ->setMaxResults(1);
                     $query->setParameter(1,$poetry );
                 } else {
-                    $query=$userspoetry->createQuery('SELECT COUNT(ip.poetryId),ip.poetryId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr WHERE usr.userId=?1 and ip.poetryId=?2');// usr usr.userId=?1 and
                     //если это не стих репост
+                    $query=$userspoetry->createQuery('SELECT COUNT(ip.poetryId),ip.poetryId FROM IpoetryBundle\Entity\IpoetryPoetry ip JOIN ip.ipoetryUserUser usr WHERE usr.userId=?1 and ip.poetryId=?2');// usr usr.userId=?1 and
                     if ($poetryowneruser<>0)
                         $query->setParameter(1,$poetryowneruser );//$this->session->has('login_id')
                     else
@@ -265,6 +270,7 @@ abstract class LoggingController extends Controller{
                 $result['poetry']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetry')->findOneBy(array('poetryId'=>$poetry));
                 $result['poetrybackgroundimage']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryBackgroundImages')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
                 $result['poetryrating']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetryRating')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                $result['poetryViewers']=$unewsfeedentity->getRepository('IpoetryBundle:PoetrySessionViewers')->CountOneBy($poetry);
                 $period='WEEK';
                 $result['poetrydailyrating']=$unewsfeedentity->getRepository('IpoetryBundle:DailyPoetryRating')->findOneByPeriod($poetry,$period);
             } else
@@ -289,6 +295,8 @@ abstract class LoggingController extends Controller{
             $poetryresult['comment']=$result['poetry']->getPoetryDescription();//$result['poetry']->getPoetryBody();        
             $poetryresult['like']=$result['poetryrating']->getIpoetryPoetryRatingValueUp();
             $poetryresult['dislike']=$result['poetryrating']->getIpoetryPoetryRatingValueDown();
+            $poetryresult['poetryViewers']=$result['poetryViewers'][0]['poetryViewers'];
+            
             if (isset($result['poetrydailyrating'][0]))
                 $poetryresult['poetrydailyrating']=$result['poetrydailyrating'][0];
             else
@@ -616,7 +624,11 @@ abstract class LoggingController extends Controller{
     public function jsonFileUpload($authorization_parameters,$session,$request,$source) {
         //$this->request=$request;
         //директория для хранения временных файлов
-        $uploadtmp=$request['DOCUMENT_ROOT'].$request['BASE'].'/uploadtmp';
+        if (isset($request['BASE']))
+            $pathpart=$request['BASE'];
+        else
+            $pathpart='';
+        $uploadtmp=$request['DOCUMENT_ROOT'].$pathpart.'/uploadtmp';
         $filetype='txt';
         VarDumper::dump(array($authorization_parameters,$session,$request,$source,$uploadtmp));  
         //путь к временному файлу с картинкой
@@ -1000,7 +1012,17 @@ abstract class LoggingController extends Controller{
             }
         }
     }
-
+    //учет просмотров стихотворений
+    public function AddPoetryViewerAjaxAnswer($authorization_parameters,$request){
+        VarDumper::dump(array($authorization_parameters['poetry'],$request->cookies->get('PHPSESSID')));
+        $stmt = $this->getDoctrine()
+                     ->getConnection()
+                     ->prepare($this->sql_array['add_poetry_view']);
+        $stmt->bindValue(':ipoetry_poetry_id',$authorization_parameters['poetry']);
+        $stmt->bindValue(':session_id',$request->cookies->get('PHPSESSID'));
+        $stmt->execute();
+        return 1;
+    }
     //удаляем стих/сообщение пользователя
     public function delUserPostAjaxAnswer($authorization_parameters,$request) {
         try {

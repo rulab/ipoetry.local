@@ -68,7 +68,7 @@
                                                                                         <a href="#" tagid="{% verbatim %}{{tag.tagid}}{% endverbatim %}">#{% verbatim %}{{tag.tagtext}}{% endverbatim %}</a>
                                                                                 </div>
                                                                                 <div class="main-post-item-info">
-                                                                                        <div class="main-post-item-info-item post-views">155</div>
+                                                                                        <div class="main-post-item-info-item post-views">{% verbatim %}{{unewsfeeditem.poetryViewers}}{% endverbatim %}</div>
                                                                                         <a href="#" class="main-post-item-info-item post-comments">{% verbatim %}{{unewsfeeditem.poetrypostscnt}}{% endverbatim %}</a>
                                                                                 </div>
                                                                                 <div class="main-post-more-details" ng-mouseover="shbutton($event);" ng-mouseleave="delbutton($event);" ng-show="ownershow" getbodyelem>
@@ -99,8 +99,8 @@
                                                                         <div class="main-post-poem-text clearfix">{% verbatim %}{{unewsfeeditem.comment}}{% endverbatim %}
                                                                         </div>
                                                                         <div class="main-post-likes-wrap">
-                                                                            <div class="like" poetryid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" ng-click="Likefunc($event,'up');">{% verbatim %}{{unewsfeeditem.like}}{% endverbatim %}</div>
-                                                                            <div class="dislike" poetryid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" ng-click="Likefunc($event,'down');">{% verbatim %}{{unewsfeeditem.dislike}}{% endverbatim %}</div>
+                                                                            <div class="like" poetryid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" ng-click="Likefunc($event,'{{ path('IpoetryBundle_unewsfeedentityajax') }}','up');">{% verbatim %}{{unewsfeeditem.like}}{% endverbatim %}</div>
+                                                                            <div class="dislike" poetryid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" ng-click="Likefunc($event,'{{ path('IpoetryBundle_unewsfeedentityajax') }}','down');">{% verbatim %}{{unewsfeeditem.dislike}}{% endverbatim %}</div>
                                                                         </div>
                                                                 </div>
                                                         </div>

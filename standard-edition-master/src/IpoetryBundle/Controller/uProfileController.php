@@ -277,6 +277,9 @@ class uProfileController extends LoggingController {
                         case 'add_poetry_comment':
                                     $mas=$this->AddPoetryCommentAjaxAnswer($authorization_parameters,$request);
                                     break;
+                        case 'add_poetry_viewer':
+                                    $mas['result']=$this->AddPoetryViewerAjaxAnswer($authorization_parameters,$this->request);
+                                    break;                            
                         case 'get_poetry_comments_info':
                                     $mas=$this->GetPoetryCommentsAjaxAnswer($authorization_parameters,$request);
                                     break;
@@ -444,7 +447,12 @@ class uProfileController extends LoggingController {
         $loggeduser=$this->UserHeaderInfo($request);
         //если нет картинки то ставим по умолчанию дефолтную
         if (!$this->session->has('poetry_background_image'))
-            $this->session->set('poetry_background_image',$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/images/post-bg.jpg');
+            if (null !==$this->request->server->get('BASE'))
+                $pathpart=$this->request->server->get('BASE');
+            else
+                $pathpart='';
+                
+            $this->session->set('poetry_background_image',$this->request->server->get('DOCUMENT_ROOT').$pathpart.'/images/post-bg.jpg');
         if ($loggeduser[0]['userId']==-1 || !$this->session->has('poetry_body') || !$this->session->has('poetry_background_image')) {
             return 0;            
         }
@@ -786,7 +794,11 @@ class uProfileController extends LoggingController {
         //получаем перевод всех элементов интерфейса
         $this->GetTranslator($request);
         //директория для хранения временных файлов
-        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/uploadtmp';        
+        if (null !==$this->request->server->get('BASE'))
+            $pathpart=$this->request->server->get('BASE');
+        else
+            $pathpart='';
+        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$pathpart.'/uploadtmp';        
         //читаем данные по стихотворению по данным в параметрах url
         $stmt='';
         //проверяем что пришло в сессии

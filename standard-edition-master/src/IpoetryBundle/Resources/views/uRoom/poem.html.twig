@@ -236,6 +236,26 @@
 {% endjavascripts %}
 {% endblock %}
 <script type="text/javascript">
+    function poetrviewer(){
+        //делаем запрос о наличии у стихотворения комментариев
+        //шлем AJAX
+        ajaxdata=JSON.stringify({type:"add_poetry_viewer",poetry:"{{app.request.attributes.get('_route_params')['poetry']}}"});
+        console.log(ajaxdata);
+        url='{{ path('IpoetryBundle_unewsfeedentityajax') }}';
+        type='post';
+        dataType='json';
+        onsuccess=function(json) {
+            console.log(json['result']);
+            if (json['result']==1) {
+                console.log('session was numbered');
+            }
+        };
+        onerror=function(jqXHR, textStatus, errorThrown) {
+            console.log('error AJAX_sessionnumbered_done ' + textStatus);
+        };
+        ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror);
+        
+    }
     function checkCommentsAvailable(){
         //делаем запрос о наличии у стихотворения комментариев
         //шлем AJAX
@@ -477,6 +497,7 @@
                 $('.topline-user-name').first().attr('dbid') === $('.main-post-item-author-name').first().attr('dbid'))
                 $('#PoetryRepostbtn').fadeOut();
             */
+            poetrviewer();
             {{ include('IpoetryBundle::basejs.html.twig') }}
         {% endblock documentReady %}
     });

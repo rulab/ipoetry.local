@@ -286,7 +286,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
       //$scope.$digest();
       $scope.propertyName = propertyName;
     };
-    $scope.Likefunc=function(postid,option){
+    $scope.Likefunc=function(postid,ajaxurl,option){
       //console.log(option,commentid.currentTarget.getAttribute("commentid"));
       //если есть логиненый пользователь то разрешаем лайк
       if (Number($('.topline-user-wrap').eq(0).attr('dbid'))!==-1) {
@@ -313,7 +313,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
         
         //шлем доппараметры как json
         //отправляем like к комментарию
-        oReq.open("POST", $scope.ajaxurls,true);
+        oReq.open("POST", ajaxurl,true);
         oReq.setRequestHeader("Content-Type", "application/json");
         console.log("login_json="+JSON.stringify({type:"poetrylikerequest",poetry:Number(postid.currentTarget.getAttribute("poetryid")),user:$scope.userid,updown:option}));
         oReq.send(JSON.stringify({type:"poetrylikerequest",poetry:Number(postid.currentTarget.getAttribute("poetryid")),user:$scope.userid,updown:option}));          

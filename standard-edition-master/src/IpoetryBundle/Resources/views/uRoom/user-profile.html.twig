@@ -224,7 +224,7 @@
 								<a href="#" tagid="{% verbatim %}{{tag.tagid}}{% endverbatim %}">#{% verbatim %}{{tag.tagtext}}{% endverbatim %}</a>
 							</div>
 							<div class="main-post-item-info">
-								<div class="main-post-item-info-item post-views">155</div>
+								<div class="main-post-item-info-item post-views">{% verbatim %}{{unewsfeeditem.poetryViewers}}{% endverbatim %}</div>
 								<a href="#" class="main-post-item-info-item post-comments">{% verbatim %}{{unewsfeeditem.poetrypostscnt}}{% endverbatim %}</a>
 							</div>
 							<div class="main-post-more-details" ng-mouseover="shbutton($event);" ng-mouseleave="delbutton($event);" ng-show="ownershow">
