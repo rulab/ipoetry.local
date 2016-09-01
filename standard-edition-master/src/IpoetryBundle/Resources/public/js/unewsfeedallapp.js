@@ -68,6 +68,9 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
       $scope.content = 'Вы действительно хотите удалить запись?';
     }
     MyModalController.$inject = ['$scope'];
+    if ($(location).attr('hostname')==='ipoetry.ru' || $(location).attr('hostname')==='www.ipoetry.ru')
+    var myModal = $modal({controller: MyModalController, templateUrl: '/app_dev.php/modal', show: false,container: 'body',scope:$scope});
+    if ($(location).attr('hostname')==='ipoetry.local')
     var myModal = $modal({controller: MyModalController, templateUrl: '/standard-edition-master/web/app_dev.php/modal', show: false,container: 'body',scope:$scope});
   
     $scope.delbtnname='Удалить';
