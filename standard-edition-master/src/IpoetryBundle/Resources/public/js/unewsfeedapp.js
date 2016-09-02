@@ -66,7 +66,7 @@ var unewsfeedApp = angular.module('unewsfeedApp', ['mgcrea.ngStrap','ngAnimate',
         $scope.page=1;
         $scope.ajaxurls=ajaxurls;
         $scope.userid=userid;
-        $scope.requesturl=requesturl
+        $scope.requesturl=requesturl;
         //$scope.modal=modal;
         $scope.addunewsfeed();
     };

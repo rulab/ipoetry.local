@@ -97,6 +97,7 @@
                                                                         </div>
                                                                         <div class="clearfix"></div>
                                                                         <div class="main-post-poem-text clearfix">{% verbatim %}{{unewsfeeditem.comment}}{% endverbatim %}
+                                                                        <div class="main-post-item-recommend recommend-smoke-bg" style="display: {% verbatim %}{{unewsfeeditem.recommendvisibility}}{% endverbatim %}; opacity: 1;">iPoetry рекомендует</div>    
                                                                         </div>
                                                                         <div class="main-post-likes-wrap">
                                                                             <div class="like" poetryid="{% verbatim %}{{unewsfeeditem.poetry_id}}{% endverbatim %}" ng-click="Likefunc($event,'{{ path('IpoetryBundle_unewsfeedentityajax') }}','up');">{% verbatim %}{{unewsfeeditem.like}}{% endverbatim %}</div>

@@ -138,6 +138,13 @@ class IpoetryPoetry
      * @ORM\Column(name="ipoetry_poetry_tags", length=255, type="string", nullable=true)
      */
     private $poetryPoetryTags;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="recommended", type="boolean", nullable=false)
+     */
+    private $recommended = '0';
     
     /**
      * @var \Doctrine\Common\Collections\ArrayCollection
@@ -497,6 +504,31 @@ class IpoetryPoetry
     {
         return $this->poetryIsGift;
     }
+    
+    /**
+     * Set  recommended
+     *
+     * @param boolean $recommended
+     *
+     * @return IpoetryPoetry
+     */
+    public function setRecommended($recommended)
+    {
+        $this->recommended = $recommended;
+
+        return $this;
+    }
+
+    /**
+     * Get recommended
+     *
+     * @return boolean
+     */
+    public function getRecommended()
+    {
+        return $this->recommended;
+    }
+
     /**
      * Set poetryTitle
      *

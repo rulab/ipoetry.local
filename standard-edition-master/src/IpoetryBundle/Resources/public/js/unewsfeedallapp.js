@@ -60,6 +60,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
     $scope.MyModal;
     $scope.delpoetryid;
     $scope.delbtnvisibility=0;
+    $scope.recommended=false;
     //$modal.delpoetryid;
     $scope.title = 'Подтверждение действия.';
     $scope.content = 'Вы действительно хотите удалить запись?';    
@@ -91,7 +92,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
         $scope.page=1;
         $scope.ajaxurls=ajaxurls;
         //$scope.userid=userid;
-        $scope.requesturl=requesturl
+        $scope.requesturl=requesturl;
         //$scope.modal=modal;
         $scope.addunewsfeed();
     };
@@ -99,7 +100,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
     $scope.addunewsfeed = function(){
             $scope.users_count=0;
             console.log($scope.ajaxurls+' '+$scope.page+' '+' '+$scope.elements_on_page);
-            if ($scope.page == 1)
+            if ($scope.page === 1)
                     $scope.comments = [];
             if ($scope.page > 1){
                 $scope.page=1;
@@ -115,8 +116,16 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
                         //заполняем элементы данными
                         $scope.unewsfeed_count=response.unewsfeedcount;
                         $scope.unewsfeed=response.unewsfeedlist;
+                        for(i=0;i<$scope.unewsfeed.length;i++){
+                          console.log('deleted',$scope.delpoetryid);
+                          if (Boolean($scope.unewsfeed[i].recommended)===true){
+                              $scope.unewsfeed[i].recommendvisibility='block';
+                          } else {
+                              $scope.unewsfeed[i].recommendvisibility='none';                              
+                          }
+                        };
                         //защита от множественных ajax
-                        if ($scope.page==1)
+                        if ($scope.page===1)
                             $scope.plusPage();
                         //if ($scope.frominit===false){
                         $scope.sortBy($scope.propertyName,$scope.filtersetperiod,$scope.reverse);
@@ -426,9 +435,11 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
       //MyModal.$promise.then(MyModal.hide);
     //};
     //функция наблюдения
-    $scope.$watchCollection('unewsfeed', function(newNames, oldNames) {
-        console.log('unewsfeed changed');
+    $scope.$watchCollection('unewsfeed', function(newValues, oldValues) {
+        //console.log('unewsfeed changed',newValues, oldValues);
     },true);
-
+    $scope.$watchCollection('unewsfeed.recommended', function(newValues, oldValues) {
+        //console.log('unewsfeed changed',newValues, oldValues);
+    },true);
 });
 

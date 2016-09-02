@@ -92,6 +92,12 @@ IpoetryBundle\Entity\IpoetryPoetry:
             options:
                 default: '0'
             column: poetry_is_gift
+        recommended:
+            type: boolean
+            nullable: false
+            options:
+                default: '0'
+            column: recommended
         poetryTitle:
             type: string
             nullable: false

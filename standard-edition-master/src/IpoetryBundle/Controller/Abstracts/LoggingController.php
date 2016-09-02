@@ -292,7 +292,8 @@ abstract class LoggingController extends Controller{
             $poetryresult['title']=$result['poetry']->getPoetryTitle();
             $poetryresult['created']=$result['poetry']->getPoetryCreatedAt()->format('Y-m-d H:i:s');//->date
             $poetryresult['body']=$result['poetry']->getPoetryBodyText();//$result['poetry']->getPoetryBody();
-            $poetryresult['comment']=$result['poetry']->getPoetryDescription();//$result['poetry']->getPoetryBody();        
+            $poetryresult['comment']=$result['poetry']->getPoetryDescription();//$result['poetry']->getPoetryBody();
+            $poetryresult['recommended']=$result['poetry']->GetRecommended();
             $poetryresult['like']=$result['poetryrating']->getIpoetryPoetryRatingValueUp();
             $poetryresult['dislike']=$result['poetryrating']->getIpoetryPoetryRatingValueDown();
             $poetryresult['poetryViewers']=$result['poetryViewers'][0]['poetryViewers'];
@@ -416,6 +417,7 @@ abstract class LoggingController extends Controller{
                 $result['poetry']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetry')->findOneBy(array('poetryId'=>$poetry));
                 $result['poetrybackgroundimage']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryBackgroundImages')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
                 $result['poetryrating']=$unewsfeedentity->getRepository('IpoetryBundle:IpoetryPoetryRating')->findOneBy(array('ipoetryPoetryPoetry'=>$poetry));
+                $result['poetryViewers']=$unewsfeedentity->getRepository('IpoetryBundle:PoetrySessionViewers')->CountOneBy($poetry);
                 $period='WEEK';
                 $result['poetrydailyrating']=$unewsfeedentity->getRepository('IpoetryBundle:DailyPoetryRating')->findOneByPeriod($poetry,$period);
             } else
@@ -437,9 +439,12 @@ abstract class LoggingController extends Controller{
             $poetryresult['title']=$result['poetry']->getPoetryTitle();
             $poetryresult['created']=$result['poetry']->getPoetryCreatedAt()->format('Y-m-d H:i:s');//->date
             $poetryresult['body']=$result['poetry']->getPoetryBodyText();//$result['poetry']->getPoetryBody();
-            $poetryresult['comment']=$result['poetry']->getPoetryDescription();//$result['poetry']->getPoetryBody();        
+            $poetryresult['comment']=$result['poetry']->getPoetryDescription();//$result['poetry']->getPoetryBody();
+            $poetryresult['recommended']=$result['poetry']->GetRecommended();
             $poetryresult['like']=$result['poetryrating']->getIpoetryPoetryRatingValueUp();
             $poetryresult['dislike']=$result['poetryrating']->getIpoetryPoetryRatingValueDown();
+            $poetryresult['poetryViewers']=$result['poetryViewers'][0]['poetryViewers'];
+            
             if (isset($result['poetrydailyrating'][0]))
                 $poetryresult['poetrydailyrating']=$result['poetrydailyrating'][0];
             else
