@@ -117,7 +117,7 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
                         $scope.unewsfeed_count=response.unewsfeedcount;
                         $scope.unewsfeed=response.unewsfeedlist;
                         for(i=0;i<$scope.unewsfeed.length;i++){
-                          console.log('deleted',$scope.delpoetryid);
+                          //console.log('deleted',$scope.delpoetryid);
                           if (Boolean($scope.unewsfeed[i].recommended)===true){
                               $scope.unewsfeed[i].recommendvisibility='block';
                           } else {
@@ -149,6 +149,14 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
                     $scope.unewsfeed_part_count = response.unewsfeedlistcnt;
                     //заполняем элементы данными
                     $scope.unewsfeed_count=response.unewsfeedcount;
+                    for(i=0;i<response.unewsfeedlist.length;i++){
+                      //console.log('deleted',$scope.delpoetryid);
+                      if (Boolean(response.unewsfeedlist[i].recommended)===true){
+                          response.unewsfeedlist[i].recommendvisibility='block';
+                      } else {
+                          response.unewsfeedlist[i].recommendvisibility='none';                              
+                      }
+                    };
                     $scope.unewsfeed=$scope.unewsfeed.concat(response.unewsfeedlist);
                     $scope.plusPage();
                     //if ($scope.filterset===false)
