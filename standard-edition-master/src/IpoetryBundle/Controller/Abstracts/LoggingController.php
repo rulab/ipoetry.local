@@ -89,7 +89,8 @@ abstract class LoggingController extends Controller{
     public $cacheDriver;
 
     private $sql_array=array('del_ipoetry_user_post'=>'CALL del_ipoetry_user_post(:ipoetry_poetry_id)',
-        'add_poetry_view'=>'CALL add_poetry_view(:session_id,:ipoetry_poetry_id)');
+                             'add_poetry_view'=>'CALL add_poetry_view(:session_id,:ipoetry_poetry_id)',
+                             'add_poetry_complain'=>'CALL add_poetry_complain(:userid,:poetryid,:complaintext)');
     
     public function loginAction(Request $request){
         $html='';
@@ -1066,7 +1067,35 @@ abstract class LoggingController extends Controller{
             echo 'Error in delUserPostAjaxAnswer: ',  $e->getMessage(), "\n";
         }
     }
-
+    public function ComplainUserPostAjaxAnswer($authorization_parameters,$session,$request,$source) {
+        try {
+        $this->GetCache($request);
+        VarDumper::dump(array('cache'=>$this->cacheDriver,
+            'request'=>$request,'login='=>$this->session->get('login'),
+            'poetry='=>$authorization_parameters['poetry']));
+        
+        //пишем обновленные данные в базу
+        if ($session->has('login') && $session->has('login_id')){
+            $stmt = $this->getDoctrine()
+                         ->getConnection()
+                         ->prepare($this->sql_array['add_poetry_complain']);
+            $stmt->bindValue(':poetryid',$authorization_parameters['poetry']);
+            $stmt->bindValue(':userid',$session->get('login_id'));
+            $stmt->bindValue(':complaintext','undefined');
+            $stmt->execute();
+            //читаем данные по ангуляру сохраненные ранее при открытии модального окна
+            //if ($authorization_parameters['source']=='NEWSFEED'){
+            //    if ($this->session->has('lastNewsfeedDelElement')){
+            //        $scope=unserialize(file_get_contents($this->session->get('lastNewsfeedDelElement')));
+            //    }                    
+            //}
+            return 1;
+        } else
+            return 0;
+        } catch (Exception $e) {
+            echo 'Error in delUserPostAjaxAnswer: ',  $e->getMessage(), "\n";
+        }
+    }
     public function array_datetime_fomatter(&$item, $key,$keyname)
     {
         if ($key==$keyname)

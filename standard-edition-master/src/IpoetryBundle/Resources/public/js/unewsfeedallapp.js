@@ -63,16 +63,26 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
     $scope.recommended=false;
     //$modal.delpoetryid;
     $scope.title = 'Подтверждение действия.';
-    $scope.content = 'Вы действительно хотите удалить запись?';    
     function MyModalController($scope) {
-      $scope.title = 'Подтверждение действия.';
-      $scope.content = 'Вы действительно хотите удалить запись?';
+      $scope.content = '<h4>Вы действительно хотите удалить запись?</h4>';
+      $scope.source=0;      
     }
+    function MyModalController1($scope) {
+      $scope.content = '<h4>Пожаловаться на запись?</h4>';
+      $scope.source=1;
+    }
+
     MyModalController.$inject = ['$scope'];
-    if ($(location).attr('hostname')==='ipoetry.ru' || $(location).attr('hostname')==='www.ipoetry.ru')
-    var myModal = $modal({controller: MyModalController, templateUrl: '/app_dev.php/modal', show: false,container: 'body',scope:$scope});
-    if ($(location).attr('hostname')==='ipoetry.local')
-    var myModal = $modal({controller: MyModalController, templateUrl: '/standard-edition-master/web/app_dev.php/modal', show: false,container: 'body',scope:$scope});
+    MyModalController1.$inject = ['$scope'];
+
+    if ($(location).attr('hostname')==='ipoetry.ru' || $(location).attr('hostname')==='www.ipoetry.ru'){
+        var myModal = $modal({controller: MyModalController, templateUrl: '/app_dev.php/modal', show: false,container: 'body',scope:$scope});
+        var myModal1 = $modal({controller: MyModalController1, templateUrl: '/app_dev.php/modal', show: false,container: 'body',scope:$scope});        
+    }
+    if ($(location).attr('hostname')==='ipoetry.local'){
+        var myModal = $modal({controller: MyModalController, templateUrl: '/standard-edition-master/web/app_dev.php/modal', show: false,container: 'body',scope:$scope});
+        var myModal1 = $modal({controller: MyModalController1, templateUrl: '/standard-edition-master/web/app_dev.php/modal', show: false,container: 'body',scope:$scope});        
+    }
   
     $scope.delbtnname='Удалить';
     //карточки ленты стихов
@@ -178,9 +188,11 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
             element.currentTarget.children[0].setAttribute("style",'display: block; opacity: 1;');
             //меняем кнопку удалить на пожаловаться      
             if (element.currentTarget.children[0].children[0].getAttribute('dbid')===element.currentTarget.children[0].children[0].getAttribute('userid')){
+               //element.currentTarget.children[0].children[0].setAttribute("value",'Удалить'); 
                $scope.delbtnname='Удалить';
             } else {
                $scope.delbtnname='Пожаловаться';
+               //element.currentTarget.children[0].children[0].setAttribute("value",'Пожаловаться');              
                element.currentTarget.children[0].children[0].setAttribute("style",'width: 140px;padding-left: 15px;');
             }
         }
@@ -262,6 +274,19 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
         });
         
     };
+    $scope.complainelement = function(element) {
+        console.log($scope.ajaxurls+' '+$scope.page+' '+$scope.userid+' '+element+' '+$scope.elements_on_page);
+        //return false;
+        $http.post($scope.ajaxurls,{type:"complain_user_post",user:$scope.userid,poetry:element}).success(function(response)
+        {
+            if (response.result)
+            {
+                console.log(response.result);
+            }
+        });
+        
+    };
+
     $scope.sortBy = function(propertyName,period,reverse) {
         if ($scope.filterset===false)
             $scope.reverse=true;
@@ -377,7 +402,6 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
       $scope.userid=element.currentTarget.getAttribute("userid");
       //$scope.MyModal = $modal({controller: 'unewsfeedallController', templateUrl: '/standard-edition-master/web/app_dev.php/modal/'+$scope.userid+'_'+$scope.delpoetryid, show: false,container: 'body',delpoetryid:$scope.delpoetryid});
       //$scope.MyModal = $modal({controller: 'unewsfeedallController', templateUrl: '/standard-edition-master/web/modal/modaldemo.html.twig?userid='+$scope.userid+'&poetryid='+$scope.delpoetryid, show: false,container: 'body',delpoetryid:$scope.delpoetryid});
-      console.log('showModal',$scope.delpoetryid,element.currentTarget.getAttribute("postid"),myModal);
       var scopeobj={'page':$scope.page,
                     'elements_on_page':$scope.elements_on_page,
                     'users_part_count':$scope.users_part_count,
@@ -398,40 +422,75 @@ var unewsfeedallApp = angular.module('unewsfeedallApp', ['mgcrea.ngStrap','ngAni
                     'content':$scope.content,
                     'delbtnname':$scope.delbtnname,
                     'unewsfeed':$scope.unewsfeed};
-      //производим сохранение на сервер пространства scope для контроллера
-      $http.post($scope.ajaxurls,{type:"del_feed_element",scope:scopeobj}).success(function(response)
-      {
-        if (response.result === 1)
+      
+      if (element.currentTarget.getAttribute('value')==='Удалить'){
+        console.log('showModal',$scope.delpoetryid,element.currentTarget.getAttribute("postid"),myModal);
+        //производим сохранение на сервер пространства scope для контроллера
+        $http.post($scope.ajaxurls,{type:"del_feed_element",scope:scopeobj}).success(function(response)
         {
-            console.log('AJAX_del_feed_element result='+response.result);
-            myModal.$promise.then(myModal.show);
-        }
-      });
+          if (response.result === 1)
+          {
+              console.log('AJAX_del_feed_element result='+response.result);
+              myModal.$promise.then(myModal.show);
+          }
+        });
 
-      //var oReq = new XMLHttpRequest();
-      //oReq.onreadystatechange = function() {
-      //    if (oReq.readyState === 4 && oReq.status === 200) {
-      //        response=JSON.parse(oReq.response);
-      //        console.log(response.result);
-      //    }
-      //};
+        //var oReq = new XMLHttpRequest();
+        //oReq.onreadystatechange = function() {
+        //    if (oReq.readyState === 4 && oReq.status === 200) {
+        //        response=JSON.parse(oReq.response);
+        //        console.log(response.result);
+        //    }
+        //};
 
-      //шлем scope как json
-      //oReq.open("POST", $scope.ajaxurls,true);
-      //oReq.setRequestHeader("Content-Type", "application/json");
-      //console.log("login_json="+JSON.stringify({type:"del_wall_element",scope:scopeobj}));
-      //oReq.send(JSON.stringify({type:"del_wall_element",scope:scopeobj}));
+        //шлем scope как json
+        //oReq.open("POST", $scope.ajaxurls,true);
+        //oReq.setRequestHeader("Content-Type", "application/json");
+        //console.log("login_json="+JSON.stringify({type:"del_wall_element",scope:scopeobj}));
+        //oReq.send(JSON.stringify({type:"del_wall_element",scope:scopeobj}));
 
-      //$scope.MyModal.$promise.then($scope.MyModal.show);
+        //$scope.MyModal.$promise.then($scope.MyModal.show);          
+      }
+      if (element.currentTarget.getAttribute('value')==='Пожаловаться'){
+        console.log('showModal',$scope.delpoetryid,element.currentTarget.getAttribute("postid"),myModal);
+        //производим сохранение на сервер пространства scope для контроллера
+        $http.post($scope.ajaxurls,{type:"del_feed_element",scope:scopeobj}).success(function(response)
+        {
+          if (response.result === 1)
+          {
+              console.log('AJAX_del_feed_element result='+response.result);
+              myModal1.$promise.then(myModal1.show);
+          }
+        });
+
+        //var oReq = new XMLHttpRequest();
+        //oReq.onreadystatechange = function() {
+        //    if (oReq.readyState === 4 && oReq.status === 200) {
+        //        response=JSON.parse(oReq.response);
+        //        console.log(response.result);
+        //    }
+        //};
+
+        //шлем scope как json
+        //oReq.open("POST", $scope.ajaxurls,true);
+        //oReq.setRequestHeader("Content-Type", "application/json");
+        //console.log("login_json="+JSON.stringify({type:"del_wall_element",scope:scopeobj}));
+        //oReq.send(JSON.stringify({type:"del_wall_element",scope:scopeobj}));
+
+        //$scope.MyModal.$promise.then($scope.MyModal.show);          
+      }
 
     };
     $scope.hideModal = function(status,element,ajaxurl) {
-      console.log('hideModal',$scope.delpoetryid,status,ajaxurl);
+      console.log('hideModal',element.currentTarget.getAttribute("value"),$scope.delpoetryid,status,ajaxurl);
       //$scope.userid=element.currentTarget.getAttribute("userid");
       $scope.ajaxurls=ajaxurl;
       myModal.$promise.then(myModal.hide);
-      if (status===1)
+      if (status===1 && Number(element.currentTarget.getAttribute("value"))===0)
         $scope.delelement($scope.delpoetryid);
+      if (status===1 && Number(element.currentTarget.getAttribute("value"))===1)
+        $scope.complainelement($scope.delpoetryid);
+
       //MyModal.$promise.then(MyModal.hide);
     };
     //$scope.hideModal = function() {

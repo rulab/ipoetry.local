@@ -128,7 +128,7 @@ class IndexController extends LoggingController
                     case 'del_feed_element':
                                 //Vardumper::dump(array('$request'=>$request,'ServerBag'=>$request->server->all(),'session'=>$this->session));
                                 $mas['result']=$this->jsonFileUpload($authorization_parameters,$this->session,$request->server->all(),'NEWSFEED');
-                                break; 
+                                break;
             }
         } else
             $mas['result']=0;
