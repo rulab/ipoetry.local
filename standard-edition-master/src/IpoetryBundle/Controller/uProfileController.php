@@ -385,7 +385,7 @@ class uProfileController extends LoggingController {
 
             $this->session=$request->getSession();
             $poetryposts = $this->getDoctrine()->getEntityManager();
-            if ($this->session->has('login') && $this->session->has('login_id')){
+            //if ($this->session->has('login') && $this->session->has('login_id')){
                 //получаем кол-во записей
                 $query=$poetryposts->createQuery('SELECT COUNT(iub.ipoetryUserBlogPostPoetryId) FROM IpoetryBundle\Entity\IpoetryUserBlogPost iub WHERE iub.ipoetryUserBlogPostPoetryId=?1');// usr usr.userId=?1 and 
                 $query->setParameter(1,$authorization_parameters['poetry'] );//$this->session->has('login_id')
@@ -399,7 +399,7 @@ class uProfileController extends LoggingController {
                     $ostatok_1=$poetrypostscnt[0][1]-$datapart;
                     $datapart+=$ostatok_1;
                     //получаем список комментов
-                    $query=$poetryposts->createQuery('SELECT iub.ipoetryUserBlogPostId,iub.ipoetryUserBlogPostParentId,iub.ipoetryUserBlogPostText,ipu.userName,ipu.userLastname,ipuphoto.userPhotoUrl,iub.ipoetryUserBlogPostCreatedAt,iub.ipoetryUserBlogPostUpdatedAt,ibpr.ipoetryBlogPostRatingValueUp,ibpr.ipoetryBlogPostRatingValueDown FROM IpoetryBundle\Entity\IpoetryUserBlogPost iub JOIN iub.ipoetryBlogPostRating ibpr JOIN iub.ipoetryUserUser ipu JOIN ipu.userPhoto ipuphoto WHERE iub.ipoetryUserBlogPostPoetryId=?1')
+                    $query=$poetryposts->createQuery('SELECT ipu.userId,iub.ipoetryUserBlogPostId,iub.ipoetryUserBlogPostParentId,iub.ipoetryUserBlogPostText,ipu.userName,ipu.userLastname,ipuphoto.userPhotoUrl,iub.ipoetryUserBlogPostCreatedAt,iub.ipoetryUserBlogPostUpdatedAt,ibpr.ipoetryBlogPostRatingValueUp,ibpr.ipoetryBlogPostRatingValueDown FROM IpoetryBundle\Entity\IpoetryUserBlogPost iub JOIN iub.ipoetryBlogPostRating ibpr JOIN iub.ipoetryUserUser ipu JOIN ipu.userPhoto ipuphoto WHERE iub.ipoetryUserBlogPostPoetryId=?1')
                         ->setFirstResult((($this->getParameter('ipoetry.uprofilecommentslimit')*$authorization_parameters['datapart'])-$this->getParameter('ipoetry.uprofilecommentslimit')))
                         ->setMaxResults($this->getParameter('ipoetry.uprofilecommentslimit'));
                     $query->setParameter(1,$authorization_parameters['poetry'] );//$this->session->has('login_id')
@@ -436,7 +436,7 @@ class uProfileController extends LoggingController {
                                  'commentscount'=>$poetrypostscnt[0][1],);
                 } else
                     return array('result'=>false);
-            }
+            //}
         }
     }
 

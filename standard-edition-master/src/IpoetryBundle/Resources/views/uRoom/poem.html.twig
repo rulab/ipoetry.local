@@ -166,8 +166,8 @@
                                                         <div class="comments-item-info clearfix">
                                                                 <div class="comments-item-time">{% verbatim %}{{CommentsBody.ipoetryUserBlogPostCreatedAt}}{% endverbatim %}</div>
                                                                 <a class="comments-item-get-answer" name="PoetryAddCommentCommentbtn" href="#" style="visibility:hidden;">Ответить</a>
-                                                                <div class="complain" style="visibility:hidden;">
-                                                                        <div class="complane-text" parentcommentid="{% verbatim %}{{CommentsBody.ipoetryUserBlogPostParentId}}{% endverbatim %}" commentid="{% verbatim %}{{CommentsBody.ipoetryUserBlogPostId}}{% endverbatim %}">Пожаловаться</div>
+                                                                <div class="complain" getbodyelem>
+                                                                        <div class="complane-text" parentcommentid="{% verbatim %}{{CommentsBody.ipoetryUserBlogPostParentId}}{% endverbatim %}" commentid="{% verbatim %}{{CommentsBody.ipoetryUserBlogPostId}}{% endverbatim %}"  userid="{% verbatim %}{{CommentsBody.userId}}{% endverbatim %}" ng-click="showModal($event);" value="{% verbatim %}{{delbtnname}}{% endverbatim %}">{% verbatim %}{{delbtnname}}{% endverbatim %}</div>
                                                                 </div>
                                                         </div>
                                                 </div>
@@ -225,10 +225,15 @@
 {% javascripts '@IpoetryBundle/Resources/public/js/jquery-1.11.0.min.js'
 '@IpoetryBundle/Resources/public/bootstrap/dist/js/bootstrap.min.js'
 '@IpoetryBundle/Resources/public/js/angular.min.js'
+'@IpoetryBundle/Resources/public/js/angular-animate.min.js'
+'@IpoetryBundle/Resources/public/js/angular-route.min.js'
+'@IpoetryBundle/Resources/public/js/fancybox/jquery.fancybox.pack.js'
 '@IpoetryBundle/Resources/public/js/poemcommentsapp.js'
 '@IpoetryBundle/Resources/public/js/w_load.js'
-'@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.min.js'
+'@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.js'
 '@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/dist/angular-strap.tpl.min.js'
+'@IpoetryBundle/Resources/public/js/moment-with-locales.min.js'
+'@IpoetryBundle/Resources/public/js/angular-strap-2.3.6/src/modal/modal.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie-emulation-modes-warning.js'
 '@IpoetryBundle/Resources/public/bootstrap/docs/assets/js/ie10-viewport-bug-workaround.js'
 %}
