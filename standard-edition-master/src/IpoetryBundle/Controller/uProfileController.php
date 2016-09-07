@@ -810,13 +810,13 @@ class uProfileController extends LoggingController {
         //проверяем что пришло в сессии
         $this->GetCache($request);
 
-        if ($request->hasSession()) {
+        //if ($request->hasSession()) {
 
             VarDumper::dump(array('user'=>$user));
 
-            $this->session=$request->getSession();
+            //$this->session=$request->getSession();
             //$userentity = $this->getDoctrine()->getManager();
-            if ($this->session->has('login') && $this->session->has('login_id')){
+            //if ($this->session->has('login') && $this->session->has('login_id')){
                 //получаем связанные таблицы для показа данных
                 //получаем кол-во записей
                 $userentity = $this->getDoctrine()->getEntityManager();
@@ -848,8 +848,8 @@ class uProfileController extends LoggingController {
                     $authorization_parameters=array('period'=>'day');
                     $poetryrating=$this->GetPoetriesRatingsAjaxAnswer($authorization_parameters,$request);
                 }
-            }
-        }
+            //}
+        //}
         if (!isset($userentities[0])) {
             $userentities[0]["userId"] = -1;
             $userentities[0]["userName"] = "undefined";

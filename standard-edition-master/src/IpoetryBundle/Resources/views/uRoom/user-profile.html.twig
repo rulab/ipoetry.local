@@ -38,6 +38,7 @@
 					</div>
 					<button id="setusersubscriptionbtn" class="btn-white-border">Подписаться</button>
 					<button id="gotousernewsfeedbtn" class="btn-white-border">Смотреть ленту пользователя</button>
+                                        <button id="addpoembtn" class="btn-white-border" style="width: 277px;height: auto;">Добавить стихотворение</button>
 				</div>
 				<a href="#" onclick="javascript:window.history.back(-1);return false;" class="back-link">Назад</a>
 			</div>
@@ -105,7 +106,7 @@
 					<div class="clearfix">
 						<a href="#" class="aside-widget-title">Лучшие стихи <span>({{poetryratingcnt}})</span></a>
 					</div>
-                                        {% for poetryratingitem in poetryrating.poetriesratings %}                                            
+                                        {% for poetryratingitem in poetryrating.poetriesratings %}
 					<div class="poem-item clearfix">
                                                     <a href="#" class="poem-img-item-wrap">
                                                             <img src="{{poetryratingitem.image_url}}" alt="alt">
@@ -368,6 +369,14 @@
         oReq.send(blob);        
     }
     */
+    function checkUserLogged(){
+      if (Number($('.topline-user-wrap').eq(0).attr('dbid'))===-1) {
+        //скрываем возможность менять статус
+        $('#userstatustext').prop( "disabled", true );
+        $('#addpoembtn').fadeOut();
+      }
+ 
+    }
     function addUserSubscription(){
         
         //делаем запрос на добавление подписки на данного владельца профиля
@@ -432,6 +441,7 @@
                 $('.add-post-wrap').eq(0).fadeOut();
                 //скрываем возможность менять статус
                 $('#userstatustext').prop( "disabled", true );
+                $('#addpoembtn').fadeOut();
             }
                 
         },
@@ -652,6 +662,17 @@
               }
               document.location.assign('{{path('IpoetryBundle_unewsfeedall')}}');
             });
+            $('#addpoembtn').on('click',function (event){
+                event = event || window.event;
+
+                  if (event.preventDefault) { // если метод существует
+                    event.preventDefault(); // то вызвать его
+                  } else { // иначе вариант IE8-:
+                    event.returnValue = false;
+                  }
+                  location.assign('{{ path('IpoetryBundle_addpoem') }}');
+            });
+ 
             $('#userstatustext').on('click',function(event){
               event = event || window.event;
 
@@ -690,6 +711,7 @@
             });
             checkOwnProfile();
             checkUserSubscribed();
+            checkUserLogged();
         {{ include('IpoetryBundle::basejs.html.twig') }}
         {% endblock documentReady %}
     });

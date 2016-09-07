@@ -980,12 +980,12 @@ abstract class LoggingController extends Controller{
         //проверяем что пришло в сессии
         $this->GetCache($request);
 
-        if ($request->hasSession()) {
+        //if ($request->hasSession()) {
 
             $this->session=$request->getSession();
             $prating = $this->getDoctrine()->getEntityManager();
 
-            if ($this->session->has('login') && $this->session->has('login_id')) {
+            //if ($this->session->has('login') && $this->session->has('login_id')) {
                 //в зависимости от полученного параметра получаем пользователи и рейтинги 
                 $pratingcnt = $prating->getRepository('IpoetryBundle:DailyPoetryRating')
                     ->getCountRating();  
@@ -1015,8 +1015,8 @@ abstract class LoggingController extends Controller{
                     return array('result'=>1,'poetriesratings'=>$pratings);                    
                 } else
                     return array('result'=>0,'poetriesratings'=>0);
-            }
-        }
+            //}
+        //}
     }
     //учет просмотров стихотворений
     public function AddPoetryViewerAjaxAnswer($authorization_parameters,$request){
