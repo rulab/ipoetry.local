@@ -31,15 +31,10 @@
 				</div>
 				<div class="user-profile-top-right clearfix">
 					<div class="head-cover-title">{{userprofileowner.userName}} {{userprofileowner.userLastname}}</div>
+					<!--<div class="user-profile-favorite-item clearfix">-->
+                                            <input class="form-control" id="userstatustext" type="text" placeholder="Добавить статус" maxlength="1024" data-toggle="modal"  title="Введите статус" data-html="true"/>
+					<!--</div>-->
 					<div class="user-profile-favorite-item clearfix">
-						<div class="user-profile-favorite-title">Любимые авторы: </div>
-						<div class="user-profile-favorite-text">
-						</div>
-					</div>
-					<div class="user-profile-favorite-item clearfix">
-						<div class="user-profile-favorite-title">Любимые направления в поэзии: </div>
-						<div class="user-profile-favorite-text">
-						</div>
 					</div>
 					<button id="setusersubscriptionbtn" class="btn-white-border">Подписаться</button>
 					<button id="gotousernewsfeedbtn" class="btn-white-border">Смотреть ленту пользователя</button>
@@ -291,6 +286,7 @@
         -->
 
         <input id="datapartnum" type="hidden" value="1"/>
+        {{ include('IpoetryBundle::basemodal1.html.twig') }}  
 <!-- Подвал -->
         {{ include('IpoetryBundle::basefooter.html.twig') }}    
 {% block javascripts %}
@@ -659,6 +655,16 @@
                 event.returnValue = false;
               }
               document.location.assign('{{path('IpoetryBundle_unewsfeedall')}}');
+            });
+            $('#userstatustext').on('click',function(event){
+              event = event || window.event;
+
+              if (event.preventDefault) { // если метод существует
+                event.preventDefault(); // то вызвать его
+              } else { // иначе вариант IE8-:
+                event.returnValue = false;
+              }
+              $('#inputUserStatusModal').modal('show'); 
             });
             checkOwnProfile();
             checkUserSubscribed();
