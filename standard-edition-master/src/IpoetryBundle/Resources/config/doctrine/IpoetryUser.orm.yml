@@ -83,6 +83,14 @@ IpoetryBundle\Entity\IpoetryUser:
                 fixed: false
                 default: undefined
             column: user_email
+        userStatus:
+            type: string
+            nullable: true
+            length: 1024
+            options:
+                fixed: false
+                default: ''
+            column: ipoetry_user_status
         userRatingId:
             type: integer
             nullable: false

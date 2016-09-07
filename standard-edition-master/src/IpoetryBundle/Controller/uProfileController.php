@@ -102,7 +102,8 @@ class uProfileController extends LoggingController {
                             'add_ipoetry_poem_comment_like'=>'CALL add_ipoetry_poem_comment_like(:ipoetry_user_id,:ipoetry_poem_id,\'UP\')',
                             'add_ipoetry_poem_comment_dislike'=>'CALL add_ipoetry_poem_comment_like(:ipoetry_user_id,:ipoetry_poem_id,\'DOWN\')',
                             'add_ipoetry_poetry_like'=>'CALL add_ipoetry_poetry_like(:ipoetry_user_id,:ipoetry_poetry_id,\'UP\')',
-                            'add_ipoetry_poetry_dislike'=>'CALL add_ipoetry_poetry_like(:ipoetry_user_id,:ipoetry_poetry_id,\'DOWN\')');
+                            'add_ipoetry_poetry_dislike'=>'CALL add_ipoetry_poetry_like(:ipoetry_user_id,:ipoetry_poetry_id,\'DOWN\')',
+                            'add_user_status'=>'CALL add_user_status(:ipoetry_user_id,:status_text)');
 
     public function uProfileAction (Request $request){
         $options=array();
@@ -313,6 +314,9 @@ class uProfileController extends LoggingController {
                                     break;
                     case 'complain_user_post':
                                 $mas['result']=$this->ComplainUserPostAjaxAnswer($authorization_parameters,$this->session,$this->request,'NEWSFEED');
+                                break;
+                    case 'add_user_status':
+                                $mas['result']=$this->addUserStatusAjaxAnswer($authorization_parameters,$this->request);
                                 break;
                 }
         } else if ($request->headers->has('Content-Type')) {
@@ -824,7 +828,7 @@ class uProfileController extends LoggingController {
                 //если есть такой пользователь то формируем вывод данных по нему
                 if ($userentitycnt[0][1]==1){
                     //выбираем данные по пользователям подписантам на стих
-                    $query=$userentity->createQuery('SELECT usr.userId,usr.userName,usr.userLastname,usrAge.ipoetryUserAge,usrCity.cityName,usrWebsite.ipoetryUserWebsite,usrphoto.userPhotoUrl,CONCAT(?2,usr.userId) AS reposterurl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto JOIN usr.userCity usrCity JOIN usr.userAge usrAge JOIN usr.userWebsite usrWebsite WHERE usr.userId=?1');
+                    $query=$userentity->createQuery('SELECT usr.userId,usr.userName,usr.userLastname,usr.userStatus,usrAge.ipoetryUserAge,usrCity.cityName,usrWebsite.ipoetryUserWebsite,usrphoto.userPhotoUrl,CONCAT(?2,usr.userId) AS reposterurl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto JOIN usr.userCity usrCity JOIN usr.userAge usrAge JOIN usr.userWebsite usrWebsite WHERE usr.userId=?1');
                     $query->setParameter(1,$user );
                     $query->setParameter(2,'\''.$this->getParameter('ipoetry.UserProfileUrl').'\'');
                     $userentities=$query->getResult();
@@ -1069,5 +1073,29 @@ class uProfileController extends LoggingController {
             //}
         }
         return 0;
+    }
+    public function addUserStatusAjaxAnswer($authorization_parameters,$request){
+
+            $this->GetCache($request);
+    
+            VarDumper::dump(array(
+                'request'=>$request,'login='=>$this->session->get('login'),
+                'login_id='=>$this->session->get('login_id'),
+                'status='=>$authorization_parameters['status']));
+     
+            if ($request->hasSession()) {
+                //пишем обновленные данные в базу
+                if ($this->session->has('login') && $this->session->has('login_id')){
+                    $stmt = $this->getDoctrine()
+                                ->getConnection()
+                                ->prepare($this->sql_array['add_user_status']);
+                    $stmt->bindValue(':ipoetry_user_id',$this->session->get('login_id'));
+                    $stmt->bindValue(':status_text',$authorization_parameters['status']);
+                    $stmt->execute();
+                    return 1;
+                } else
+                    return 0;
+            } else
+                return 0;    
     }
 }

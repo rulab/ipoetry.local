@@ -32,7 +32,7 @@
 				<div class="user-profile-top-right clearfix">
 					<div class="head-cover-title">{{userprofileowner.userName}} {{userprofileowner.userLastname}}</div>
 					<!--<div class="user-profile-favorite-item clearfix">-->
-                                            <input class="form-control" id="userstatustext" type="text" placeholder="Добавить статус" maxlength="1024" data-toggle="modal"  title="Введите статус" data-html="true"/>
+                                            <input class="form-control" id="userstatustext" type="text" placeholder="Добавить статус" maxlength="1024" data-toggle="modal"  title="Введите статус" data-html="true" value="{{userprofileowner.userStatus}}"/>
 					<!--</div>-->
 					<div class="user-profile-favorite-item clearfix">
 					</div>
@@ -425,13 +425,13 @@
         success: function(json) {
             console.log(json['result']);
             if (json['result']==1) {
-               //скрываем кнопку если это собственный профиль пользователя
-               $('#setusersubscriptionbtn').fadeOut();
+                //скрываем кнопку если это собственный профиль пользователя
+                $('#setusersubscriptionbtn').fadeOut();
             } else {
-               //скрываем блок с вводом сообщения
-               $('.add-post-wrap').eq(0).fadeOut();
-               //скрываем кнопки удалить в элементах стены
-               //$('.main-post-more-details').fadeOut();
+                //скрываем блок с вводом сообщения
+                $('.add-post-wrap').eq(0).fadeOut();
+                //скрываем возможность менять статус
+                $('#userstatustext').prop( "disabled", true );
             }
                 
         },
@@ -573,8 +573,6 @@
             $('button[name="PoetryLikebtn"]').each(function (index){
                 $(this).on('click',function () {
                     console.log($(this).attr('commentid'));
-                    poetryid=1;
-                    userid=16;
                     var oReq = new XMLHttpRequest();
                     oReq.onreadystatechange = function() {
                         //console.log(JSON.parse(oReq.responseText));
@@ -593,8 +591,6 @@
             $('button[name="PoetryDisLikebtn"]').each(function (index){
                 $(this).on('click',function () {
                     console.log($(this).attr('commentid'));
-                    poetryid=1;
-                    userid=16;
                     var oReq = new XMLHttpRequest();
                     oReq.onreadystatechange = function() {
                         //console.log(JSON.parse(oReq.responseText));
@@ -665,6 +661,32 @@
                 event.returnValue = false;
               }
               $('#inputUserStatusModal').modal('show'); 
+            });
+            $('#savestatusbtn').on('click',function(event){
+              event = event || window.event;
+
+              if (event.preventDefault) { // если метод существует
+                event.preventDefault(); // то вызвать его
+              } else { // иначе вариант IE8-:
+                event.returnValue = false;
+              }
+              console.log('savestatusbtn clicked');
+              //пускаем ajax запрос на изменение статуса
+                    var oReq = new XMLHttpRequest();
+                    oReq.onreadystatechange = function() {
+                        //console.log(JSON.parse(oReq.responseText));
+                        if (oReq.readyState == 4 && oReq.status == 200) {
+                            console.log(JSON.parse(oReq.response));
+                            $('#userstatustext').val($('#message-text').val());
+                        }
+                    };
+                    //шлем доппараметры как json
+                    //отправляем like к комментарию
+                    oReq.open("POST", "{{ path('IpoetryBundle_unewsfeedentityajax') }}",true);
+                    oReq.setRequestHeader("Content-Type", "application/json");
+                    console.log("login_json="+JSON.stringify({type:"add_user_status",status:$('#message-text').val()}));
+                    oReq.send(JSON.stringify({type:"add_user_status",status:$('#message-text').val()}));
+                    $('#inputUserStatusModal').modal('hide');
             });
             checkOwnProfile();
             checkUserSubscribed();

@@ -57,6 +57,13 @@ class IpoetryUser
     private $userEmail = 'undefined';
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="ipoetry_user_status", type="string", length=1024, nullable=true)
+     */
+    private $userStatus = '';
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="user_rating_id", type="integer", nullable=false)
@@ -302,6 +309,30 @@ class IpoetryUser
     public function getUserEmail()
     {
         return $this->userEmail;
+    }
+
+    /**
+     * Set userStatus
+     *
+     * @param string $userStatus
+     *
+     * @return IpoetryUser
+     */
+    public function setUserStatus($userStatus)
+    {
+        $this->userStatus = $userStatus;
+
+        return $this;
+    }
+
+    /**
+     * Get userStatus
+     *
+     * @return string
+     */
+    public function getUserStatus()
+    {
+        return $this->userStatus;
     }
 
     /**
