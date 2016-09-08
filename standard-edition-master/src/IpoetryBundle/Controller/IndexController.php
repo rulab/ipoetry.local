@@ -325,7 +325,16 @@ class IndexController extends LoggingController
     }
     // страница поиска стихов и сообщений по темам и названиям
     public function pSearchAction(Request $request){
-        return $this->render('IpoetryBundle:Main:psearch.html.twig',array('poetrysearchlimit'=>$this->getParameter('ipoetry.poetrysearchlimit')));
+        //получаем данные по пользователю для шапки страницы
+        $userheaderInfo=$this->UserHeaderInfo($request);
+        //получаем данные по пользователю владельцу профайла
+        $this->request=$request;
+        //получаем перевод всех элементов интерфейса
+        $this->GetTranslator($request);
+
+        return $this->render('IpoetryBundle:Main:psearch.html.twig',array('poetrysearchlimit'=>$this->getParameter('ipoetry.poetrysearchlimit'),
+            'userheaderInfo'=>$userheaderInfo[0],
+            'MoreFeeds'=>$this->translator->trans('More comments',array(),'userprofile')));
     }
     //выполнение процедуры подсчета рейтинга стихов
     public function DailyPoetryRatingAction(Request $request){

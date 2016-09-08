@@ -3,8 +3,42 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-var psearchApp = angular.module('psearchApp', []);
-psearchApp.controller('PoetrySearchController', function($scope,$http) {
+var psearchApp = angular.module('psearchApp', ['mgcrea.ngStrap','ngAnimate','ngRoute'])
+.filter('trusted_html', ['$sce', function($sce){
+    return function(text) {
+        return $sce.trustAsHtml(text);
+    };
+}])
+.filter('moment', function () {
+  return function (input, momentFn /*, param1, param2, ...param n */) {
+    moment.locale('ru');
+    var args = Array.prototype.slice.call(arguments, 2),
+        momentObj = moment(input);
+    return momentObj[momentFn].apply(momentObj, args);
+  };
+})
+.directive('getbodyelem', function () {
+  return {
+    link: function (scope, element, attrs) {
+      var documentmainpostmoredetails = document.getElementsByClassName("main-post-more-details");
+      var documentbtnwhiteborderdel = document.getElementsByClassName("btn-white-border del");
+      
+      if (Number($('.topline-user-wrap').eq(0).attr('dbid'))===-1) {
+        angular.element(documentmainpostmoredetails).remove();
+      } else {
+        //angular.element(documentmainpostmoredetails).attr('dbid',$('.topline-user-wrap').eq(0).attr('dbid'));
+        angular.element(documentbtnwhiteborderdel).attr('dbid',$('.topline-user-wrap').eq(0).attr('dbid'));
+        scope.userid=Number($('.topline-user-wrap').eq(0).attr('dbid'));
+      }
+    }
+  }
+})
+.config(function($sceProvider) {
+  // Completely disable SCE.  For demonstration purposes only!
+  // Do not use in new projects.
+  $sceProvider.enabled(false);
+})
+.controller('PoetrySearchController', function($scope,$http) {
     //var searchedpoetries=this;
     $scope.page;
     $scope.elements_on_page = 20;
@@ -68,16 +102,24 @@ psearchApp.controller('PoetrySearchController', function($scope,$http) {
                 
             $http.post(ajaxurls,{'type':'poetrysearch','phrase':$scope.searchedpoetriestext.text,'datapart':$scope.page}).success(function(response)
             {
-                    if (response.result == 1)
+                    if (response.result>=1)
                     {
                         console.log(response.psearchfeedlist.length);
                         $scope.poetries_part_count = response.psearchfeedlist.length;
                         //заполняем элементы данными
                         //$scope.searchedpoetries = response.searchedpoetries;
-                        $scope.searchedpoetries.push({psearchfeedlist:response.psearchfeedlist});
-                        //$scope.searchedpoetries = $scope.searchedpoetries.concat(response.psearchfeedlist);
-                        //$scope.plusPage;
-                        $scope.page++;
+                        //$scope.searchedpoetries.push({psearchfeedlist:response.psearchfeedlist});
+                        $scope.searchedpoetries = response.psearchfeedlist;
+                        for(i=0;i<$scope.searchedpoetries.length;i++){
+                          //console.log('deleted',$scope.delpoetryid);
+                          if (Boolean($scope.searchedpoetries[i].recommended)===true){
+                              $scope.searchedpoetries[i].recommendvisibility='block';
+                          } else {
+                              $scope.searchedpoetries[i].recommendvisibility='none';                              
+                          }
+                        };
+                        $scope.plusPage();
+                        $('#getsearchresultblockbtn').fadeIn();
                     }
                     else
                     {
@@ -90,15 +132,24 @@ psearchApp.controller('PoetrySearchController', function($scope,$http) {
             console.log(ajaxurls+' '+$scope.page+' '+$scope.elements_on_page);
             $http.post(ajaxurls,{'type':'poetrysearch','phrase':$scope.searchedpoetriestext.text,'datapart':$scope.page}).success(function(response)
             {
-                    if (response.result == 1)
+                    if (response.result >= 1)
                     {
                         console.log(response.psearchfeedlist.length);
                         $scope.poetries_part_count = response.psearchfeedlist.length;
                         //заполняем элементы данными
                         //$scope.searchedpoetries = response.searchedpoetries;
-                        $scope.searchedpoetries.push({psearchfeedlist:response.psearchfeedlist});
-                        //$scope.searchedpoetries = $scope.searchedpoetries.concat(response.psearchfeedlist);
-                        $scope.page++;
+                        //$scope.searchedpoetries.push({psearchfeedlist:response.psearchfeedlist});
+                        $scope.searchedpoetries = $scope.searchedpoetries.concat(response.psearchfeedlist);
+                        for(i=0;i<$scope.searchedpoetries.length;i++){
+                          //console.log('deleted',$scope.delpoetryid);
+                          if (Boolean($scope.searchedpoetries[i].recommended)===true){
+                              $scope.searchedpoetries[i].recommendvisibility='block';
+                          } else {
+                              $scope.searchedpoetries[i].recommendvisibility='none';                              
+                          }
+                        };
+                        $scope.plusPage();
+                        $('#getsearchresultblockbtn').fadeIn();
                     }
                     else
                     {
