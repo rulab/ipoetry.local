@@ -99,8 +99,15 @@ class uRoomController extends LoggingController{
                                  
         private $is_cache=false;
         
-        public function uroomAction(Request $request){
+        public function uroomAction(Request $request,$source='TEMPLATE'){
         $stmt='';
+        //получаем данные по пользователю для шапки страницы
+        $userheaderInfo=$this->UserHeaderInfo($request);
+        //получаем данные по пользователю владельцу профайла
+        $this->request=$request;
+        //получаем перевод всех элементов интерфейса
+        $this->GetTranslator($request);
+
         parent::loginAction($request);
         //проверяем что пришло в сессии
         $this->GetCache($request);
@@ -174,7 +181,9 @@ class uRoomController extends LoggingController{
             $result=$uroom->findOneBy(array('userEmail'=>$this->session->get('login')));
         }
         if (!isset($result)) {
-            throw $this->createNotFoundException('No user found for email:'.$this->session->get('login'));
+            //уходим на страницу логина
+           return $this->redirect($this->generateUrl('IpoetryBundle_login'));
+            //throw $this->createNotFoundException('No user found for email:'.$this->session->get('login'));
         }
         VarDumper::dump(array('result'=>$result));
 
@@ -213,15 +222,18 @@ class uRoomController extends LoggingController{
         //картинка пользователя по умолчанию, тогда делаем знак вопроса
         if ($options['data']['user_photo']=='undefined')
             $options['data']['user_photo']=$this->getRequest()->getBasePath().'/images/question.jpg';
-        //return new Response('тут отображается форма с данными о пользователе');                
-        return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView(),'user_photo'=>$options['data']['user_photo'],'userid'=>$result->getUserId()));
+        //return new Response('тут отображается форма с данными о пользователе');    
+        if ($source=='TEMPLATE')
+            return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView(),'user_photo'=>$options['data']['user_photo'],'userid'=>$result->getUserId(),'userheaderInfo'=>$userheaderInfo[0]));
+        if ($source=='JSON')
+            return array('result'=>1,$userheaderInfo[0]);
     }
 
     //распределитель ajax запросов по логированию и регистрации пользователей
-    public function uroomajaxAction(Request $request){
+    public function uroomAjaxAction(Request $request){
         //по полученном параметрам делаем запрос в базу узнать что такой пользователь существует
         $mas=array();
-
+        //VarDumper::dump(array('request='=>$request->headers->get('userphoto')));
         $authorization_parameters=@json_decode($request->get('login_json'),true);
         if (isset($authorization_parameters)){
         //проверяем что пришло в сессии
@@ -231,10 +243,16 @@ class uRoomController extends LoggingController{
             $mas['logging']=$this->LoginAjaxAnswer($authorization_parameters,$request);
         } else if ($authorization_parameters['type']=='signin') {
             $mas['logging']=$this->SigninAjaxAnswer($authorization_parameters,$request);
+        } else if ($authorization_parameters['type']=='refresh') {
+            $mas=$this->RefreshAjaxAnswer($authorization_parameters,$request);            
         }
+        } else if ($request->headers->has('content-type')) {
+            if (intval($request->headers->get('userphoto'))===1){
+                $mas['result']=$this->FileUploadAjaxAnswer($request,'userphoto');                
+            }
         } else
             $mas['logging']=0;
-        //VarDumper::dump(array('sql'=>$this->sql_array,'logging'=>$mas['logging'],'jsonlogin='=>$request->get('jsonlogin'),'cache'=>$this->cacheDriver));
+        VarDumper::dump(array('mas'=>$mas));
         /*
         $rsm = new ResultSetMapping;
         $rsm->addEntityResult('user', 'u');
@@ -422,6 +440,10 @@ class uRoomController extends LoggingController{
              */
             return 1;
         }
+    }
+    
+    public function RefreshAjaxAnswer($authorization_parameters,$request){
+        return $this->uroomAction($request,'JSON');
     }
     
     public function SendVerificationMail($user_name=null,$email=null,$url_verify_param=null) {

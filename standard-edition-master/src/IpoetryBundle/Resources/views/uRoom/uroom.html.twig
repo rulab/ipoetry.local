@@ -14,12 +14,34 @@
         'bundles/ipoetry/css/style.css'
         'bundles/ipoetry/bootstrap/docs/dist/css/bootstrap.min.css'
         'bundles/ipoetry/bootstrap/docs/dist/css/bootstrap-theme.min.css'
+        'bundles/ipoetry/js/jQuery-File-Upload-9.12.3/css/jquery.fileupload.css'
          filter='cssrewrite' %}
         <link rel="stylesheet" href="{{ asset_url }}" />     
         {% endstylesheets %}        
     {% endblock %}            
 </head>
 <body id="body_container" style="position: absolute; width:100%;height:100%;max-width:100%;max-height:100%;" onresize="btn_font_size();"> <!--//onload="javascript:Dimension();" width: 1160px; height: 800px;visibility:hidden;-->
+                {{ include('IpoetryBundle::baseheader.html.twig',{'userheaderInfo':userheaderInfo}) }}
+<div class="head-cover" style="background-image: url(img/profile-settings-bg.jpg)">
+		<div class="container">
+			<div class="head-inner">
+				<div class="head-cover-avatar">
+					<img id="userbigphoto" src="{{user_photo}}" alt="alt">
+					<!--<a href="#" class="change-avatar-text">Обновить фотографию профиля</a>-->
+                                        <span class="btn fileinput-button change-avatar-text" style="position:absolute;bottom: 15px;left: 15px;width: 208px;font-size: 13px;background-color: rgba(0, 0, 0, 0.5);border-radius: 0 0 5px 5px;padding: 12px 5px;line-height: 16px;color: #fff;text-decoration: none;">
+                                            <span>Обновить фотографию профиля</span>
+                                            <!-- The file input field used as target for the file upload widget -->
+                                            <input id="fileupload" type="file" name="files[]"/>
+                                        </span>
+				</div>
+				<div class="clearfix">
+					<div class="head-cover-title">Настройки профиля</div>
+					<button class="btn-white-border">Обновить фото обложки</button>
+				</div>
+				<a href="#" class="back-link">Назад</a>
+			</div>
+		</div>
+	</div>
 <div class="row">
     <div class="col-lg-14">
     <a style="margin-left: 15px;" href="{{ path('IpoetryBundle_root') }}" data-toggle="popover" title="На главную" data-content="Some content inside the popover">На главную</a>
@@ -40,13 +62,18 @@
 <div class="row">
 <div class="col-lg-offset-5 col-lg-2">
 {% form_theme form 'IpoetryBundle:Default:form_fields.html.twig' %}
-<form id="uroom_user_form" class="bg-info form-signin" role="form" method="post" action="uroom">
+<form id="uroom_user_form" class="bg-info form-signin" role="form" method="post" action="{{ path('IpoetryBundle_uroom') }}" enctype="multipart/form-data">
 {# {{ form_start(form) }} #}
 <h2 class="form-signin-heading">{{'личная информация'|trans}}</h2>
     {{ form_widget(form) }}
 {# {{ form_end(form) }} #}
 </form>
-        <input id="fileupload" type="file" name="files[]"/>
+    <span class="btn fileinput-button">
+        <i class="glyphicon glyphicon-plus"></i>
+        <span>фото обложки</span>
+        <!-- The file input field used as target for the file upload widget -->
+        <input id="fileupload" type="file" name="files[]">
+    </span>
 
 </div>
 
@@ -60,11 +87,36 @@
 '@IpoetryBundle/Resources/public/js/jQuery-File-Upload-9.12.3/js/vendor/jquery.ui.widget.js'
 '@IpoetryBundle/Resources/public/js/jQuery-File-Upload-9.12.3/js/jquery.iframe-transport.js'
 '@IpoetryBundle/Resources/public/js/jQuery-File-Upload-9.12.3/js/jquery.fileupload.js'
+'@IpoetryBundle/Resources/public/js/jQuery-File-Upload-9.12.3/js/jquery.fileupload-process.js'
+'@IpoetryBundle/Resources/public/js/jQuery-File-Upload-9.12.3/js/jquery.fileupload-image.js'
+'@IpoetryBundle/Resources/public/js/jQuery-File-Upload-9.12.3/js/jquery.fileupload-validate.js'
 %}
 <script type="text/javascript" src="{{ asset_url }}"></script>
 {% endjavascripts %}
 {% endblock %}
 <script type="text/javascript">
+    function RefreshUserImage(){
+        //делаем запрос на закрытие сессии
+        //шлем AJAX
+        ajaxdata='login_json={"type":"refresh"}';
+        console.log(ajaxdata);
+        url='{{ path('IpoetryBundle_uroomajax') }}';
+        type='post';
+        dataType='json';
+        onsuccess=function(json) {
+            console.log(json);
+            if (json['result']===1) {
+                $('#userbigphoto').attr('src',json[0]['userPhotoUrl']);
+                $('#usersmallphoto').attr('src',json[0]['userPhotoUrl']);
+                console.log('AJAX_refresh result='+json['result']);
+            }
+        };
+        onerror=function(jqXHR, textStatus, errorThrown) {
+            console.log('error refresh  ' + textStatus);
+        };
+        ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror);
+    }
+
     function CloseiPoetrySession(){
         //делаем запрос на закрытие сессии
         //шлем AJAX
@@ -83,12 +135,12 @@
         onerror=function(jqXHR, textStatus, errorThrown) {
             console.log('error AJAX_set_user_session_closed ' + textStatus);
         };
-        ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror);
-        
+        ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror);        
     }
 
     $(document).ready(function () {
         {% block documentReady %}
+
             $('#fileupload').fileupload({
                 type: 'POST',
                 dataType: 'json',
@@ -96,16 +148,17 @@
                 url: '{{ path('IpoetryBundle_uroomajax') }}',
                 dropZone:null,
                 //fileInput:$('input:file[id="fileupload"]'),
-                //paramName:'files[]',
+                paramName:'files[]',
                 multipart:false,
                 singleFileUploads:true,
                 loadImageMaxFileSize:999000,
                 imageMaxWidth:1024,
                 imageMaxHeight:768,
                 loadAudioMaxFileSize:999000,
+                source:1,
                 add: function (e, data) {
-                    data.context = $('<p/>').text(data.files[0].name+' uploading...').appendTo(document.body);
-                    //data.submit();
+                    //data.context = $('<div class="add-bg-image-text" style="margin-top:11px;margin-right:0px;float:none;"/>').text(data.files[0].name+' загрузка...').insertAfter('#fileupload');
+                    data.submit();
                         //.success(function (result, textStatus, jqXHR) {console.log(result);})
                         //.error(function (jqXHR, textStatus, errorThrown) {})
                         //.complete(function (result, textStatus, jqXHR) { console.log(result);});
@@ -121,7 +174,11 @@
                     });
                 },
                 done: function (e, data) {
-                    data.context.text('Upload '+data.files[0].name+' finished.');
+                    console.log(data.result.result);
+                    if (data.result.result===1){
+                        RefreshUserImage();
+                    }
+                    //data.context.text('Upload '+data.files[0].name+' finished.');
                     $.each(data.result.files, function (index, file) {
                         console.log('File uploaded: ' + file.name);
                     });
@@ -142,6 +199,7 @@
                   }
                 CloseiPoetrySession();
             });
+        {{ include('IpoetryBundle::basejs.html.twig') }}
         {% endblock documentReady %}
     });
 </script>

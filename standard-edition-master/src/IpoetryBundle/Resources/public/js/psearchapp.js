@@ -158,6 +158,39 @@ var psearchApp = angular.module('psearchApp', ['mgcrea.ngStrap','ngAnimate','ngR
                     }
             });
     };
+    $scope.Likefunc=function(postid,ajaxurl,option){
+      //console.log(option,commentid.currentTarget.getAttribute("commentid"));
+      //если есть логиненый пользователь то разрешаем лайк
+      if (Number($('.topline-user-wrap').eq(0).attr('dbid'))!==-1) {
+        var oReq = new XMLHttpRequest();
+        oReq.onreadystatechange = function() {
+            if (oReq.readyState === 4 && oReq.status === 200) {
+                response=JSON.parse(oReq.response);
+                console.log(response.poetrylike+' '+response.poetrydislike+' sendLike|Dislike done');
+                //$scope.like=response.commentlike;
+                //$scope.dislike=response.commentdislike;
+                if (typeof response.poetrylike!== 'undefined' && typeof response.poetrydislike!== 'undefined') {
+                    for(i=0;i<$scope.searchedpoetries.length;i++){
+                        //console.log($scope.comments[i].ipoetryUserBlogPostId,commentid.currentTarget.getAttribute("commentid"))
+                        if ($scope.searchedpoetries[i].poetry_id===Number(postid.currentTarget.getAttribute("poetryid"))){
+                            $scope.searchedpoetries[i].like=response.poetrylike;
+                            $scope.searchedpoetries[i].dislike=response.poetrydislike;
+                        }
+                    };
+                    $scope.$apply();
+                    //console.log($scope.comments[i],$scope.comments.length);
+                }
+            }
+        };
+        
+        //шлем доппараметры как json
+        //отправляем like к комментарию
+        oReq.open("POST", ajaxurl,true);
+        oReq.setRequestHeader("Content-Type", "application/json");
+        console.log("login_json="+JSON.stringify({type:"poetrylikerequest",poetry:Number(postid.currentTarget.getAttribute("poetryid")),user:$scope.userid,updown:option}));
+        oReq.send(JSON.stringify({type:"poetrylikerequest",poetry:Number(postid.currentTarget.getAttribute("poetryid")),user:$scope.userid,updown:option}));          
+      }
+    };
 
 });
 //

@@ -90,7 +90,8 @@ abstract class LoggingController extends Controller{
 
     private $sql_array=array('del_ipoetry_user_post'=>'CALL del_ipoetry_user_post(:ipoetry_poetry_id)',
                              'add_poetry_view'=>'CALL add_poetry_view(:session_id,:ipoetry_poetry_id)',
-                             'add_poetry_complain'=>'CALL add_poetry_complain(:userid,:poetryid,:complaintext)');
+                             'add_poetry_complain'=>'CALL add_poetry_complain(:userid,:poetryid,:complaintext)',
+                             'add_ipoetry_user_photo'=>'CALL add_ipoetry_user_photo(:ipoetry_user_photo,:ipoetry_user_photo_url,:ipoetry_user_id)');
     
     public function loginAction(Request $request){
         $html='';
@@ -562,7 +563,10 @@ abstract class LoggingController extends Controller{
             $uploadtmpfile=$uploadtmp.'/newpoetrycomment_data'.rand(1,9999999999).'.'.$filetype;
         if (strtoupper($source)=='NEWMESSAGE')
             $uploadtmpfile=$uploadtmp.'/newmessage_data'.rand(1,9999999999).'.'.$filetype;
-                
+        if (strtoupper($source)=='USERPHOTO'){
+            $photofile='/userphoto_data'.rand(1,9999999999).'.'.$filetype;
+            $uploadtmpfile=$uploadtmp.$photofile;
+        } 
         //Vardumper::dump(array('request'=>$request,'file'=>$request->files->get('files')[0],'conent type'=>$request->headers->get('content-type')));
         //$StreamedResponse=new StreamedResponse(null,200,array($request->headers->get('content-disposition'),
         //    $request->headers->get('content-length'),
@@ -622,6 +626,10 @@ abstract class LoggingController extends Controller{
 
             if (strtoupper($source)=='USERPROFILE') {
                 $this->session->set('user_profile_image',$uploadtmpfile );
+            }
+            if (strtoupper($source)=='USERPHOTO') {
+                $this->session->set('user_photo_image',$uploadtmpfile );
+                $this->SaveUserPhoto($this->session->get('user_photo_image'),$photofile);
             }
         }
         return 1;
@@ -763,6 +771,8 @@ abstract class LoggingController extends Controller{
         $this->translator->addResource('yaml',$this->getTranslatorPath($this->request).'/unewsfeedentity.ru.yml', 'ru_RU','unewsfeedentity');
         $this->translator->addResource('yaml',$this->getTranslatorPath($this->request).'/users.ru.yml', 'ru_RU','users');
         $this->translator->addResource('yaml',$this->getTranslatorPath($this->request).'/user-profile.ru.yml', 'ru_RU','userprofile');
+        $this->translator->addResource('yaml',$this->getTranslatorPath($request).'/poetrycreation.ru.yml', 'ru_RU','poetrycreation');
+
         //VarDumper::dump(array($this->translator,$this->translator->trans('Comments',array(),'unewsfeedentity')));
     }
 
@@ -1095,6 +1105,24 @@ abstract class LoggingController extends Controller{
         } catch (Exception $e) {
             echo 'Error in delUserPostAjaxAnswer: ',  $e->getMessage(), "\n";
         }
+    }
+    public function SaveUserPhoto($photo_path,$uploadtmpfile){
+        if ($this->request->server->get('SERVER_NAME')==='ipoetry.local')
+            $userphotourl='/standard-edition-master/web/uploadtmp';
+        else if ($this->request->server->get('SERVER_NAME')==='www.ipoetry.ru' || $this->request->get('SERVER_NAME')==='ipoetry.ru')
+            $userphotourl='/standard-edition-master/web/uploadtmp';
+        else
+            $userphotourl='/standard-edition-master/web/uploadtmp';
+
+        //заводим новый пост, через хранимую процедуру
+        $stmt = $this->getDoctrine()
+                     ->getConnection()
+                     ->prepare($this->sql_array['add_ipoetry_user_photo']);
+        $stmt->bindValue(':ipoetry_user_photo',addslashes(file_get_contents($photo_path)));
+        $stmt->bindValue(':ipoetry_user_photo_url',$userphotourl.$uploadtmpfile);
+        $stmt->bindValue(':ipoetry_user_id',$this->session->get('login_id'));
+        $stmt->execute();
+        return 1;
     }
     public function array_datetime_fomatter(&$item, $key,$keyname)
     {

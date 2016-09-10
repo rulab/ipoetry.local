@@ -165,7 +165,7 @@
             bitrateInterval: 500,
             // By default, uploads are started automatically when adding files:
             autoUpload: true,
-
+            source:'userphoto',
             // Error and info messages:
             messages: {
                 uploadedBytes: 'Uploaded bytes exceed file size'
@@ -318,14 +318,18 @@
         },
 
         _getFormData: function (options) {
+            //console.log(options);
             var formData;
             if ($.type(options.formData) === 'function') {
+                //console.log('function',options.formData);
                 return options.formData(options.form);
             }
             if ($.isArray(options.formData)) {
+                //console.log('Array',options.formData);
                 return options.formData;
             }
             if ($.type(options.formData) === 'object') {
+                //console.log('Object',options.formData);
                 formData = [];
                 $.each(options.formData, function (name, value) {
                     formData.push({name: name, value: value});
@@ -448,6 +452,7 @@
                 paramName = $.type(options.paramName) === 'array' ?
                     options.paramName[0] : options.paramName;
             options.headers = $.extend({}, options.headers);
+            options.headers['userphoto']=options.source;
             if (options.contentRange) {
                 options.headers['Content-Range'] = options.contentRange;
             }
@@ -665,6 +670,9 @@
                 return this._processQueue || getPromise([this]);
             };
             data.submit = function () {
+                //this.userphoto='userphoto';
+                console.log(this);
+
                 if (this.state() !== 'pending') {
                     data.jqXHR = this.jqXHR =
                         (that._trigger(

@@ -133,10 +133,10 @@ class uProfileController extends LoggingController {
         $options=array();
         //получаем данные по пользователю для шапки страницы
         $userheaderInfo=$this->UserHeaderInfo($request);
-        $translator = new Translator($request->getLocale(), new MessageSelector());
-        $translator->addLoader('yaml',new YamlFileLoader());
-        $translator->addResource('yaml',$this->getTranslatorPath($request).'/poetrycreation.ru.yml', 'ru_RU','poetrycreation');
-
+        //получаем данные по пользователю владельцу профайла
+        $this->request=$request;
+        //получаем перевод всех элементов интерфейса
+        $this->GetTranslator($request);
         /*
         $upload_handler = new UploadHandler(array(
         'download_via_php' => true
@@ -145,11 +145,11 @@ class uProfileController extends LoggingController {
         //подготавливаем данные для вывода существующих тегов для стихотворения
         $tagsselectentity = $this->getDoctrine()->getManager();
         $result['tagsselect']=$tagsselectentity->getRepository('IpoetryBundle:IpoetryTags')->findBy(array('moderated'=>0),array('tagsText' => 'ASC'));
-        $options['data'][-1]=$translator->trans('Tags',array(),'poetrycreation');
+        $options['data'][-1]=$this->translator->trans('Tags',array(),'poetrycreation');
         for ($i=0;$i<count($result['tagsselect']);$i++){
             $options['data'][$result['tagsselect'][$i]->getIpoetryTagsTagsId()]=$result['tagsselect'][$i]->getTagsText();//array($key,$value->get('tagstext'));
         }
-        VarDumper::dump(array($request->server->get('DOCUMENT_ROOT'),$translator,$options,count($result['tagsselect'])));
+        //VarDumper::dump(array($request->server->get('DOCUMENT_ROOT'),$this->translator,$options,count($result['tagsselect'])));
         //выводим форму
         $IpoetryUserBlogPost=new IpoetryUserBlogPost();
         $UserPoetryCreationType=new UserPoetryCreationType($this->get('router'),$this->session,$request);

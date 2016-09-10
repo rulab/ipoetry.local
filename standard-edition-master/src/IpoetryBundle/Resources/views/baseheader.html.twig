@@ -17,7 +17,7 @@
 			<div class="topline-user-wrap" dbid="{{userheaderInfo.userId}}">
 				<a href="{{ path('IpoetryBundle_unewsfeed',{'user':userheaderInfo.userId}) }}" class="clearfix">
 					<div class="topline-user-img-wrap" dbid="{{userheaderInfo.userId}}">
-						<img src="{{userheaderInfo.userPhotoUrl}}" alt="" />
+						<img id="usersmallphoto" src="{{userheaderInfo.userPhotoUrl}}" alt="" />
 					</div>
 					<div class="topline-user-name">{{userheaderInfo.userName}} <span>{{userheaderInfo.userLastname}}</span></div>
 				</a>
