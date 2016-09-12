@@ -91,7 +91,8 @@ abstract class LoggingController extends Controller{
     private $sql_array=array('del_ipoetry_user_post'=>'CALL del_ipoetry_user_post(:ipoetry_poetry_id)',
                              'add_poetry_view'=>'CALL add_poetry_view(:session_id,:ipoetry_poetry_id)',
                              'add_poetry_complain'=>'CALL add_poetry_complain(:userid,:poetryid,:complaintext)',
-                             'add_ipoetry_user_photo'=>'CALL add_ipoetry_user_photo(:ipoetry_user_photo,:ipoetry_user_photo_url,:ipoetry_user_id)');
+                             'add_ipoetry_user_photo'=>'CALL add_ipoetry_user_photo(:ipoetry_user_photo,:ipoetry_user_photo_url,:ipoetry_user_id)',
+                             'add_ipoetry_user_bkground'=>'CALL add_ipoetry_user_bkground(:ipoetry_user_bkground,:ipoetry_user_bkground_url,:ipoetry_user_id)');
     
     public function loginAction(Request $request){
         $html='';
@@ -566,7 +567,13 @@ abstract class LoggingController extends Controller{
         if (strtoupper($source)=='USERPHOTO'){
             $photofile='/userphoto_data'.rand(1,9999999999).'.'.$filetype;
             $uploadtmpfile=$uploadtmp.$photofile;
+        }
+        if (strtoupper($source)=='USERBKGROUNDPHOTO'){
+            //userbkgroundphoto
+            $photofile='/userbkgroundphoto_data'.rand(1,9999999999).'.'.$filetype;
+            $uploadtmpfile=$uploadtmp.$photofile;
         } 
+
         //Vardumper::dump(array('request'=>$request,'file'=>$request->files->get('files')[0],'conent type'=>$request->headers->get('content-type')));
         //$StreamedResponse=new StreamedResponse(null,200,array($request->headers->get('content-disposition'),
         //    $request->headers->get('content-length'),
@@ -631,6 +638,11 @@ abstract class LoggingController extends Controller{
                 $this->session->set('user_photo_image',$uploadtmpfile );
                 $this->SaveUserPhoto($this->session->get('user_photo_image'),$photofile);
             }
+            if (strtoupper($source)=='USERBKGROUNDPHOTO') {
+                $this->session->set('user_bkground_image',$uploadtmpfile );
+                $this->SaveUserbkground($this->session->get('user_bkground_image'),$photofile);
+            }
+
         }
         return 1;
     }
@@ -1124,6 +1136,25 @@ abstract class LoggingController extends Controller{
         $stmt->execute();
         return 1;
     }
+    public function SaveUserbkground($photo_path,$uploadtmpfile){
+        if ($this->request->server->get('SERVER_NAME')==='ipoetry.local')
+            $userphotourl='/standard-edition-master/web/uploadtmp';
+        else if ($this->request->server->get('SERVER_NAME')==='www.ipoetry.ru' || $this->request->get('SERVER_NAME')==='ipoetry.ru')
+            $userphotourl='/standard-edition-master/web/uploadtmp';
+        else
+            $userphotourl='/standard-edition-master/web/uploadtmp';
+
+        //заводим новый пост, через хранимую процедуру
+        $stmt = $this->getDoctrine()
+                     ->getConnection()
+                     ->prepare($this->sql_array['add_ipoetry_user_bkground']);
+        $stmt->bindValue(':ipoetry_user_bkground',addslashes(file_get_contents($photo_path)));
+        $stmt->bindValue(':ipoetry_user_bkground_url',$userphotourl.$uploadtmpfile);
+        $stmt->bindValue(':ipoetry_user_id',$this->session->get('login_id'));
+        $stmt->execute();
+        return 1;
+    }
+
     public function array_datetime_fomatter(&$item, $key,$keyname)
     {
         if ($key==$keyname)

@@ -14,6 +14,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 use Symfony\Component\DomCrawler\Field\InputFormField;
 
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -175,8 +177,7 @@ class uRoomController extends LoggingController{
         $result=$stmt->fetchAll();
         */
 
-        $uroom = $this->getDoctrine()->getManager()
-        ->getRepository('IpoetryBundle:IpoetryUser');
+        $uroom = $this->getDoctrine()->getManager()->getRepository('IpoetryBundle:IpoetryUser');
         if ($this->session->has('login')) {
             $result=$uroom->findOneBy(array('userEmail'=>$this->session->get('login')));
         }
@@ -222,11 +223,36 @@ class uRoomController extends LoggingController{
         //картинка пользователя по умолчанию, тогда делаем знак вопроса
         if ($options['data']['user_photo']=='undefined')
             $options['data']['user_photo']=$this->getRequest()->getBasePath().'/images/question.jpg';
+        //если в сессии есть переменная содержащая изображение фона и такой файл есть на самом деле
+        //то выводим из файла, если файла нет то выгружаем его содержимое и запоминаем в сессии.
+        if ($request->hasSession()) {
+            if (!file_exists($this->request->server->get('DOCUMENT_ROOT').$result->getUserPhoto()->getUserPhotoUrl())){
+                //Vardumper::dump(array('imgfile'=>'Z:/domains/ipoetry/standard-edition-master/web/uploadtmp/poetry_background'.rand(1,9999999999).'.png','request content'=>$udl));        
+                $fp=fopen($this->request->server->get('DOCUMENT_ROOT').$result->getUserPhoto()->getUserPhotoUrl(), 'w+');
+                $bytes = @fwrite($fp,$result->getUserPhoto()->getUserPhoto());
+                if ($bytes === false || $bytes <= 0)
+                    throw new NotFoundHttpException();
+                fclose($fp);
+                $this->session->set('user_photo_image',$result->getUserPhoto()->getUserPhotoUrl() );
+            }                    
+            if (!file_exists($this->request->server->get('DOCUMENT_ROOT').$result->getUserPhoto()->getUserBkgroundUrl())){
+                //Vardumper::dump(array('imgfile'=>'Z:/domains/ipoetry/standard-edition-master/web/uploadtmp/poetry_background'.rand(1,9999999999).'.png','request content'=>$udl));        
+                $fp=fopen($this->request->server->get('DOCUMENT_ROOT').$result->getUserPhoto()->getUserBkgroundUrl(), 'w+');
+                $bytes = @fwrite($fp,$result->getUserPhoto()->getUserBkground());
+                if ($bytes === false || $bytes <= 0)
+                    throw new NotFoundHttpException();
+                fclose($fp);
+                $this->session->set('user_bkground_image',$result->getUserPhoto()->getUserBkgroundUrl() );
+            }                    
+        }
+
         //return new Response('тут отображается форма с данными о пользователе');    
         if ($source=='TEMPLATE')
-            return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView(),'user_photo'=>$options['data']['user_photo'],'userid'=>$result->getUserId(),'userheaderInfo'=>$userheaderInfo[0]));
-        if ($source=='JSON')
-            return array('result'=>1,$userheaderInfo[0]);
+            return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView(),'uroom_user_form' => $form->createView(),'user_photo'=>$options['data']['user_photo'],'userBkground'=>$result->getUserPhoto()->getUserBkgroundUrl(),'userid'=>$result->getUserId(),'userheaderInfo'=>$userheaderInfo[0]));
+        if ($source=='JSON'){
+            $userheaderInfo[0]['user_bkground_url']=$result->getUserPhoto()->getUserBkgroundUrl();
+            return array('result'=>1,$userheaderInfo[0]);            
+        }
     }
 
     //распределитель ajax запросов по логированию и регистрации пользователей
@@ -250,6 +276,10 @@ class uRoomController extends LoggingController{
             if (intval($request->headers->get('userphoto'))===1){
                 $mas['result']=$this->FileUploadAjaxAnswer($request,'userphoto');                
             }
+            if (intval($request->headers->get('userphoto'))===0){
+                $mas['result']=$this->FileUploadAjaxAnswer($request,'userbkgroundphoto');                
+            }
+
         } else
             $mas['logging']=0;
         VarDumper::dump(array('mas'=>$mas));

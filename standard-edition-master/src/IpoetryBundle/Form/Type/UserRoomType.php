@@ -82,7 +82,7 @@ class UserRoomType extends LoggingForms{
 
             $builder
                 ->setMethod('POST')
-                ->add('username',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('John')),'label' => $translator->trans('Name'),'data'=>$options['data']['user_name']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('username',TextType::class,array('attr' => array('maxlength' => 50,'placeholder'=>$translator->trans('John')),'data'=>$options['data']['user_name'],'label' => $translator->trans('Name'),'required' => true))//array('attr' => array('maxlength' => 50,'required' => true)))
                 ->add('userlastname',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('LastName'),'data'=>$options['data']['user_lastname']))//array('attr' => array('maxlength' => 50,'required' => true)))
                 ->add('userpassword',PasswordType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Wha37on')),'label' => $translator->trans('Password'),'data'=>$options['data']['user_password']))
                 ->add('useremail',EmailType::class,array('attr' => array('maxlength' => 255,'required' => true,'placeholder'=>$translator->trans('JWhatson@mail.ru')),'label' => $translator->trans('email'),'data'=>$options['data']['user_email']))//array('attr' => array('maxlength' => 50,'required' => true)))

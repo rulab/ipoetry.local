@@ -24,6 +24,19 @@ class IpoetryUserPhoto
     /**
      * @var string
      *
+     * @ORM\Column(name="user_bkground", type="blob", length=65535, nullable=true)
+     */
+    private $userBkground;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="user_bkground_url", type="string", length=2083, nullable=true)
+     */
+    private $userBkgroundUrl = 'undefined';
+    /**
+     * @var string
+     *
      * @ORM\Column(name="user_photo", type="blob", length=65535, nullable=true)
      */
     private $userPhoto;
@@ -31,7 +44,7 @@ class IpoetryUserPhoto
     /**
      * @var string
      *
-     * @ORM\Column(name="user_photo_url", type="string", length=2083, nullable=false)
+     * @ORM\Column(name="user_photo_url", type="string", length=2083, nullable=true)
      */
     private $userPhotoUrl = 'undefined';
 
@@ -66,7 +79,7 @@ class IpoetryUserPhoto
      */
     public function getUserPhoto()
     {
-        return $this->userPhoto;
+        return stripslashes(stream_get_contents($this->userPhoto));
     }
 
     /**
@@ -92,4 +105,52 @@ class IpoetryUserPhoto
     {
         return $this->userPhotoUrl;
     }
+    /**
+     * Set userBkground
+     *
+     * @param string $userBkground
+     *
+     * @return IpoetryUserPhoto
+     */
+    public function setUserBkground($userBkground)
+    {
+        $this->userBkground = $userBkground;
+
+        return $this;
+    }
+
+    /**
+     * Get UserBkground
+     *
+     * @return string
+     */
+    public function getUserBkground()
+    {
+        return stripslashes(stream_get_contents($this->userBkground));
+    }
+
+    /**
+     * Set userBkground
+     *
+     * @param string $userBkgroundUrl
+     *
+     * @return IpoetryUserPhoto
+     */
+    public function setUserBkgroundUrl($userBkgroundUrl)
+    {
+        $this->userBkgroundUrl = $userBkgroundUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get UserBkgroundUrl
+     *
+     * @return string
+     */
+    public function getUserBkgroundUrl()
+    {
+        return $this->userBkgroundUrl;
+    }
+
 }

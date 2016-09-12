@@ -22,7 +22,7 @@
 </head>
 <body id="body_container" style="position: absolute; width:100%;height:100%;max-width:100%;max-height:100%;" onresize="btn_font_size();"> <!--//onload="javascript:Dimension();" width: 1160px; height: 800px;visibility:hidden;-->
                 {{ include('IpoetryBundle::baseheader.html.twig',{'userheaderInfo':userheaderInfo}) }}
-<div class="head-cover" style="background-image: url(img/profile-settings-bg.jpg)">
+<div class="head-cover" style="background-image: url({{userBkground}})">
 		<div class="container">
 			<div class="head-inner">
 				<div class="head-cover-avatar">
@@ -31,17 +31,21 @@
                                         <span class="btn fileinput-button change-avatar-text" style="position:absolute;bottom: 15px;left: 15px;width: 208px;font-size: 13px;background-color: rgba(0, 0, 0, 0.5);border-radius: 0 0 5px 5px;padding: 12px 5px;line-height: 16px;color: #fff;text-decoration: none;">
                                             <span>Обновить фотографию профиля</span>
                                             <!-- The file input field used as target for the file upload widget -->
-                                            <input id="fileupload" type="file" name="files[]"/>
+                                            <input id="fileuploaduserphoto" type="file" name="files[]"/>
                                         </span>
 				</div>
 				<div class="clearfix">
 					<div class="head-cover-title">Настройки профиля</div>
-					<button class="btn-white-border">Обновить фото обложки</button>
+                                        <span class="fileinput-button btn-white-border" style="padding: 13px 23px 11px;border: 1px solid white;border-radius: 50px;color: #fff;text-transform: uppercase;font-size: 13px;font-family: ProximaNovaBold, sans-serif;">
+                                            <span>Обновить фото обложки</span>
+                                        <input id="fileuploaduserbackgroundphoto" type="file" name="files[]" accept="image/jpg" />
+                                        </span>
 				</div>
 				<a href="#" onclick="javascript:window.history.back(-1);return false;" class="back-link">Назад</a>
 			</div>
 		</div>
 	</div>
+<!--
 <div class="row">
     <div class="col-lg-14">
     <a style="margin-left: 15px;" href="{{ path('IpoetryBundle_root') }}" data-toggle="popover" title="На главную" data-content="Some content inside the popover">На главную</a>
@@ -53,6 +57,204 @@
     <br />
     </div>
 </div>
+-->
+    <div class="main-wrap">
+		<div class="container clearfix">
+
+			<!-- Контент -->
+			<div class="content">
+
+				<!-- Информация о пользователе -->
+                                {% form_theme uroom_user_form 'IpoetryBundle:Default:form_fields.html.twig' %}
+                                    <form id="uroom_user_form" class="form-signin" role="form" method="POST" role="form" method="post" action="{{ path('IpoetryBundle_uroom') }}" enctype="multipart/form-data">
+                                    {{ form_start(uroom_user_form) }}
+                                    {% set parameters=[] %}
+                                    {{ form_errors(uroom_user_form) }}
+					<!-- Данные пользователя -->
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.username) }}
+                                                {{ form_errors(uroom_user_form.username) }}
+                                                {{ form_widget(uroom_user_form.username) }}
+					</div>
+
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.userlastname) }}
+                                                {{ form_errors(uroom_user_form.userlastname) }}
+                                                {{ form_widget(uroom_user_form.userlastname) }}
+					</div>
+
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.userpassword) }}
+                                                {{ form_errors(uroom_user_form.userpassword) }}
+                                                {{ form_widget(uroom_user_form.userpassword) }}
+					</div>
+
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.useremail) }}
+                                                {{ form_errors(uroom_user_form.useremail) }}
+                                                {{ form_widget(uroom_user_form.useremail) }}
+					</div>
+                                        
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.usercity) }}
+                                                {{ form_errors(uroom_user_form.usercity) }}
+                                                {{ form_widget(uroom_user_form.usercity) }}
+					</div>
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.userage) }}
+                                                {{ form_errors(uroom_user_form.userage) }}
+                                                {{ form_widget(uroom_user_form.userage) }}
+					</div>
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.userphone) }}
+                                                {{ form_errors(uroom_user_form.userphone) }}
+                                                {{ form_widget(uroom_user_form.userphone) }}
+					</div>
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.userwebsite) }}
+                                                {{ form_errors(uroom_user_form.userwebsite) }}
+                                                {{ form_widget(uroom_user_form.userwebsite) }}
+					</div>
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.userphoto) }}
+                                                {{ form_errors(uroom_user_form.userphoto) }}
+                                                {{ form_widget(uroom_user_form.userphoto) }}
+					</div>
+					<!-- Любимые авторы -->
+					<div class="input-wrap add-input-wrap clearfix">
+						<label>Любимые авторы:</label>
+						<div class="profile-favorite-items-wrap clearfix">
+							<div class="clearfix">
+								<div class="profile-favorite-item">Лев Толстой<div class="profile-favorite-item-close"></div></div>
+								<div class="profile-favorite-item">Антон Чехов<div class="profile-favorite-item-close"></div></div>
+								<div class="profile-favorite-item">Анна Ахматова<div class="profile-favorite-item-close"></div></div>
+							</div>
+							<input type="text" value="Иван Турганев">
+							<button class="btn-blue-border">Добавить</button>
+						</div>
+					</div>
+					<!-- Любимые авторы конец -->
+
+					<!-- Направления в поэзии -->
+					<div class="input-wrap add-input-wrap clearfix">
+						<label>Направления в поэзии:</label>
+						<div class="profile-favorite-items-wrap clearfix">
+							<div class="profile-favorite-item">Классицизм<div class="profile-favorite-item-close"></div></div>
+							<div class="profile-favorite-item">Романтизм<div class="profile-favorite-item-close"></div></div>
+							<div class="profile-favorite-item">Поэт-Классик<div class="profile-favorite-item-close"></div></div>
+							<input type="text" value="Романтизм">
+							<button class="btn-blue-border">Добавить</button>
+						</div>
+					</div>
+					<!-- Направления в поэзии конец -->
+
+					<hr>
+
+					<div class="checkbox-wrap">
+						<label>Читать могут только подписчики</label><div class="jq-checkbox" unselectable="on" style="-webkit-user-select: none; display: inline-block; position: relative; overflow: hidden;"><input type="checkbox" style="position: absolute; z-index: -1; opacity: 0; margin: 0px; padding: 0px;"><div class="jq-checkbox__div"></div></div>
+					</div>
+
+                                        <!-- Данные польователя конец -->
+                                        {{ form_label(uroom_user_form.enter) }}
+                                        {{ form_widget(uroom_user_form.enter, {'attr': {'class': 'btn-blue-bg'}}) }}
+					<hr>
+
+                                    {{ form_end(uroom_user_form) }} 
+				</form>
+				<!-- Информация о пользователе конец -->
+
+			</div>
+			<!-- Контент конец -->
+
+			<!-- Боковая панель -->
+			<aside class="clearfix">
+
+				<!-- Виджет боковой панели -->
+				<div class="aside-widget clearfix">
+
+					<!-- Подписчики -->
+					<div class="clearfix">
+						<a href="#" class="aside-widget-title">Подписчики <span>(125)</span></a>
+						<a href="#" class="aside-widget-you">Подписан <span>(20)</span></a>
+					</div>
+					<a href="#" class="subscribers-item">
+						<div class="subscribers-item-img-wrap">
+							<img src="img/subscribe-ico1.jpg" alt="alt">
+						</div>
+						<div class="subscriber-item-name">Анастасия<span>Соколова</span></div>
+					</a>
+					<a href="#" class="subscribers-item">
+						<div class="subscribers-item-img-wrap">
+							<img src="img/subscribe-ico2.jpg" alt="alt">
+						</div>
+						<div class="subscriber-item-name">Андрей<span>Леницкий</span></div>
+					</a>
+					<a href="#" class="subscribers-item">
+						<div class="subscribers-item-img-wrap">
+							<img src="img/subscribe-ico3.jpg" alt="alt">
+						</div>
+						<div class="subscriber-item-name">Алина<span>Солопова</span></div>
+					</a>
+					<a href="#" class="subscribers-item">
+						<div class="subscribers-item-img-wrap">
+							<img src="img/subscribe-ico4.jpg" alt="alt">
+						</div>
+						<div class="subscriber-item-name">Евгений<span>Белозеров</span></div>
+					</a>
+					<a href="#" class="subscribers-item">
+						<div class="subscribers-item-img-wrap">
+							<img src="img/subscribe-ico5.jpg" alt="alt">
+						</div>
+						<div class="subscriber-item-name">Анастасия<span>Перекрест</span></div>
+					</a>
+					<a href="#" class="subscribers-item">
+						<div class="subscribers-item-img-wrap">
+							<img src="img/subscribe-ico6.jpg" alt="alt">
+						</div>
+						<div class="subscriber-item-name">Анастасия<span>Соколова</span></div>
+					</a>
+					<!-- Подписчики конец -->
+
+				</div>
+				<!-- Виджет боковой панели конец-->
+
+				<!-- Виджет боковой панели -->
+				<div class="aside-widget">
+
+					<!-- Группы -->
+					<a href="#" class="aside-widget-title">Группы <span>(125)</span></a>
+					<a href="#" class="aside-widget-you">Администратор <span>(20)</span></a>
+					<div class="groups-item clearfix">
+						<a href="#" class="groups-img-item-wrap">
+							<img src="img/group-ico.jpg" alt="alt">
+						</a>
+						<div class="groups-item-text">
+							<a href="#" class="groups-item-title">Встреча участников группы “Любовь”</a>
+							<div class="groups-item-subscribers">1 222 414 подписчиков</div>
+							<button class="btn-light-blue-bg">Подписаться</button>
+						</div>
+					</div>
+					<div class="groups-item clearfix">
+						<a href="#" class="groups-img-item-wrap">
+							<img src="img/group-ico2.jpg" alt="alt">
+						</a>
+						<div class="groups-item-text">
+							<a href="#" class="groups-item-title">Мастерклассы лучших писателей</a>
+							<div class="groups-item-subscribers">1 222 414 подписчиков</div>
+							<button class="btn-light-blue-bg">Подписаться</button>
+						</div>
+					</div>
+					<!-- Группы конец -->
+
+				</div>
+				<!-- Виджет боковой панели конец-->
+
+			</aside>
+			<!-- Боковая панель конец -->
+
+		</div>
+	</div>
+<!--
 <div class="row">
     <div class="col-lg-14">
     <p style="margin: 0 15px 0;">тут отображается информация о пользователе</p>
@@ -61,6 +263,7 @@
 </div>
 <div class="row">
 <div class="col-lg-offset-5 col-lg-2">
+    
 {% form_theme form 'IpoetryBundle:Default:form_fields.html.twig' %}
 <form id="uroom_user_form" class="bg-info form-signin" role="form" method="post" action="{{ path('IpoetryBundle_uroom') }}" enctype="multipart/form-data">
 {# {{ form_start(form) }} #}
@@ -71,13 +274,13 @@
     <span class="btn fileinput-button">
         <i class="glyphicon glyphicon-plus"></i>
         <span>фото обложки</span>
-        <!-- The file input field used as target for the file upload widget -->
         <input id="fileupload" type="file" name="files[]">
     </span>
 
 </div>
 
 </div>
+-->
 {% block javascripts %}
 {% javascripts '@IpoetryBundle/Resources/public/js/jquery-1.11.0.min.js'
 '@IpoetryBundle/Resources/public/bootstrap/dist/js/bootstrap.min.js'
@@ -95,6 +298,26 @@
 {% endjavascripts %}
 {% endblock %}
 <script type="text/javascript">
+    function RefreshUserBackgroundImage(){
+        //делаем запрос на закрытие сессии
+        //шлем AJAX
+        ajaxdata='login_json={"type":"refresh"}';
+        console.log(ajaxdata);
+        url='{{ path('IpoetryBundle_uroomajax') }}';
+        type='post';
+        dataType='json';
+        onsuccess=function(json) {
+            console.log(json);
+            if (json['result']===1) {
+                $('.head-cover').eq(0).css('background-image','url('+json[0]['user_bkground_url']+')');
+                console.log('AJAX_refreshuserbkgrnd result='+json['result']);
+            }
+        };
+        onerror=function(jqXHR, textStatus, errorThrown) {
+            console.log('error refreshuserbkgrnd  ' + textStatus);
+        };
+        ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror);        
+    }
     function RefreshUserImage(){
         //делаем запрос на закрытие сессии
         //шлем AJAX
@@ -108,11 +331,11 @@
             if (json['result']===1) {
                 $('#userbigphoto').attr('src',json[0]['userPhotoUrl']);
                 $('#usersmallphoto').attr('src',json[0]['userPhotoUrl']);
-                console.log('AJAX_refresh result='+json['result']);
+                console.log('AJAX_refreshusr result='+json['result']);
             }
         };
         onerror=function(jqXHR, textStatus, errorThrown) {
-            console.log('error refresh  ' + textStatus);
+            console.log('error refreshusr  ' + textStatus);
         };
         ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror);
     }
@@ -141,7 +364,7 @@
     $(document).ready(function () {
         {% block documentReady %}
 
-            $('#fileupload').fileupload({
+            $('#fileuploaduserphoto').fileupload({
                 type: 'POST',
                 dataType: 'json',
                 acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
@@ -185,6 +408,51 @@
                 }
 
             });
+            $('#fileuploaduserbackgroundphoto').fileupload({
+                type: 'POST',
+                dataType: 'json',
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                url: '{{ path('IpoetryBundle_uroomajax') }}',
+                dropZone:null,
+                //fileInput:$('input:file[id="fileupload"]'),
+                paramName:'files[]',
+                multipart:false,
+                singleFileUploads:true,
+                loadImageMaxFileSize:999000,
+                imageMaxWidth:1024,
+                imageMaxHeight:768,
+                loadAudioMaxFileSize:999000,
+                source:0,
+                add: function (e, data) {
+                    //data.context = $('<div class="add-bg-image-text" style="margin-top:11px;margin-right:0px;float:none;"/>').text(data.files[0].name+' загрузка...').insertAfter('#fileupload');
+                    data.submit();
+                        //.success(function (result, textStatus, jqXHR) {console.log(result);})
+                        //.error(function (jqXHR, textStatus, errorThrown) {})
+                        //.complete(function (result, textStatus, jqXHR) { console.log(result);});
+                },
+                drop: function (e, data) {
+                    $.each(data.files, function (index, file) {
+                        console.log('Dropped file: ' + file.name);
+                    });
+                },
+                change: function (e, data) {
+                    $.each(data.files, function (index, file) {
+                        console.log('Selected file: ' + file.name);
+                    });
+                },
+                done: function (e, data) {
+                    console.log(data.result.result);
+                    if (data.result.result===1){
+                        RefreshUserBackgroundImage();
+                    }
+                    //data.context.text('Upload '+data.files[0].name+' finished.');
+                    $.each(data.result.files, function (index, file) {
+                        console.log('File uploaded: ' + file.name);
+                    });
+                }
+
+            });
+
             $('#sendfileupload').on('click',function () {
                     //data.context = $('<p/>').text('Uploading...').replaceAll($(this));
                     //data.submit();
@@ -199,6 +467,7 @@
                   }
                 CloseiPoetrySession();
             });
+
         {{ include('IpoetryBundle::basejs.html.twig') }}
         {% endblock documentReady %}
     });
