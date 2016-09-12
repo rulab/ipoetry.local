@@ -225,19 +225,23 @@ class uRoomController extends LoggingController{
             $options['data']['user_photo']=$this->getRequest()->getBasePath().'/images/question.jpg';
         //если в сессии есть переменная содержащая изображение фона и такой файл есть на самом деле
         //то выводим из файла, если файла нет то выгружаем его содержимое и запоминаем в сессии.
+        if ($this->request->server->get('SERVER_NAME')==='www.ipoetry.ru' || $this->request->get('SERVER_NAME')==='ipoetry.ru')
+            $imagepath='';
+        else
+            $imagepath=$this->request->server->get('DOCUMENT_ROOT');
         if ($request->hasSession()) {
-            if (!file_exists($this->request->server->get('DOCUMENT_ROOT').$result->getUserPhoto()->getUserPhotoUrl())){
+            if (!file_exists($imagepath.$result->getUserPhoto()->getUserPhotoUrl())){
                 //Vardumper::dump(array('imgfile'=>'Z:/domains/ipoetry/standard-edition-master/web/uploadtmp/poetry_background'.rand(1,9999999999).'.png','request content'=>$udl));        
-                $fp=fopen($this->request->server->get('DOCUMENT_ROOT').$result->getUserPhoto()->getUserPhotoUrl(), 'w+');
+                $fp=fopen($imagepath.$result->getUserPhoto()->getUserPhotoUrl(), 'w+');
                 $bytes = @fwrite($fp,$result->getUserPhoto()->getUserPhoto());
                 if ($bytes === false || $bytes <= 0)
                     throw new NotFoundHttpException();
                 fclose($fp);
                 $this->session->set('user_photo_image',$result->getUserPhoto()->getUserPhotoUrl() );
-            }                    
-            if (!file_exists($this->request->server->get('DOCUMENT_ROOT').$result->getUserPhoto()->getUserBkgroundUrl())){
+            }
+            if (!file_exists($imagepath.$result->getUserPhoto()->getUserBkgroundUrl())){
                 //Vardumper::dump(array('imgfile'=>'Z:/domains/ipoetry/standard-edition-master/web/uploadtmp/poetry_background'.rand(1,9999999999).'.png','request content'=>$udl));        
-                $fp=fopen($this->request->server->get('DOCUMENT_ROOT').$result->getUserPhoto()->getUserBkgroundUrl(), 'w+');
+                $fp=fopen($imagepath.$result->getUserPhoto()->getUserBkgroundUrl(), 'w+');
                 $bytes = @fwrite($fp,$result->getUserPhoto()->getUserBkground());
                 if ($bytes === false || $bytes <= 0)
                     throw new NotFoundHttpException();
