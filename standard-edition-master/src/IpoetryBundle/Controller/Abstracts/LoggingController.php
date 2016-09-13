@@ -1145,7 +1145,7 @@ abstract class LoggingController extends Controller{
         if ($this->request->server->get('SERVER_NAME')==='ipoetry.local')
             $userphotourl='/standard-edition-master/web/uploadtmp';
         else if ($this->request->server->get('SERVER_NAME')==='www.ipoetry.ru' || $this->request->get('SERVER_NAME')==='ipoetry.ru')
-            $userphotourl='/standard-edition-master/web/uploadtmp';
+            $userphotourl='/uploadtmp';
         else
             $userphotourl='/standard-edition-master/web/uploadtmp';
 
