@@ -530,7 +530,12 @@ abstract class LoggingController extends Controller{
     public function FileUploadAjaxAnswer($request,$source){
         $this->request=$request;
         //директория для хранения временных файлов
-        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/uploadtmp';
+        //$uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$this->request->server->get('BASE').'/uploadtmp';
+        if ($this->request->server->get('BASE')!=null)
+            $pathpart=$this->request->server->get('BASE');
+        else
+            $pathpart='';
+        $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$pathpart.'/uploadtmp';
 
         //тип файла для хранения данных
         $filetype;

@@ -225,9 +225,7 @@ class uRoomController extends LoggingController{
             $options['data']['user_photo']=$this->getRequest()->getBasePath().'/images/question.jpg';
         //если в сессии есть переменная содержащая изображение фона и такой файл есть на самом деле
         //то выводим из файла, если файла нет то выгружаем его содержимое и запоминаем в сессии.
-        //if ($this->request->server->get('SERVER_NAME')==='www.ipoetry.ru' || $this->request->get('SERVER_NAME')==='ipoetry.ru')
-        //    $imagepath='';
-        //else
+
         $imagepath=$this->request->server->get('DOCUMENT_ROOT');
         if ($request->hasSession()) {
             if (!file_exists($imagepath.$result->getUserPhoto()->getUserPhotoUrl()) && !empty($result->getUserPhoto()->getUserPhotoUrl())){
