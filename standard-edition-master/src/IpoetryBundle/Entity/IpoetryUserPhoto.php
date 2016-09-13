@@ -79,7 +79,10 @@ class IpoetryUserPhoto
      */
     public function getUserPhoto()
     {
-        return stripslashes(stream_get_contents($this->userPhoto));
+        if ($this->userPhoto===null)
+            return false;
+        else
+            return stripslashes(stream_get_contents($this->userPhoto));
     }
 
     /**
@@ -126,7 +129,10 @@ class IpoetryUserPhoto
      */
     public function getUserBkground()
     {
-        return stripslashes(stream_get_contents($this->userBkground));
+        if ($this->userBkground===null)
+            return false;
+        else
+            return stripslashes(stream_get_contents($this->userBkground));
     }
 
     /**

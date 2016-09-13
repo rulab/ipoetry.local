@@ -66,7 +66,7 @@
 
 				<!-- Информация о пользователе -->
                                 {% form_theme uroom_user_form 'IpoetryBundle:Default:form_fields.html.twig' %}
-                                    <form id="uroom_user_form" class="form-signin" role="form" method="POST" role="form" method="post" action="{{ path('IpoetryBundle_uroom') }}" enctype="multipart/form-data">
+                                    <form id="uroom_user_form" class="form-signin" role="form" method="POST" method="post" action="{{ path('IpoetryBundle_uroom') }}" enctype="multipart/form-data">
                                     {{ form_start(uroom_user_form) }}
                                     {% set parameters=[] %}
                                     {{ form_errors(uroom_user_form) }}
@@ -120,33 +120,6 @@
                                                 {{ form_errors(uroom_user_form.userphoto) }}
                                                 {{ form_widget(uroom_user_form.userphoto) }}
 					</div>
-					<!-- Любимые авторы -->
-					<div class="input-wrap add-input-wrap clearfix">
-						<label>Любимые авторы:</label>
-						<div class="profile-favorite-items-wrap clearfix">
-							<div class="clearfix">
-								<div class="profile-favorite-item">Лев Толстой<div class="profile-favorite-item-close"></div></div>
-								<div class="profile-favorite-item">Антон Чехов<div class="profile-favorite-item-close"></div></div>
-								<div class="profile-favorite-item">Анна Ахматова<div class="profile-favorite-item-close"></div></div>
-							</div>
-							<input type="text" value="Иван Турганев">
-							<button class="btn-blue-border">Добавить</button>
-						</div>
-					</div>
-					<!-- Любимые авторы конец -->
-
-					<!-- Направления в поэзии -->
-					<div class="input-wrap add-input-wrap clearfix">
-						<label>Направления в поэзии:</label>
-						<div class="profile-favorite-items-wrap clearfix">
-							<div class="profile-favorite-item">Классицизм<div class="profile-favorite-item-close"></div></div>
-							<div class="profile-favorite-item">Романтизм<div class="profile-favorite-item-close"></div></div>
-							<div class="profile-favorite-item">Поэт-Классик<div class="profile-favorite-item-close"></div></div>
-							<input type="text" value="Романтизм">
-							<button class="btn-blue-border">Добавить</button>
-						</div>
-					</div>
-					<!-- Направления в поэзии конец -->
 
 					<hr>
 
@@ -218,36 +191,6 @@
 				</div>
 				<!-- Виджет боковой панели конец-->
 
-				<!-- Виджет боковой панели -->
-				<div class="aside-widget">
-
-					<!-- Группы -->
-					<a href="#" class="aside-widget-title">Группы <span>(125)</span></a>
-					<a href="#" class="aside-widget-you">Администратор <span>(20)</span></a>
-					<div class="groups-item clearfix">
-						<a href="#" class="groups-img-item-wrap">
-							<img src="img/group-ico.jpg" alt="alt">
-						</a>
-						<div class="groups-item-text">
-							<a href="#" class="groups-item-title">Встреча участников группы “Любовь”</a>
-							<div class="groups-item-subscribers">1 222 414 подписчиков</div>
-							<button class="btn-light-blue-bg">Подписаться</button>
-						</div>
-					</div>
-					<div class="groups-item clearfix">
-						<a href="#" class="groups-img-item-wrap">
-							<img src="img/group-ico2.jpg" alt="alt">
-						</a>
-						<div class="groups-item-text">
-							<a href="#" class="groups-item-title">Мастерклассы лучших писателей</a>
-							<div class="groups-item-subscribers">1 222 414 подписчиков</div>
-							<button class="btn-light-blue-bg">Подписаться</button>
-						</div>
-					</div>
-					<!-- Группы конец -->
-
-				</div>
-				<!-- Виджет боковой панели конец-->
 
 			</aside>
 			<!-- Боковая панель конец -->

@@ -228,7 +228,7 @@ class uRoomController extends LoggingController{
 
         $imagepath=$this->request->server->get('DOCUMENT_ROOT');
         if ($request->hasSession()) {
-            if (!file_exists($imagepath.$result->getUserPhoto()->getUserPhotoUrl()) && !empty($result->getUserPhoto()->getUserPhotoUrl())){
+            if (!file_exists($imagepath.$result->getUserPhoto()->getUserPhotoUrl()) && !empty($result->getUserPhoto()->getUserPhotoUrl() && $result->getUserPhoto()->getUserPhoto()<>false)){
                 //Vardumper::dump(array('imgfile'=>'Z:/domains/ipoetry/standard-edition-master/web/uploadtmp/poetry_background'.rand(1,9999999999).'.png','request content'=>$udl));        
                 $fp=fopen($imagepath.$result->getUserPhoto()->getUserPhotoUrl(), 'w+');
                 $bytes = @fwrite($fp,$result->getUserPhoto()->getUserPhoto());
@@ -237,7 +237,7 @@ class uRoomController extends LoggingController{
                 fclose($fp);
                 $this->session->set('user_photo_image',$imagepath.$result->getUserPhoto()->getUserPhotoUrl() );
             }
-            if (!file_exists($imagepath.$result->getUserPhoto()->getUserBkgroundUrl()) && !empty($result->getUserPhoto()->getUserBkgroundUrl())){
+            if (!file_exists($imagepath.$result->getUserPhoto()->getUserBkgroundUrl()) && !empty($result->getUserPhoto()->getUserBkgroundUrl() && $result->getUserPhoto()->getUserBkground()<>false)){
                 //Vardumper::dump(array('imgfile'=>'Z:/domains/ipoetry/standard-edition-master/web/uploadtmp/poetry_background'.rand(1,9999999999).'.png','request content'=>$udl));        
                 $fp=fopen($imagepath.$result->getUserPhoto()->getUserBkgroundUrl(), 'w+');
                 $bytes = @fwrite($fp,$result->getUserPhoto()->getUserBkground());
