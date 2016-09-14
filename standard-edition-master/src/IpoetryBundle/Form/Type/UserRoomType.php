@@ -28,6 +28,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
@@ -79,18 +80,19 @@ class UserRoomType extends LoggingForms{
             //}
         //VarDumper::dump(array('user='=>$request->get('user'),'password'=>$request->get('password')));
         //if ($this->request->get('user') && $this->request->get('password')) {
-
             $builder
                 ->setMethod('POST')
                 ->add('username',TextType::class,array('attr' => array('maxlength' => 50,'placeholder'=>$translator->trans('John')),'data'=>$options['data']['user_name'],'label' => $translator->trans('Name'),'required' => true))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userlastname',TextType::class,array('attr' => array('maxlength' => 50,'required' => true,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('LastName'),'data'=>$options['data']['user_lastname']))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userpassword',PasswordType::class,array('attr' => array('maxlength' => 20,'required' => true,'placeholder'=>$translator->trans('Wha37on')),'label' => $translator->trans('Password'),'data'=>$options['data']['user_password']))
-                ->add('useremail',EmailType::class,array('attr' => array('maxlength' => 255,'required' => true,'placeholder'=>$translator->trans('JWhatson@mail.ru')),'label' => $translator->trans('email'),'data'=>$options['data']['user_email']))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('usercity',TextType::class,array('attr' => array('maxlength' => 255,'required' => false,'placeholder'=>$translator->trans('Москва')),'label' => $translator->trans('City'),'data'=>$options['data']['user_city']))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userage',IntegerType::class,array('attr' => array('maxlength' => 3,'required' => false,'placeholder'=>$translator->trans('30')),'label' => $translator->trans('Age'),'data'=>$options['data']['user_age']))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userwebsite',TextType::class,array('attr' => array('maxlength' => 2083,'required' => false,'placeholder'=>$translator->trans('vk.com/poetryguy87')),'label' => $translator->trans('website'),'data'=>$options['data']['user_website']))//array('attr' => array('maxlength' => 50,'required' => true)))
-                ->add('userphone',TextType::class,array('attr' => array('maxlength' => 11,'required' => false,'placeholder'=>$translator->trans('+71019090101')),'label' => $translator->trans('phone number'),'data'=>$options['data']['user_phone']))
-                ->add('userphoto',UrlType::class,array('attr' => array('maxlength' => 2083,'required' => false,'placeholder'=>$translator->trans('site.com/image.jpg')),'label' => $translator->trans('avatar url'),'data'=>$options['data']['user_photo']))
+                ->add('userlastname',TextType::class,array('attr' => array('maxlength' => 50,'placeholder'=>$translator->trans('Whatson')),'label' => $translator->trans('LastName'),'data'=>$options['data']['user_lastname'],'required' => true))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userpassword',PasswordType::class,array('attr' => array('maxlength' => 20,'placeholder'=>$translator->trans('Wha37on')),'label' => $translator->trans('Password'),'data'=>$options['data']['user_password'],'required' => true))
+                ->add('useremail',EmailType::class,array('attr' => array('maxlength' => 255,'placeholder'=>$translator->trans('JWhatson@mail.ru')),'label' => $translator->trans('email'),'data'=>$options['data']['user_email'],'required' => true))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('usercity',TextType::class,array('attr' => array('maxlength' => 255,'placeholder'=>$translator->trans('Москва')),'label' => $translator->trans('City'),'data'=>$options['data']['user_city']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userage',IntegerType::class,array('attr' => array('maxlength' => 3,'placeholder'=>$translator->trans('30')),'label' => $translator->trans('Age'),'data'=>$options['data']['user_age']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userwebsite',TextType::class,array('attr' => array('maxlength' => 2083,'placeholder'=>$translator->trans('vk.com/poetryguy87')),'label' => $translator->trans('website'),'data'=>$options['data']['user_website']))//array('attr' => array('maxlength' => 50,'required' => true)))
+                ->add('userphone',TextType::class,array('attr' => array('maxlength' => 11,'placeholder'=>$translator->trans('+71019090101')),'label' => $translator->trans('phone number'),'data'=>$options['data']['user_phone']))
+                ->add('userphoto',TextType::class,array('attr' => array('maxlength' => 2083,'placeholder'=>$translator->trans('site.com/image.jpg')),'label' => $translator->trans('avatar url'),'data'=>$options['data']['user_photo'],'required' => false))
+                ->add('onlysubscribercanread',CheckboxType::class ,array('attr' => array(),'label' => $translator->trans('onlysubscribercanread'),'required' => false,'value'=>$options['data']['ipoetry_user_followers_can_read']))
+                    
                 //->add('captcha', $CaptchaType,array('attr' => array('required' => true,'disabled' => false)))
                 ->add('enter', SubmitType::class, array('attr'=>array('class'=>'btn btn-lg btn-primary btn-block'),'label' => $translator->trans('Refresh')));
                 //->add('user', HiddenType::class,array('data' => $options['data']['user']))
@@ -98,10 +100,14 @@ class UserRoomType extends LoggingForms{
                 //->add('mail_link_activation', HiddenType::class,array('data' => $options['data']['mail_link_activation_old']))
                 //->add('system_captcha', HiddenType::class,array('data' => $phrasebuilderinterface->niceize($generator->getPhrase($this->option))) 
 
-            $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+            $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
                 $form_data = $event->getData();
-                //$phrase=$this->captchabuilder->getPhrase();
-                //VarDumper::dump(array('$phrase='=>$form_data,'$phrase'=>$phrase));
+                //if (empty($form_data )){
+                    //$form_data['onlysubscribercanread']=0;
+                    //$event->setData(array('onlysubscribercanread'=>0));
+                   // $event->getForm()->setData(array('onlysubscribercanread'=>0));
+               // }
+                VarDumper::dump(array('$phrase='=>$form_data));
             });
 
             //VarDumper::dump(array('$generator_phrase='=>$generator->getPhrase($this->option),'CaptchaType'=>$CaptchaType->getName(),'fingerprint'=>$this->captchabuilder->getPhrase()));
@@ -123,6 +129,3 @@ class UserRoomType extends LoggingForms{
         parent::__construct($c_container,$c_session,$request ); 
     }
 }
-
-
-

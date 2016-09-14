@@ -53,6 +53,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 use SwiftMailer;
 
@@ -156,10 +157,17 @@ class uRoomController extends LoggingController{
                         }
                         if ($UserRoom_key=='userphoto' && $UserRoom_val!=$result->getUserPhoto()->getUserPhotoUrl()){
                             $result_photo->setUserPhotoUrl($UserRoom_val);
+                            $result_photo->setUserPhoto(null);
                             $result->setUserPhoto($result_photo);
                         }
-
+                        if ($UserRoom_key=='onlysubscribercanread' && $UserRoom_val!=$result->getIpoetryUserFollowersCanRead()){
+                            $result->setIpoetryUserFollowersCanRead((bool)$UserRoom_val);
+                        }
                     }
+                    if (!array_key_exists ( 'onlysubscribercanread' , $request->request->get('UserRoom') )){
+                        $result->setIpoetryUserFollowersCanRead(false);
+                    }
+                            
                     $uroom->merge($result);
                     VarDumper::dump(array('uroom'=>$uroom,'result'=>$result));
                     $uroom->flush();
@@ -180,14 +188,35 @@ class uRoomController extends LoggingController{
         $uroom = $this->getDoctrine()->getManager()->getRepository('IpoetryBundle:IpoetryUser');
         if ($this->session->has('login')) {
             $result=$uroom->findOneBy(array('userEmail'=>$this->session->get('login')));
+            $authorization_parameters=array('usertype'=>'SUBSCRIBERS','user'=>$this->session->get('login_id'),'datapart'=>1);
+            $subscribers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
+            //выбираем подписчиков
+            $authorization_parameters=array('usertype'=>'FOLLOW','user'=>$this->session->get('login_id'),'datapart'=>1);
+            $followers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
         }
+        if ($subscribers['result']===0){
+            $subscribers['userslist'][0]['userId']=0;
+            $subscribers['userslist'][0]['userName']='';
+            $subscribers['userslist'][0]['userLastname']='';
+            $subscribers['userslist'][0]['cityName']='';
+            $subscribers['userslist'][0]['userPhotoUrl']='';
+            $subscribers['userscount']=0;
+        }
+        if ($followers['result']===0){
+            $followers['userslist'][0]['userId']=0;
+            $followers['userslist'][0]['userName']='';
+            $followers['userslist'][0]['userLastname']='';
+            $followers['userslist'][0]['cityName']='';
+            $followers['userslist'][0]['userPhotoUrl']='';
+            $followers['userscount']=0;
+        }
+
         if (!isset($result)) {
             //уходим на страницу логина
            return $this->redirect($this->generateUrl('IpoetryBundle_login'));
             //throw $this->createNotFoundException('No user found for email:'.$this->session->get('login'));
         }
         VarDumper::dump(array('result'=>$result));
-
 
         $options['data']['user_name']=$result->getUserName();
         $options['data']['user_lastname']=$result->getUserLastname();
@@ -198,6 +227,7 @@ class uRoomController extends LoggingController{
         $options['data']['user_website']=$result->getUserWebsite()->getIpoetryUserWebsite();
         $options['data']['user_phone']=$result->getUserPhone()->getIpoetryUserPhone();
         $options['data']['user_photo']=$result->getUserPhoto()->getUserPhotoUrl();
+        $options['data']['ipoetry_user_followers_can_read']=$result->getIpoetryUserFollowersCanRead();
         //пишем в сессию необходимые данные
         $this->session->set('user_photo_url',$options['data']['user_photo']);
         $this->session->set('user_name',$options['data']['user_name']);
@@ -250,7 +280,14 @@ class uRoomController extends LoggingController{
 
         //return new Response('тут отображается форма с данными о пользователе');    
         if ($source=='TEMPLATE')
-            return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView(),'uroom_user_form' => $form->createView(),'user_photo'=>$options['data']['user_photo'],'userBkground'=>$result->getUserPhoto()->getUserBkgroundUrl(),'userid'=>$result->getUserId(),'userheaderInfo'=>$userheaderInfo[0]));
+            return $this->render('IpoetryBundle:uRoom:uroom.html.twig',array('form' => $form->createView(),
+                'uroom_user_form' => $form->createView(),
+                'user_photo'=>$options['data']['user_photo'],
+                'userBkground'=>$result->getUserPhoto()->getUserBkgroundUrl(),
+                'userid'=>$result->getUserId(),
+                'userheaderInfo'=>$userheaderInfo[0],
+                'subscribers'=>$subscribers,
+                'followers'=>$followers));
         if ($source=='JSON'){
             $userheaderInfo[0]['user_bkground_url']=$result->getUserPhoto()->getUserBkgroundUrl();
             return array('result'=>1,$userheaderInfo[0]);            

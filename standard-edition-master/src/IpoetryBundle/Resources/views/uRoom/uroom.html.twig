@@ -66,7 +66,7 @@
 
 				<!-- Информация о пользователе -->
                                 {% form_theme uroom_user_form 'IpoetryBundle:Default:form_fields.html.twig' %}
-                                    <form id="uroom_user_form" class="form-signin" role="form" method="POST" method="post" action="{{ path('IpoetryBundle_uroom') }}" enctype="multipart/form-data">
+                                    <form id="uroom_user_form" class="form-signin" role="form" method="POST" action="{{ path('IpoetryBundle_uroom') }}">
                                     {{ form_start(uroom_user_form) }}
                                     {% set parameters=[] %}
                                     {{ form_errors(uroom_user_form) }}
@@ -120,13 +120,17 @@
                                                 {{ form_errors(uroom_user_form.userphoto) }}
                                                 {{ form_widget(uroom_user_form.userphoto) }}
 					</div>
-
+					<div class="input-wrap clearfix">
+                                                {{ form_label(uroom_user_form.onlysubscribercanread) }}
+                                                {{ form_errors(uroom_user_form.onlysubscribercanread) }}
+                                                {{ form_widget(uroom_user_form.onlysubscribercanread) }}
+					</div>
 					<hr>
-
+<!--
 					<div class="checkbox-wrap">
 						<label>Читать могут только подписчики</label><div class="jq-checkbox" unselectable="on" style="-webkit-user-select: none; display: inline-block; position: relative; overflow: hidden;"><input type="checkbox" style="position: absolute; z-index: -1; opacity: 0; margin: 0px; padding: 0px;"><div class="jq-checkbox__div"></div></div>
 					</div>
-
+-->
                                         <!-- Данные польователя конец -->
                                         {{ form_label(uroom_user_form.enter) }}
                                         {{ form_widget(uroom_user_form.enter, {'attr': {'class': 'btn-blue-bg'}}) }}
@@ -144,50 +148,31 @@
 
 				<!-- Виджет боковой панели -->
 				<div class="aside-widget clearfix">
-
 					<!-- Подписчики -->
 					<div class="clearfix">
-						<a href="#" class="aside-widget-title">Подписчики <span>(125)</span></a>
-						<a href="#" class="aside-widget-you">Подписан <span>(20)</span></a>
+						<a href="#" class="aside-widget-title subscriber">Подписчики <span>({{subscribers.userscount}})</span></a>
+						<a href="#" class="aside-widget-you follower">Подписан <span>({{followers.userscount}})</span></a>
 					</div>
-					<a href="#" class="subscribers-item">
-						<div class="subscribers-item-img-wrap">
-							<img src="img/subscribe-ico1.jpg" alt="alt">
-						</div>
-						<div class="subscriber-item-name">Анастасия<span>Соколова</span></div>
-					</a>
-					<a href="#" class="subscribers-item">
-						<div class="subscribers-item-img-wrap">
-							<img src="img/subscribe-ico2.jpg" alt="alt">
-						</div>
-						<div class="subscriber-item-name">Андрей<span>Леницкий</span></div>
-					</a>
-					<a href="#" class="subscribers-item">
-						<div class="subscribers-item-img-wrap">
-							<img src="img/subscribe-ico3.jpg" alt="alt">
-						</div>
-						<div class="subscriber-item-name">Алина<span>Солопова</span></div>
-					</a>
-					<a href="#" class="subscribers-item">
-						<div class="subscribers-item-img-wrap">
-							<img src="img/subscribe-ico4.jpg" alt="alt">
-						</div>
-						<div class="subscriber-item-name">Евгений<span>Белозеров</span></div>
-					</a>
-					<a href="#" class="subscribers-item">
-						<div class="subscribers-item-img-wrap">
-							<img src="img/subscribe-ico5.jpg" alt="alt">
-						</div>
-						<div class="subscriber-item-name">Анастасия<span>Перекрест</span></div>
-					</a>
-					<a href="#" class="subscribers-item">
-						<div class="subscribers-item-img-wrap">
-							<img src="img/subscribe-ico6.jpg" alt="alt">
-						</div>
-						<div class="subscriber-item-name">Анастасия<span>Соколова</span></div>
-					</a>
-					<!-- Подписчики конец -->
+                                                {% for subscriberitem in subscribers.userslist %}
+						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : subscriberitem.userId}) }}" class="subscribers-item">
+							<div class="subscribers-item-img-wrap">
+								<img alt="{{subscriberitem.userName}}{{subscriberitem.userLastname}}" src="{{subscriberitem.userPhotoUrl}}" width="50" heiht="50">
+							</div>
+							<div class="subscriber-item-name">{{subscriberitem.userName}} {{subscriberitem.userLastname}}</div>
+                                                    
+						</a>
+                                                {% endfor %}
+                                                {% for followeritem in followers.userslist %}
+						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : followeritem.userId}) }}" class="followers-item" style="display:none;">
+							<div class="followers-item-img-wrap">
+								<img alt="{{followeritem.userName}}{{followeritem.userLastname}}" src="{{followeritem.userPhotoUrl}}" width="50" heiht="50">
+							</div>
+							<div class="follower-item-name">{{followeritem.userName}} {{followeritem.userLastname}}</div>
+                                                    
+						</a>
+                                                {% endfor %}
 
+					<!-- Подписчики конец -->
 				</div>
 				<!-- Виджет боковой панели конец-->
 
@@ -397,7 +382,20 @@
                 }
 
             });
-
+            if ($('#UserRoom_onlysubscribercanread').val()==0 && $('#UserRoom_onlysubscribercanread').attr('checked')=='checked'){
+                //$('#UserRoom_onlysubscribercanread').removeAttr('value');
+                $('#UserRoom_onlysubscribercanread').attr('checked',false);
+            }
+            $('#UserRoom_onlysubscribercanread').on('change',function () {
+                if ($(this).attr('checked')){
+                    $(this).val(0);
+                    $(this).attr('checked',false);                    
+                }
+                else {
+                    $(this).val(1)
+                    $(this).attr('checked',true); 
+                }
+             });
             $('#sendfileupload').on('click',function () {
                     //data.context = $('<p/>').text('Uploading...').replaceAll($(this));
                     //data.submit();
@@ -411,6 +409,28 @@
                     event.returnValue = false;
                   }
                 CloseiPoetrySession();
+            });
+            $('.aside-widget-you.follower').eq(0).on('click',function(event){
+            event = event || window.event;
+
+              if (event.preventDefault) { // если метод существует
+                event.preventDefault(); // то вызвать его
+              } else { // иначе вариант IE8-:
+                event.returnValue = false;
+              }
+              $('.subscribers-item').fadeOut();
+              $('.followers-item').fadeIn();
+            });
+            $('.aside-widget-title.subscriber').eq(0).on('click',function(event){
+            event = event || window.event;
+
+              if (event.preventDefault) { // если метод существует
+                event.preventDefault(); // то вызвать его
+              } else { // иначе вариант IE8-:
+                event.returnValue = false;
+              }
+              $('.followers-item').fadeOut();
+              $('.subscribers-item').fadeIn();
             });
 
         {{ include('IpoetryBundle::basejs.html.twig') }}

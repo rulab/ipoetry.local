@@ -76,22 +76,22 @@
 						<a href="#" class="aside-widget-you follower">Подписан <span>({{followers.userscount}})</span></a>
 					</div>
                                                 {% for subscriberitem in subscribers.userslist %}
-						<div class="subscribers-item">
+						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : subscriberitem.userId}) }}" class="subscribers-item">
 							<div class="subscribers-item-img-wrap">
 								<img alt="{{subscriberitem.userName}}{{subscriberitem.userLastname}}" src="{{subscriberitem.userPhotoUrl}}" width="50" heiht="50">
 							</div>
 							<div class="subscriber-item-name">{{subscriberitem.userName}} {{subscriberitem.userLastname}}</div>
                                                     
-						</div>
+						</a>
                                                 {% endfor %}
                                                 {% for followeritem in followers.userslist %}
-						<div class="followers-item" style="display:none;">
+						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : followeritem.userId}) }}" class="followers-item" style="display:none;">
 							<div class="followers-item-img-wrap">
 								<img alt="{{followeritem.userName}}{{followeritem.userLastname}}" src="{{followeritem.userPhotoUrl}}" width="50" heiht="50">
 							</div>
 							<div class="follower-item-name">{{followeritem.userName}} {{followeritem.userLastname}}</div>
                                                     
-						</div>
+						</a>
                                                 {% endfor %}
 
 					<!-- Подписчики конец -->
