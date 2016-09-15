@@ -25,6 +25,7 @@ class Configuration implements ConfigurationInterface{
         ->scalarNode('UserPasswordChangeUrl')->end()
         ->scalarNode('RedirectAfterUnsuccOauthLogin')->end()
         ->scalarNode('UserProfileUrl')->end()
+        ->scalarNode('admin')->end()
         ->scalarNode('uprofilenewsfeedlimit')->end()
         ->scalarNode('uprofilecommentslimit')->end()
         ->scalarNode('userratinglimit')->end()

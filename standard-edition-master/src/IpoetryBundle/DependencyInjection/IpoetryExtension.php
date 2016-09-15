@@ -36,6 +36,7 @@ class IpoetryExtension extends Extension {
             'UserPasswordChangeUrl',
             'RedirectAfterUnsuccOauthLogin',
             'UserProfileUrl',
+            'admin',
             'uprofilenewsfeedlimit',
             'uprofilecommentslimit',
             'userratinglimit',

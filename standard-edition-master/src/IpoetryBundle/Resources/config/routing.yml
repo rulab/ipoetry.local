@@ -12,7 +12,21 @@ IpoetryBundle_root:
     requirements:
         _method:  GET|POST
         _locale: en|ru
-
+#страница администратора
+IpoetryBundle_admin:
+    path:     /admin
+    defaults: { _controller: IpoetryBundle:Index:admin }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#страница администратора
+IpoetryBundle_errorpage:
+    path:     /error
+    defaults: { _controller: IpoetryBundle:Index:error }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+#окно удаления стихов\сообщений
 IpoetryBundle_modal:
     path:     /modal
     defaults: { _controller: IpoetryBundle:Index:modal }

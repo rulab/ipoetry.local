@@ -481,7 +481,7 @@ class uRoomController extends LoggingController{
             if ($request->hasSession()) {
                 $this->session=$request->getSession();
                 $this->session->set('login',$json_array['signin_useremail']);
-                $this->session->set('login_id',$result[0][user_id]);
+                $this->session->set('login_id',$result[0]['user_id']);
                 
             }
             //шлем почту пользователю

@@ -4,6 +4,7 @@ ipoetry:
     UserPasswordChangeUrl: http://ipoetry.local/standard-edition-master/web/app_dev.php/userpasswordchange?code=
     RedirectAfterUnsuccOauthLogin: http://ipoetry.local/standard-edition-master/web/app_dev.php/login
     UserProfileUrl: http://ipoetry.local/standard-edition-master/web/app_dev.php/unewsfeed/
+    admin: admin@ipoetry.ru
     uprofilenewsfeedlimit: 20
     uprofilecommentslimit: 20
     userratinglimit: 50

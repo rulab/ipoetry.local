@@ -76,6 +76,7 @@ class IndexController extends LoggingController
     //массив запросов к БД
     private $sql_array=array('get_daily_poetry_rating'=>'CALL poetry_rating_calc(:poetry)',
                             'get_daily_user_rating'=>'CALL user_rating_calc(:user)',
+                            'del_ipoetry_user_messages'=>'CALL del_ipoetry_user_messages()',
                             'delete_user_subscriber_action'=>'DELETE FROM ipoetry_user_followed_by WHERE ipoetry_user_followed_by_id=:follow AND ipoetry_user_user_id=:subscriber',
                             );
 
@@ -84,12 +85,33 @@ class IndexController extends LoggingController
             $this->session=$request->getSession();
             varDumper::dump(array('request'=>$request,'session'=>$this->session,'login'=>$this->session->get('login'),'vk_access_token'=>$this->session->get('vk_access_token')));
             $user_short_info=array($this->session->get('user_photo_url'),$this->session->get('user_name'),$this->session->get('user_lastname'));
-            $retval=$this->render('IpoetryBundle:Default:index.html.twig',array('user_short_info'=>$user_short_info));
+            return $this->render('IpoetryBundle:Default:index.html.twig',array('user_short_info'=>$user_short_info));
         }
         else
-            $retval=$this->render('IpoetryBundle:Default:index.html.twig');
-         return $retval;
+            return $this->render('IpoetryBundle:Default:index.html.twig');
     }
+    //страница администратора
+    public function adminAction(Request $request){
+        if ($request->hasSession()) {
+            $this->session=$request->getSession();
+                if ($this->session->has('login')){
+                    if ($this->session->get('login')===$this->getParameter('ipoetry.admin')){
+                        varDumper::dump(array('request'=>$request,'session'=>$this->session,'login'=>$this->session->get('login')));
+                        $user_short_info=array($this->session->get('user_photo_url'),$this->session->get('user_name'),$this->session->get('user_lastname'));
+                        return $this->render('IpoetryBundle:Main:admin.html.twig');                        
+                    } else
+                        return $this->render('IpoetryBundle:Default:error.html.twig',array('message'=>'Необходимо быть администратором обратитесь на admin@ipoetry.ru'));                        
+                } else
+                    return $this->render('IpoetryBundle:Default:error.html.twig',array('message'=>'Необходимо быть администратором обратитесь на admin@ipoetry.ru'));
+        } else
+            return $this->render('IpoetryBundle:Default:error.html.twig',array('message'=>'Необходимо быть администратором обратитесь на admin@ipoetry.ru'));
+    }
+    //страница ошибочных действий
+    public function errorAction(Request $request){
+        $retval=$this->render('IpoetryBundle:Default:error.html.twig');
+        return $retval;
+    }
+
     public function modalAction(Request $request){
         $retval=$this->render('IpoetryBundle::modaldemo.html.twig');//,array('userid'=>$user,'poetryid'=>$poetry)
         return $retval;
@@ -129,6 +151,10 @@ class IndexController extends LoggingController
                                 //Vardumper::dump(array('$request'=>$request,'ServerBag'=>$request->server->all(),'session'=>$this->session));
                                 $mas['result']=$this->jsonFileUpload($authorization_parameters,$this->session,$request->server->all(),'NEWSFEED');
                                 break;
+                    case 'del_all_messages':
+                                $mas['result']=$this->delAllMessagesAjaxAnswer($authorization_parameters,$request);
+                                break;
+
             }
         } else
             $mas['result']=0;
@@ -594,5 +620,27 @@ class IndexController extends LoggingController
             }            
         } else
             return array('result'=>0);
+    }
+    public function delAllMessagesAjaxAnswer($authorization_parameters,$request){
+        //в request может приходить день,месяц,год
+        $this->request=$request;
+        $stmt='';
+
+        if ($this->request->hasSession()) {
+
+            $this->session=$this->request->getSession();
+            if ($this->session->has('login')) {
+                if ($this->session->get('login')===$this->getParameter('ipoetry.admin')){
+                    $stmt = $this->getDoctrine()
+                                 ->getConnection()
+                                 ->prepare($this->sql_array['del_ipoetry_user_messages']);
+                    $stmt->execute();
+                    return 1;
+                } else
+                    return 0;
+            } else
+                return 0;
+        } else
+            return 0;
     }
 }
