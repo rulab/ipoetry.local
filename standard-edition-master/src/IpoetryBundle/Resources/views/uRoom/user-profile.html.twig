@@ -39,7 +39,7 @@
 					<button id="setusersubscriptionbtn" class="btn-white-border">Подписаться</button>
 					<button id="gotousernewsfeedbtn" class="btn-white-border">Смотреть ленту пользователя</button>
                                         <button id="addpoembtn" class="btn-white-border" style="width: 277px;height: auto;">Добавить стихотворение</button>
-				</div>
+				</div> 
 				<a href="#" onclick="javascript:window.history.back(-1);return false;" class="back-link">Назад</a>
 			</div>
 		</div>
@@ -72,8 +72,8 @@
 
 					<!-- Подписчики -->
 					<div class="clearfix">
-						<a href="#" class="aside-widget-title subscriber">Подписчики <span>({{subscribers.userscount}})</span></a>
-						<a href="#" class="aside-widget-you follower">Подписан <span>({{followers.userscount}})</span></a>
+						<a href="{{path('IpoetryBundle_subscribers',{user:userprofileowner.userId,utype:'s'})}}" class="aside-widget-title subscriber">Подписчики <span>({{subscribers.userscount}})</span></a>
+						<a href="{{path('IpoetryBundle_subscribers',{user:userprofileowner.userId,utype:'f'})}}" class="aside-widget-you follower">Подписан <span>({{followers.userscount}})</span></a>
 					</div>
                                                 {% for subscriberitem in subscribers.userslist %}
 						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : subscriberitem.userId}) }}" class="subscribers-item">

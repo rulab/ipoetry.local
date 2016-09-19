@@ -150,8 +150,8 @@
 				<div class="aside-widget clearfix">
 					<!-- Подписчики -->
 					<div class="clearfix">
-						<a href="#" class="aside-widget-title subscriber">Подписчики <span>({{subscribers.userscount}})</span></a>
-						<a href="#" class="aside-widget-you follower">Подписан <span>({{followers.userscount}})</span></a>
+						<a href="{{path('IpoetryBundle_subscribers',{user:userid,type:'s'})}}" class="aside-widget-title subscriber">Подписчики <span>({{subscribers.userscount}})</span></a>
+						<a href="{{path('IpoetryBundle_subscribers',{user:userid,type:'f'})}}" class="aside-widget-you follower">Подписан <span>({{followers.userscount}})</span></a>
 					</div>
                                                 {% for subscriberitem in subscribers.userslist %}
 						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : subscriberitem.userId}) }}" class="subscribers-item">

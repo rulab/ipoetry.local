@@ -880,6 +880,38 @@ abstract class LoggingController extends Controller{
             } else
                 return array(0=>array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined'));
     }
+    //функция проверки наличия подписчиков или тех на кого подписан пользователь
+    //функция выборки данных по пользователю из url страницы
+    public function UserSubscribersInfo($request,$user=null,$type=null) {
+            if (!empty($user)) {
+                //проверяем что пришло в сессии
+                $this->GetCache($request);
+
+                $usersfeed = $this->getDoctrine()->getEntityManager();
+                //проверяем существование пользователя
+                $query=$usersfeed->createQuery('SELECT COUNT(usr.userId) FROM IpoetryBundle\Entity\IpoetryUser usr WHERE usr.userId=?1');
+                $query->setParameter(1,$user);
+
+                $usersfeedcnt=$query->getResult();
+
+                //вытаскиваем пользователя
+                if ($usersfeedcnt[0][1]>0){
+                    $query=$usersfeed->createQuery('SELECT DISTINCT usr.userId,usr.userName,usr.userLastname,usrphoto.userPhotoUrl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.ipoetryUserSubscribedBy usrflwr JOIN usr.userPhoto usrphoto WHERE usr.userId=?1');
+                    $query->setParameter(1,$user);
+                    $usersubscribers=$query->getResult();
+                    
+                    $query=$usersfeed->createQuery('SELECT DISTINCT usr.userId,usr.userName,usr.userLastname,usrphoto.userPhotoUrl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.ipoetryUserFollowedBy usrflwr JOIN usr.userPhoto usrphoto WHERE usr.userId=?1');
+                    $query->setParameter(1,$user);
+                    $userfollowed=$query->getResult();
+
+                    return array_merge($usersubscribers, $userfollowed);
+                } else {
+                    return array(0=>array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined'));
+                }
+            } else
+                return array(0=>array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined'));
+    }
+    
     public function GetUsersAjaxAnswer($authorization_parameters,$request){
         //user:$scope.usertype,'datapart':$scope.page
         //в request может приходить день,месяц,год
@@ -890,18 +922,23 @@ abstract class LoggingController extends Controller{
         if ($request->hasSession()) {
 
             $this->session=$request->getSession();
-
+            VarDumper::dump(array('urltype'=>isset($authorization_parameters['urltype'])));
             if ($this->session->has('login') && $this->session->has('login_id')) {
                 $usersfeed = $this->getDoctrine()->getEntityManager();
                 //получаем кол-во записей
-                if (strtoupper($authorization_parameters['usertype'])=='FOLLOW')
+                if (isset($authorization_parameters['urltype'])){
+                    if (strtoupper($authorization_parameters['urltype'])=='A')
+                    $query=$usersfeed->createQuery('SELECT COUNT(usr.userId) FROM IpoetryBundle\Entity\IpoetryUser usr');
+                } else if (strtoupper($authorization_parameters['usertype'])=='FOLLOW'  && !isset($authorization_parameters['urltype']))
                     $query=$usersfeed->createQuery('SELECT COUNT(usr.userId) FROM IpoetryBundle\Entity\IpoetryUser usr WHERE usr.userId IN (SELECT ufb.ipoetryUserUserId FROM IpoetryBundle\Entity\IpoetryUserFollowedBy ufb WHERE ufb.ipoetryUserFollowedById=?1)');
-                else if (strtoupper($authorization_parameters['usertype'])=='SUBSCRIBERS')
+                else if (strtoupper($authorization_parameters['usertype'])=='SUBSCRIBERS'  && !isset($authorization_parameters['urltype']))
                     $query=$usersfeed->createQuery('SELECT COUNT(usr.userId) FROM IpoetryBundle\Entity\IpoetryUser usr WHERE usr.userId IN (SELECT ufb.ipoetryUserFollowedById FROM IpoetryBundle\Entity\IpoetryUserFollowedBy ufb WHERE ufb.ipoetryUserUserId=?1)');
-                if (!empty($authorization_parameters['user']))
+                
+                if (!empty($authorization_parameters['user']) && !isset($authorization_parameters['urltype']))
                     $query->setParameter(1,$authorization_parameters['user'] );
-                else
+                else if (empty($authorization_parameters['user']))
                     throw $this->createNotFoundException('No user found for url param.');
+                
                 $usersfeedcnt=$query->getResult();
                 
                 //Если спросили большим значением возвращаем оставшее кол-во записей
@@ -915,8 +952,11 @@ abstract class LoggingController extends Controller{
                     //получаем список пользователей с фильтром города
                     $cityfilter='';
                     
-                    if (!empty($authorization_parameters['cityfilter'])){
+                    if (!empty($authorization_parameters['cityfilter']) && !isset($authorization_parameters['urltype'])){
                         $cityfilter=' and usrcity.cityName=?2';
+                    }
+                    if (!empty($authorization_parameters['cityfilter'])  && isset($authorization_parameters['urltype'])){
+                        $cityfilter=' WHERE usrcity.cityName=?1';
                     }
                     //получаем список пользователей с фильтром имя фамилия
                     $userfilter='';
@@ -928,25 +968,37 @@ abstract class LoggingController extends Controller{
                         if (count($vars)==2)
                             $userfilter=' and REGEXP (CONCAT(usr.userName,usr.userLastname), \'^.*('.$vars[0].'|'.$vars[1].').*('.$vars[0].'|'.$vars[1].')$\')=1';
                     }
-                    
-                    if (strtoupper($authorization_parameters['usertype'])=='FOLLOW'){
+                    if (isset($authorization_parameters['urltype'])){
+                        if (strtoupper($authorization_parameters['urltype'])=='A'){
+                        $query=$usersfeed->createQuery('SELECT DISTINCT usr.userId,usr.userName,usr.userLastname,usrcity.cityName,usrphoto.userPhotoUrl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto JOIN usr.userCity usrcity'.$cityfilter.$userfilter)
+                               ->setFirstResult((($this->getParameter('ipoetry.userslimit')*$authorization_parameters['datapart'])-$this->getParameter('ipoetry.userslimit')))
+                                ->setMaxResults($this->getParameter('ipoetry.userslimit'));
+                        }
+                    }
+                    else if (strtoupper($authorization_parameters['usertype'])=='FOLLOW' && !isset($authorization_parameters['urltype'])){
                         $query=$usersfeed->createQuery('SELECT DISTINCT usr.userId,usr.userName,usr.userLastname,usrcity.cityName,usrphoto.userPhotoUrl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto JOIN usr.userCity usrcity WHERE usr.userId IN (SELECT ufb.ipoetryUserUserId FROM IpoetryBundle\Entity\IpoetryUserFollowedBy ufb WHERE ufb.ipoetryUserFollowedById=?1)'.$cityfilter.$userfilter)
                                ->setFirstResult((($this->getParameter('ipoetry.userslimit')*$authorization_parameters['datapart'])-$this->getParameter('ipoetry.userslimit')))
                                 ->setMaxResults($this->getParameter('ipoetry.userslimit'));
                     }
-                    else if (strtoupper($authorization_parameters['usertype'])=='SUBSCRIBERS'){
+                    else if (strtoupper($authorization_parameters['usertype'])=='SUBSCRIBERS' && !isset($authorization_parameters['urltype'])){
                         $query=$usersfeed->createQuery('SELECT DISTINCT usr.userId,usr.userName,usr.userLastname,usrcity.cityName,usrphoto.userPhotoUrl FROM IpoetryBundle\Entity\IpoetryUser usr JOIN usr.userPhoto usrphoto JOIN usr.userCity usrcity WHERE usr.userId IN (SELECT ufb.ipoetryUserFollowedById FROM IpoetryBundle\Entity\IpoetryUserFollowedBy ufb WHERE ufb.ipoetryUserUserId=?1)'.$cityfilter.$userfilter)
                                 ->setFirstResult((($this->getParameter('ipoetry.userslimit')*$authorization_parameters['datapart'])-$this->getParameter('ipoetry.userslimit')))
                                 ->setMaxResults($this->getParameter('ipoetry.userslimit'));
                     }
-                    $query->setParameter(1,$authorization_parameters['user'] );
-                    if (!empty($authorization_parameters['cityfilter'])){
+                    VarDumper::dump(array($query->getSQL(),$cityfilter,$userfilter));
+                    if (!isset($authorization_parameters['urltype'])){
+                        $query->setParameter(1,$authorization_parameters['user']);
+                    }
+                    if (!empty($authorization_parameters['cityfilter']) && !isset($authorization_parameters['urltype'])){
                         $query->setParameter(2,$authorization_parameters['cityfilter']);
                     }
-                    //VarDumper::dump(array($query->getSQL(),$cityfilter,$userfilter));
+                    if (!empty($authorization_parameters['cityfilter']) && isset($authorization_parameters['urltype'])){
+                        $query->setParameter(1,$authorization_parameters['cityfilter']);
+                    }
+                    
                     $users=$query->getResult();
                     
-                    //VarDumper::dump(array($this->session->get('login_id'),$this->urlsession($authorization_parameters,$this->session)));
+                    VarDumper::dump(array($users));
                     return array('result'=>1,
                                 'userslist'=>$users,
                                 'userscount'=>$usersfeedcnt[0][1],

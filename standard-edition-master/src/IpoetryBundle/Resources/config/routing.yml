@@ -35,12 +35,13 @@ IpoetryBundle_modal:
         _locale: en|ru
 #страница подписчиков
 IpoetryBundle_subscribers:
-    path:     /subscribers/{user}
+    path:     /subscribers/{user}_{utype}
     defaults: { _controller: IpoetryBundle:Index:subscribers }
     requirements:
         _method:  GET|POST
         _locale: en|ru
         user: "\d+"
+        utype: "s|f|a"
 #Страница вывода фильтра по рейтингу пользователей
 IpoetryBundle_UserRating:
     path: /urating

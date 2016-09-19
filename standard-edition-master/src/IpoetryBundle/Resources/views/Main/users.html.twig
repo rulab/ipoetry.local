@@ -25,16 +25,17 @@
                             <span>Subscribe</span>
         </button>
     -->
+
 {% trans_default_domain "users" %}
-<div ng-controller="UsersController" ng-init="init({{app.request.attributes.get('_route_params')['user']}},{{userslimit}},'{{ path('IpoetryBundle_mainajax') }}','{{geturlpart(app.request.attributes.get('_route'),-1)}}')">
+<div ng-controller="UsersController" ng-init="init({{app.request.attributes.get('_route_params')['user']}},'{{app.request.attributes.get('_route_params')['utype']}}',{{userslimit}},'{{ path('IpoetryBundle_mainajax') }}','{{geturlpart(app.request.attributes.get('_route'),-1)}}')">
 	<!-- Верхняя панель -->
         {{ include('IpoetryBundle::baseheader.html.twig',{'userheaderInfo':userheaderInfo}) }}
 <div class="top-info-panel gray-bg">
 			<div class="container clearfix">
 				<div class="feed-sorting">
 					<div class="feed-sorting-items-wrap tabs">
-						<div class="feed-sorting-item tab active" ng-click="Users('subscribers')">{% trans %}%Subscribers%{% endtrans %}</div>
-						<div class="feed-sorting-item tab" ng-click="Users('follow')">{% trans %}%Follow%{% endtrans %}</div>
+						<div class="feed-sorting-item tab active" ng-click="Users('subscribers')" style="visibility:{{displaystatus}};">{% trans %}%Subscribers%{% endtrans %}</div>
+						<div class="feed-sorting-item tab" ng-click="Users('follow')" style="visibility:{{displaystatus}};">{% trans %}%Follow%{% endtrans %}</div>
 					</div>
 				</div>
 				<a href="#" onclick="javascript:window.history.back(-1);return false;" class="back-link">Назад</a>
@@ -45,7 +46,7 @@
 <div class="container">
     <div class="feed-sorting clearfix">
     
-        <div class="feed-sorting-title">{{userhassubsribers.userName}} {{userhassubsribers.userLastname}} <ng-bind-html ng-bind-html="feedsortingtitle|trusted_html"></ng-bind-html></div>
+        <div class="feed-sorting-title" style="visibility:{{displaystatus}};">{{userhassubsribers.userName}} {{userhassubsribers.userLastname}} <ng-bind-html ng-bind-html="feedsortingtitle|trusted_html"></ng-bind-html></div>
 					<form action="">
 						<div class="feed-sorting-input-wrap">
 							<input id="userssearchinput" name="userssearchinput" type="text" placeholder="Имя Фамилия" ng-model="userssearch" ng-change="change_userssearch()"/>

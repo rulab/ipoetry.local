@@ -4985,7 +4985,7 @@ aside {
 .link-item::after {
   height: 14px;
   top: 1px;
-  background-image: url("../images/ico-link.png");
+  background-image: url("../images/inet.png");
 }
 
 .date-item::after {

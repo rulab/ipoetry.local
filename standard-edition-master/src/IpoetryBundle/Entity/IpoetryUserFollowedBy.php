@@ -41,12 +41,22 @@ class IpoetryUserFollowedBy
     /**
      * @var IpoetryBundle\Entity\IpoetryUser
      *
-     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUser",inversedBy="ipoetryUserFollowedBy")
+     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUser", inversedBy="ipoetryUserSubscribedBy")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="ipoetry_user_user_id", referencedColumnName="user_id", unique=true)
-     })
+     *   @ORM\JoinColumn(name="user_Id", referencedColumnName="ipoetry_user_user_id")
+     * })
      */
-    private $ipoetryUserUser;
+    private $ipoetryUserSubscribers;
+
+    /**
+     * @var IpoetryBundle\Entity\IpoetryUser
+     *
+     * @ORM\ManyToOne(targetEntity="IpoetryBundle\Entity\IpoetryUser", inversedBy="ipoetryUserFollowedBy")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="user_Id", referencedColumnName="ipoetry_user_followed_by_id")
+     * })
+     */
+    private $ipoetryUserFollowers;
 
     /**
      * Set pkipoetryUserFollowedById
@@ -143,25 +153,44 @@ class IpoetryUserFollowedBy
         return $this->ipoetryUserUserParentId;
     }
 
-    
-
     /**
-     * Remove ipoetryUserUser
+     * Set ipoetryUserSubscribers
      *
-     * @param \IpoetryBundle\Entity\IpoetryUser $ipoetryUserUser
+     * @param \IpoetryBundle\Entity\IpoetryUser $ipoetryUserSubscribers
      */
-    public function setIpoetryUserUser(\IpoetryBundle\Entity\IpoetryUser $ipoetryUserUser)
+    public function setIpoetryUserSubscribers(\IpoetryBundle\Entity\IpoetryUser $ipoetryUserUser)
     {
         $this->ipoetryUserUser->$ipoetryUserUser;
     }
 
     /**
-     * Get ipoetryUserUser
+     * Get ipoetryUserSubscribers
      *
      * @return \IpoetryBundle\Entity\IpoetryUser
      */
-    public function getIpoetryUserUser()
+    public function getIpoetryUserSubscribers()
     {
-        return $this->ipoetryUserUser;
+        return $this->ipoetryUserSubscribers;
     }
+    
+    /**
+     * Set ipoetryUserFollowers
+     *
+     * @param \IpoetryBundle\Entity\IpoetryUser $ipoetryUserFollowers
+     */
+    public function setIpoetryUserFollowers(\IpoetryBundle\Entity\IpoetryUser $ipoetryUserFollowers)
+    {
+        $this->ipoetryUserFollowers->$ipoetryUserFollowers;
+    }
+
+    /**
+     * Get ipoetryUserFollowers
+     *
+     * @return \IpoetryBundle\Entity\IpoetryUser
+     */
+    public function getIpoetryUserFollowers()
+    {
+        return $this->ipoetryUserFollowers;
+    }
+
 }

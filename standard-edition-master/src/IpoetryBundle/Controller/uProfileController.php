@@ -702,7 +702,7 @@ class uProfileController extends LoggingController {
             //пишем обновленные данные в базу
             if ($this->session->has('login') && $this->session->has('login_id')){
                 //получаем кол-во записей
-                $query=$usersubscribed->createQuery('SELECT COUNT(iuf.ipoetryUserFollowedById) FROM IpoetryBundle\Entity\IpoetryUserFollowedBy iuf JOIN iuf.ipoetryUserUser usr WHERE usr.userId=?1 and iuf.ipoetryUserFollowedById=?2');// usr usr.userId=?1 and 
+                $query=$usersubscribed->createQuery('SELECT COUNT(iuf.ipoetryUserFollowedById) FROM IpoetryBundle\Entity\IpoetryUserFollowedBy iuf JOIN iuf.ipoetryUserFollowers usr WHERE usr.userId=?1 and iuf.ipoetryUserFollowedById=?2');// usr usr.userId=?1 and 
                 $query->setParameter(1,intval($this->session->get('login_id')) );//$this->session->has('login_id')
                 $query->setParameter(2,$authorization_parameters['user']);// 
                 //VarDumper::dump(array('sql'=>$query->getSQL()));                

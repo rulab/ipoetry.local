@@ -53,6 +53,7 @@ usersApp.controller('UsersController', function($scope,$http) {
     $scope.userid;
     $scope.ajaxurls;
     $scope.userid;
+    $scope.urltype;
     $scope.ownuser;
     $scope.userssearch=[];
     $scope.userssearch_maxlength=100;
@@ -80,7 +81,7 @@ usersApp.controller('UsersController', function($scope,$http) {
             $scope.page++;
     };
 
-    $scope.init = function(userid,element,ajaxurls,usertype)
+    $scope.init = function(userid,urltype,element,ajaxurls,usertype)
     {/*
         if ($scope.usertype=='subscribers')
             $scope.feedsortingtitle="Вы подписаны на <span>0</span> автора:";
@@ -92,14 +93,15 @@ usersApp.controller('UsersController', function($scope,$http) {
         $scope.usertype=usertype;
         $scope.ajaxurls=ajaxurls;
         $scope.userid=userid;
+        $scope.urltype=urltype;
         $scope.ownuser=0;
         $scope.addCities();
-        $scope.addUsers(null,null);
+        $scope.addUsers(null,null,$scope.urltype);
     };
 
     $scope.Users=function(usertype){
         $scope.usertype=usertype;
-        $scope.addUsers(null,null);
+        $scope.addUsers(null,null,$scope.urltype);
     };
 /*
     $scope.LoadPoetries = function(){
@@ -142,14 +144,14 @@ usersApp.controller('UsersController', function($scope,$http) {
     $scope.CityFilter = function(){
         console.log($scope.bootstrap_cities.selected);
         if ($scope.userssearch.length>2)
-            $scope.addUsers($scope.bootstrap_cities.selected.label,$scope.userssearch);
+            $scope.addUsers($scope.bootstrap_cities.selected.label,$scope.userssearch,$scope.urltype);
         else
-            $scope.addUsers($scope.bootstrap_cities.selected.label,null);
+            $scope.addUsers($scope.bootstrap_cities.selected.label,null,$scope.urltype);
             
     };
-    $scope.addUsers = function(city,user){
+    $scope.addUsers = function(city,user,urltype){
             $scope.users_count=0;
-            console.log($scope.ajaxurls+' '+$scope.page+' '+$scope.usertype+' '+$scope.elements_on_page);
+            console.log($scope.ajaxurls+' '+$scope.page+' '+$scope.usertype+' '+$scope.elements_on_page+' '+urltype);
             if ($scope.page == 1)
                     $scope.users = [];
             if ($scope.page > 1){
@@ -157,7 +159,7 @@ usersApp.controller('UsersController', function($scope,$http) {
                 $scope.users = [];
             }
                 
-            $http.post($scope.ajaxurls,{type:"get_users",user:$scope.userid,usertype:$scope.usertype,'datapart':$scope.page,'cityfilter':city,'userfilter':user}).success(function(response)
+            $http.post($scope.ajaxurls,{type:"get_users",user:$scope.userid,urltype:urltype,usertype:$scope.usertype,'datapart':$scope.page,'cityfilter':city,'userfilter':user}).success(function(response)
             {
                     if (response.result == 1)
                     {
@@ -180,9 +182,9 @@ usersApp.controller('UsersController', function($scope,$http) {
                     }
             });
     };
-    $scope.moreUsers = function(city,user){
+    $scope.moreUsers = function(city,user,urltype){
             console.log($scope.ajaxurls+' '+$scope.page+' '+$scope.usertype+' '+$scope.elements_on_page);
-            $http.post($scope.ajaxurls,{type:"get_users",user:$scope.userid,usertype:$scope.usertype,'datapart':$scope.page,'cityfilter':city,'userfilter':user}).success(function(response)
+            $http.post($scope.ajaxurls,{type:"get_users",user:$scope.userid,urltype:$scope.urltype,usertype:$scope.usertype,'datapart':$scope.page,'cityfilter':city,'userfilter':user}).success(function(response)
             {
                     if (response.result == 1)
                     {

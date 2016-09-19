@@ -158,10 +158,15 @@ class IpoetryUser
 
     /**
      * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\OneToMany(targetEntity="IpoetryBundle\Entity\IpoetryUserFollowedBy", mappedBy="ipoetryUserUser")
+     * 
+     * @OneToMany(targetEntity="IpoetryBundle\Entity\IpoetryUserFollowedBy", mappedBy="ipoetryUserFollowers")
      */
     private $ipoetryUserFollowedBy;
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     * @OneToMany(targetEntity="IpoetryBundle\Entity\IpoetryUserFollowedBy", mappedBy="ipoetryUserSubscribers")
+     */
+    private $ipoetryUserSubscribedBy;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -179,6 +184,8 @@ class IpoetryUser
         $this->ipoetryPoetryPoetry = new \Doctrine\Common\Collections\ArrayCollection();
         //связь с подписантами
         $this->ipoetryUserFollowedBy = new \Doctrine\Common\Collections\ArrayCollection();
+        //связь с подписчиками
+        $this->ipoetryUserSubscribedBy = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -632,4 +639,45 @@ class IpoetryUser
     {
         return $this->ipoetryPoetryPoetry;
     }
+    
+    /**
+     * Set ipoetryUserFollowedBy
+     *
+     * @param \IpoetryBundle\Entity\IpoetryUserFollowedBy $ipoetryUserFollowedBy
+     */
+    public function setIpoetryUserFollowedBy(\IpoetryBundle\Entity\IpoetryUserFollowedBy $ipoetryUserFollowedBy)
+    {
+        $this->ipoetryUserFollowers->$ipoetryUserFollowedBy;
+    }
+
+    /**
+     * Get ipoetryUserFollowedBy
+     *
+     * @return \IpoetryBundle\Entity\IpoetryUserFollowedBy
+     */
+    public function getIpoetryUserFollowedBy()
+    {
+        return $this->ipoetryUserFollowedBy;
+    }
+
+    /**
+     * Set ipoetryUserSubscribedBy
+     *
+     * @param \IpoetryBundle\Entity\IpoetryUserFollowedBy $ipoetryUserFollowedBy
+     */
+    public function setIpoetryUserSubscribedBy(\IpoetryBundle\Entity\IpoetryUserFollowedBy $ipoetryUserSubscribedBy)
+    {
+        $this->ipoetryUserFollowers->$ipoetryUserSubscribedBy;
+    }
+
+    /**
+     * Get ipoetryUserSubscribedBy
+     *
+     * @return \IpoetryBundle\Entity\IpoetryUserFollowedBy
+     */
+    public function getIpoetryUserSubscribedBy()
+    {
+        return $this->ipoetryUserSubscribedBy;
+    }
+
 }

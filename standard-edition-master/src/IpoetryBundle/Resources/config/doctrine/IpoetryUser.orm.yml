@@ -197,4 +197,25 @@ IpoetryBundle\Entity\IpoetryUser:
             inversedBy: null
             joinTable: null
             orderBy: null
+    oneToMany:
+        ipoetryUserFollowedBy:
+            targetEntity: IpoetryUserFollowedBy
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: ipoetryUserFollowers
+            inversedBy: null
+            joinColumns:
+                ipoetry_user_followed_by_id:
+                    referencedColumnName: user_id
+            orphanRemoval: false
+        ipoetryUserSubscribedBy:
+            targetEntity: IpoetryUserFollowedBy
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: ipoetryUserSubscribers
+            inversedBy: null
+            joinColumns:
+                ipoetry_user_user_id:
+                    referencedColumnName: user_id
+            orphanRemoval: false
     lifecycleCallbacks: {  }

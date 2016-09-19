@@ -96,9 +96,10 @@ class IndexController extends LoggingController
             $this->session=$request->getSession();
                 if ($this->session->has('login')){
                     if ($this->session->get('login')===$this->getParameter('ipoetry.admin')){
+                        //$slug=new \Cocur\Slugify\Slugify();
                         varDumper::dump(array('request'=>$request,'session'=>$this->session,'login'=>$this->session->get('login')));
-                        $user_short_info=array($this->session->get('user_photo_url'),$this->session->get('user_name'),$this->session->get('user_lastname'));
-                        return $this->render('IpoetryBundle:Main:admin.html.twig');                        
+                        $user_short_info=array($this->session->get('user_photo_url'),$this->session->get('user_name'),$this->session->get('user_lastname'));                        
+                        return $this->render('IpoetryBundle:Main:admin.html.twig');
                     } else
                         return $this->render('IpoetryBundle:Default:error.html.twig',array('message'=>'Необходимо быть администратором обратитесь на admin@ipoetry.ru'));                        
                 } else
@@ -534,17 +535,26 @@ class IndexController extends LoggingController
                 return array('result'=>0);
         }
     }
-    public function SubscribersAction(Request $request,$user){
+    public function SubscribersAction(Request $request,$user,$utype){
         //получаем данные по пользователю для шапки страницы
         $userheaderInfo=$this->UserHeaderInfo($request);
         $this->request=$request;
         $this->GetTranslator($request);
-        $userhassubsribers=$this->UserURLInfo($request,$user);
+        if (strtoupper($utype)=='A')
+            $displaystatus='hidden';
+        else
+            $displaystatus='show';
+            
+        //для вариантов F- я подписан и S-мои подписчики логика работы с
+        //верхнем разделом top-info-panel
+        //для варианта A- участники упрощенный вариант
+        $userhassubsribers=$this->UserSubscribersInfo($request,$user,$utype);
         if (isset($userheaderInfo[0]) && isset($userhassubsribers[0]))
             VarDumper::dump(array($this->translator->trans('Follow',array(),'users'),'$userheaderInfo'=>$userheaderInfo[0],'$userhassubsribers'=>$userhassubsribers[0]));
         //$userheaderInfo=array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined');
 
         return $this->render('IpoetryBundle:Main:users.html.twig',array('userslimit'=>$this->getParameter('ipoetry.userslimit'),
+            'displaystatus'=>$displaystatus,
             'userheaderInfo'=>$userheaderInfo[0],
             'userhassubsribers'=>$userhassubsribers[0],
             'Follow'=>$this->translator->trans('Follow',array(),'users'),

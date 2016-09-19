@@ -34,14 +34,24 @@ IpoetryBundle\Entity\IpoetryUserFollowedBy:
                 unsigned: false
             column: ipoetry_user_user_parent_id
     manyToOne:
-        ipoetryUserUser:
+        ipoetryUserSubscribers:
             targetEntity: IpoetryUser
             cascade: {  }
             fetch: LAZY
             mappedBy: null
-            inversedBy: null
+            inversedBy: ipoetryUserSubscribedBy
             joinColumns:
                 ipoetry_user_user_id:
+                    referencedColumnName: user_id
+            orphanRemoval: false
+        ipoetryUserFollowers:
+            targetEntity: IpoetryUser
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: ipoetryUserFollowedBy
+            joinColumns:
+                ipoetry_user_followed_by_id:
                     referencedColumnName: user_id
             orphanRemoval: false
     lifecycleCallbacks: {  }
