@@ -1678,6 +1678,7 @@
           return i;
         };
         $select.$onMouseDown = function(evt) {
+            console.log(evt);
           evt.preventDefault();
           evt.stopPropagation();
           if (isTouch) {
@@ -1686,6 +1687,7 @@
           }
         };
         $select.$onKeyDown = function(evt) {
+            console.log(evt);
           if (!/(9|13|38|40)/.test(evt.keyCode)) return;
           if (evt.keyCode !== 9) {
             evt.preventDefault();

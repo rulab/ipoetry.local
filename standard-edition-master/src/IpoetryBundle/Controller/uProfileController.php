@@ -69,6 +69,8 @@ use Symfony\Component\Finder\Finder;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\NativeQuery;
+use Doctrine\ORM\AbstractQuery;
 use IpoetryBundle\Form\Type\UserPoetryCreationType;
 use IpoetryBundle\Entity\IpoetryUserBlogPost;
 use IpoetryBundle\Entity\IpoetryPoetry;
@@ -103,7 +105,8 @@ class uProfileController extends LoggingController {
                             'add_ipoetry_poem_comment_dislike'=>'CALL add_ipoetry_poem_comment_like(:ipoetry_user_id,:ipoetry_poem_id,\'DOWN\')',
                             'add_ipoetry_poetry_like'=>'CALL add_ipoetry_poetry_like(:ipoetry_user_id,:ipoetry_poetry_id,\'UP\')',
                             'add_ipoetry_poetry_dislike'=>'CALL add_ipoetry_poetry_like(:ipoetry_user_id,:ipoetry_poetry_id,\'DOWN\')',
-                            'add_user_status'=>'CALL add_user_status(:ipoetry_user_id,:status_text)');
+                            'add_user_status'=>'CALL add_user_status(:ipoetry_user_id,:status_text)',
+                            'check_userfollowerscanread_status'=>'CALL check_userfollowerscanread_status(:sessionuserid,:userprofileownerid)');
 
     public function uProfileAction (Request $request){
         $options=array();
@@ -201,6 +204,9 @@ class uProfileController extends LoggingController {
                 case 'set_user_session_closed':
                             $mas['result']=$this->setUserSessionClosedAjaxAnswer($authorization_parameters,$request);
                             break;
+                case 'check_UserFollowersCanReadStatus':
+                            $mas['result']=$this->checkUserFollowersCanReadStatusAjaxAnswer($authorization_parameters,$request);
+                            break;                    
         }
 
         } else if ($request->headers->has('content-type')) {
@@ -702,9 +708,9 @@ class uProfileController extends LoggingController {
             //пишем обновленные данные в базу
             if ($this->session->has('login') && $this->session->has('login_id')){
                 //получаем кол-во записей
-                $query=$usersubscribed->createQuery('SELECT COUNT(iuf.ipoetryUserFollowedById) FROM IpoetryBundle\Entity\IpoetryUserFollowedBy iuf JOIN iuf.ipoetryUserFollowers usr WHERE usr.userId=?1 and iuf.ipoetryUserFollowedById=?2');// usr usr.userId=?1 and 
-                $query->setParameter(1,intval($this->session->get('login_id')) );//$this->session->has('login_id')
-                $query->setParameter(2,$authorization_parameters['user']);// 
+                $query=$usersubscribed->createQuery('SELECT COUNT(ius.ipoetryUserUserId) FROM IpoetryBundle\Entity\IpoetryUserFollowedBy ius JOIN ius.ipoetryUserSubscribers usr WHERE ius.ipoetryUserFollowedById=?1 and ius.ipoetryUserUserId=?2');// usr usr.userId=?1 and 
+                $query->setParameter(1,$authorization_parameters['user']);// 
+                $query->setParameter(2,intval($this->session->get('login_id')) );//$this->session->has('login_id')
                 //VarDumper::dump(array('sql'=>$query->getSQL()));                
                 $usersubscribedcnt=$query->getResult();
                 //VarDumper::dump(array('$usersubscribedcnt'=>$usersubscribedcnt));
@@ -839,11 +845,11 @@ class uProfileController extends LoggingController {
                     VarDumper::dump(array('userfeedcnt'=>$userfeedcnt[0][1]));
                     //unset($userentity);
                     //выбираем подписантов
-                    $authorization_parameters=array('usertype'=>'SUBSCRIBERS','user'=>$user,'datapart'=>1);
-                    $subscribers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
-                    //выбираем подписчиков
-                    $authorization_parameters=array('usertype'=>'FOLLOW','user'=>$user,'datapart'=>1);
+                    $authorization_parameters=array('usertype'=>'SUBSCRIBERS','user'=>$user,'urltype'=>'S','datapart'=>1);
                     $followers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
+                    //выбираем подписчиков
+                    $authorization_parameters=array('usertype'=>'FOLLOW','user'=>$user,'urltype'=>'F','datapart'=>1);
+                    $subscribers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
                     //выбираем рейтинг стихов
                     $authorization_parameters=array('period'=>'day');
                     $poetryrating=$this->GetPoetriesRatingsAjaxAnswer($authorization_parameters,$request);
@@ -1097,5 +1103,36 @@ class uProfileController extends LoggingController {
                     return 0;
             } else
                 return 0;    
+    }
+    public function checkUserFollowersCanReadStatusAjaxAnswer($authorization_parameters,$request){
+            $this->GetCache($request);
+    
+            VarDumper::dump(array(
+                'request'=>$request,'login='=>$this->session->get('login'),
+                'login_id='=>$this->session->get('login_id')));
+     
+            if ($request->hasSession()) {
+                                    VarDumper::dump(array($this->session->has('login'),$this->session->has('login_id'))); 
+                //пишем обновленные данные в базу
+                if ($this->session->has('login') && $this->session->has('login_id')){
+                    if ($this->urlsession($authorization_parameters,$this->session)==0){
+                    $result=0;
+                    $conn = $this->getDoctrine()->getConnection();
+                    $stmt =$conn->prepare($this->sql_array['check_userfollowerscanread_status']);
+                    //$result=$stmt->executeQuery($this->sql_array['check_userfollowerscanread_status'],array(':sessionuserid'=>$this->session->get('login_id'),':userprofileownerid'=>$authorization_parameters['user']));
+                    $stmt->bindValue(':sessionuserid',$this->session->get('login_id'));
+                    $stmt->bindValue(':userprofileownerid',$authorization_parameters['user']);
+                    //$stmt->bindParam(':result', $result, \PDO::PARAM_INT|\PDO::PARAM_INPUT_OUTPUT,11);
+                    $stmt->execute();
+                    //$stmt->closeCursor();
+                    //VarDumper::dump(array('1'=>1,'$stmt'=>$stmt->fetch()));
+                    $return=$stmt->fetch(\PDO::FETCH_ASSOC);
+                    return $return['sclr_0'];                        
+                    } else
+                        return 1;                        
+                } else
+                    return 1;
+            } else
+                return 1;
     }
 }

@@ -140,7 +140,7 @@ class IndexController extends LoggingController
                                 $mas=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
                                 break;
                     case 'get_cities':
-                                $mas=$this->GetCitiesAjaxAnswer($request);
+                                $mas=$this->GetCitiesAjaxAnswer($authorization_parameters,$request);
                                 break;
                     case 'unsubscribe':
                                 $mas=$this->UnsubscribeAjaxAnswer($authorization_parameters,$request);
@@ -549,6 +549,8 @@ class IndexController extends LoggingController
         //верхнем разделом top-info-panel
         //для варианта A- участники упрощенный вариант
         $userhassubsribers=$this->UserSubscribersInfo($request,$user,$utype);
+        VarDumper::dump(array('$userhassubsribers'=>$userhassubsribers[0]));
+
         if (isset($userheaderInfo[0]) && isset($userhassubsribers[0]))
             VarDumper::dump(array($this->translator->trans('Follow',array(),'users'),'$userheaderInfo'=>$userheaderInfo[0],'$userhassubsribers'=>$userhassubsribers[0]));
         //$userheaderInfo=array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined');
@@ -564,7 +566,7 @@ class IndexController extends LoggingController
             'Remove Follow'=>$this->translator->trans('Remove Follow',array(),'users')));
     }
     //получение городов для фильтрации
-    public function GetCitiesAjaxAnswer($request){
+    public function GetCitiesAjaxAnswer($authorization_parameters,$request){
         //user:$scope.usertype,'datapart':$scope.page
         //в request может приходить день,месяц,год
         $this->request=$request;
@@ -573,9 +575,18 @@ class IndexController extends LoggingController
         $this->GetCache($request);
 
         $citiesfeed = $this->getDoctrine()->getEntityManager();
-        //вытаскиваем города для фильтра
-        $query=$citiesfeed->createQuery('SELECT DISTINCT city.cityId,city.cityName FROM IpoetryBundle\Entity\CityReference city');
+        if (!empty($authorization_parameters['cityfilter'])){
+            $where=' WHERE LOWER(city.cityName) LIKE \''.mb_strtolower($authorization_parameters['cityfilter'], 'UTF-8').'%\'';
+            //вытаскиваем города для фильтра
+            $query=$citiesfeed->createQuery('SELECT DISTINCT city.cityId,city.cityName FROM IpoetryBundle\Entity\CityReference city'.$where);
+        } else {
+            $where='';
+            //вытаскиваем города для фильтра
+            $query=$citiesfeed->createQuery('SELECT DISTINCT city.cityId,city.cityName FROM IpoetryBundle\Entity\CityReference city'.$where)->setFirstResult(0)->setMaxResults(0);            
+        }
+        VarDumper::dump(array('sql'=>'SELECT DISTINCT city.cityId,city.cityName FROM IpoetryBundle\Entity\CityReference city'.$where));
         $cities=$query->getResult();
+        $cities_bootstrap=array();
         foreach ($cities as $city){
             $cities_bootstrap[]=array('value'=>$city['cityId'],'label'=>$city['cityName']);
         }
@@ -594,14 +605,14 @@ class IndexController extends LoggingController
     "usertype" => "subscribers"
  * 
  */
-        if (strtoupper($authorization_parameters['usertype'])=='FOLLOW') {
+        if (strtoupper($authorization_parameters['usertype'])=='SUBSCRIBERS') {
             $stmt = $this->getDoctrine()
                         ->getConnection()
                         ->prepare($this->sql_array['delete_user_subscriber_action']);
             $stmt->bindValue(':follow',$authorization_parameters['unsubscribeuser']);
             $stmt->bindValue(':subscriber',$authorization_parameters['user']);
         }
-        if (strtoupper($authorization_parameters['usertype'])=='SUBSCRIBERS') {
+        if (strtoupper($authorization_parameters['usertype'])=='FOLLOW') {
             $stmt = $this->getDoctrine()
                         ->getConnection()
                         ->prepare($this->sql_array['delete_user_subscriber_action']);

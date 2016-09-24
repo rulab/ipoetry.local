@@ -150,13 +150,13 @@
 				<div class="aside-widget clearfix">
 					<!-- Подписчики -->
 					<div class="clearfix">
-						<a href="{{path('IpoetryBundle_subscribers',{user:userid,type:'s'})}}" class="aside-widget-title subscriber">Подписчики <span>({{subscribers.userscount}})</span></a>
-						<a href="{{path('IpoetryBundle_subscribers',{user:userid,type:'f'})}}" class="aside-widget-you follower">Подписан <span>({{followers.userscount}})</span></a>
+						<a href="{{path('IpoetryBundle_subscribers',{user:userid,utype:'s'})}}" class="aside-widget-title subscriber">Подписчики <span>({{subscribers.userscount}})</span></a>
+						<a href="{{path('IpoetryBundle_subscribers',{user:userid,utype:'f'})}}" class="aside-widget-you follower">Подписан <span>({{followers.userscount}})</span></a>
 					</div>
                                                 {% for subscriberitem in subscribers.userslist %}
 						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : subscriberitem.userId}) }}" class="subscribers-item">
 							<div class="subscribers-item-img-wrap">
-								<img alt="{{subscriberitem.userName}}{{subscriberitem.userLastname}}" src="{{subscriberitem.userPhotoUrl}}" width="50" heiht="50">
+								<img alt="{{subscriberitem.userName}}{{subscriberitem.userLastname}}" src="{{subscriberitem.userPhotoUrl}}" width="50" height="50">
 							</div>
 							<div class="subscriber-item-name">{{subscriberitem.userName}} {{subscriberitem.userLastname}}</div>
                                                     
@@ -165,7 +165,7 @@
                                                 {% for followeritem in followers.userslist %}
 						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : followeritem.userId}) }}" class="followers-item" style="display:none;">
 							<div class="followers-item-img-wrap">
-								<img alt="{{followeritem.userName}}{{followeritem.userLastname}}" src="{{followeritem.userPhotoUrl}}" width="50" heiht="50">
+								<img alt="{{followeritem.userName}}{{followeritem.userLastname}}" src="{{followeritem.userPhotoUrl}}" width="50" height="50">
 							</div>
 							<div class="follower-item-name">{{followeritem.userName}} {{followeritem.userLastname}}</div>
                                                     

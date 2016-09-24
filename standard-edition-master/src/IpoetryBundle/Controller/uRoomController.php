@@ -188,11 +188,11 @@ class uRoomController extends LoggingController{
         $uroom = $this->getDoctrine()->getManager()->getRepository('IpoetryBundle:IpoetryUser');
         if ($this->session->has('login')) {
             $result=$uroom->findOneBy(array('userEmail'=>$this->session->get('login')));
-            $authorization_parameters=array('usertype'=>'SUBSCRIBERS','user'=>$this->session->get('login_id'),'datapart'=>1);
-            $subscribers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
-            //выбираем подписчиков
-            $authorization_parameters=array('usertype'=>'FOLLOW','user'=>$this->session->get('login_id'),'datapart'=>1);
+            $authorization_parameters=array('usertype'=>'SUBSCRIBERS','user'=>$this->session->get('login_id'),'urltype'=>'S','datapart'=>1);
             $followers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
+            //выбираем подписчиков
+            $authorization_parameters=array('usertype'=>'FOLLOW','user'=>$this->session->get('login_id'),'urltype'=>'F','datapart'=>1);
+            $subscribers=$this->GetUsersAjaxAnswer($authorization_parameters,$request);
         }
         if ($subscribers['result']===0){
             $subscribers['userslist'][0]['userId']=0;

@@ -4348,6 +4348,11 @@ nav li a:focus {
   height: 100%;
 }
 
+.followers-item-img-wrap img,.subscribers-item-img-wrap img{
+  display: block;
+  border-radius: 50%;
+}
+
 .topline-user-name {
   float: left;
   color: #333;
@@ -4734,14 +4739,14 @@ aside {
   margin: 0 auto;
   border-radius: 50%;
 }
-
+/*
 .subscribers-item-img-wrap img {
   width: 100%;
   height: 100%;
   display: block;
   border-radius: 50%;
 }
-
+*/
 .subscriber-item-name {
   font-size: 13px;
   color: #2d89ca;
@@ -7740,4 +7745,17 @@ footer {
   display: block;
   margin-left: 1px;
   margin-right: auto;
+}
+
+.infomessage{
+  display: block;
+  width:300px;
+  height:60px;
+  border-radius: 3px;
+  border-style: solid;
+  border-color: red;
+  background-color: red;
+  color:white;
+  font-size: 18px;
+  font-family: "ProximaNovaBold", sans-serif;
 }

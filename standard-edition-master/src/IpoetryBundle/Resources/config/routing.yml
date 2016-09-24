@@ -40,7 +40,7 @@ IpoetryBundle_subscribers:
     requirements:
         _method:  GET|POST
         _locale: en|ru
-        user: "\d+"
+        user: "\d+|-1"
         utype: "s|f|a"
 #Страница вывода фильтра по рейтингу пользователей
 IpoetryBundle_UserRating:

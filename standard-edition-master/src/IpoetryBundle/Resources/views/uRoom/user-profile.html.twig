@@ -78,7 +78,7 @@
                                                 {% for subscriberitem in subscribers.userslist %}
 						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : subscriberitem.userId}) }}" class="subscribers-item">
 							<div class="subscribers-item-img-wrap">
-								<img alt="{{subscriberitem.userName}}{{subscriberitem.userLastname}}" src="{{subscriberitem.userPhotoUrl}}" width="50" heiht="50">
+								<img alt="{{subscriberitem.userName}}{{subscriberitem.userLastname}}" src="{{subscriberitem.userPhotoUrl}}" width="50" height="50">
 							</div>
 							<div class="subscriber-item-name">{{subscriberitem.userName}} {{subscriberitem.userLastname}}</div>
                                                     
@@ -87,7 +87,7 @@
                                                 {% for followeritem in followers.userslist %}
 						<a href="{{ path('IpoetryBundle_unewsfeed',{'user' : followeritem.userId}) }}" class="followers-item" style="display:none;">
 							<div class="followers-item-img-wrap">
-								<img alt="{{followeritem.userName}}{{followeritem.userLastname}}" src="{{followeritem.userPhotoUrl}}" width="50" heiht="50">
+								<img alt="{{followeritem.userName}}{{followeritem.userLastname}}" src="{{followeritem.userPhotoUrl}}" width="50" height="50">
 							</div>
 							<div class="follower-item-name">{{followeritem.userName}} {{followeritem.userLastname}}</div>
                                                     
@@ -375,6 +375,29 @@
         $('#addpoembtn').fadeOut();
       }
  
+    }
+    function checkUserFollowersCanReadStatus(){
+        ajaxdata='login_json={"type":"check_UserFollowersCanReadStatus","user":{{app.request.attributes.get('_route_params')['user']}}}';
+        console.log(ajaxdata);
+        url='{{ path('IpoetryBundle_uprofileajax') }}';
+        type='post';
+        dataType='json';
+        onsuccess=function(json) {
+            console.log('checkUserFollowersCanReadStatus',json['result']);
+            if (json['result']==1) {
+               //если пользователю разрешено читать стену пользователя то показываем ее
+            }
+            if (json['result']==0) {
+               //если пользователю запрещено читать стену пользователя то скрываем ее и выводи информационное окно
+               $('.content').fadeOut();
+               $('<div class="infomessage"><p>Для того чтобы читать стихи пользователя, необходимо стать его подписчиком.</p></div>').insertAfter('aside');
+            }
+                
+        };
+        onerror=function(jqXHR, textStatus, errorThrown) {
+            console.log('error AJAX_add_user_subscribtion ' + textStatus);
+        };        
+        ajaxprototype(ajaxdata,url,type,dataType,onsuccess,onerror);        
     }
     function addUserSubscription(){
         
@@ -711,6 +734,7 @@
             checkOwnProfile();
             checkUserSubscribed();
             checkUserLogged();
+            checkUserFollowersCanReadStatus()
         {{ include('IpoetryBundle::basejs.html.twig') }}
         {% endblock documentReady %}
     });

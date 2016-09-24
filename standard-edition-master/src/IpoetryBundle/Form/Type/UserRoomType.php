@@ -80,6 +80,10 @@ class UserRoomType extends LoggingForms{
             //}
         //VarDumper::dump(array('user='=>$request->get('user'),'password'=>$request->get('password')));
         //if ($this->request->get('user') && $this->request->get('password')) {
+        if ($options['data']['ipoetry_user_followers_can_read']==true)
+            $attr=array('checked'=>true);
+        else
+            $attr=array();            
             $builder
                 ->setMethod('POST')
                 ->add('username',TextType::class,array('attr' => array('maxlength' => 50,'placeholder'=>$translator->trans('John')),'data'=>$options['data']['user_name'],'label' => $translator->trans('Name'),'required' => true))//array('attr' => array('maxlength' => 50,'required' => true)))
@@ -91,7 +95,7 @@ class UserRoomType extends LoggingForms{
                 ->add('userwebsite',TextType::class,array('attr' => array('maxlength' => 2083,'placeholder'=>$translator->trans('vk.com/poetryguy87')),'label' => $translator->trans('website'),'data'=>$options['data']['user_website']))//array('attr' => array('maxlength' => 50,'required' => true)))
                 ->add('userphone',TextType::class,array('attr' => array('maxlength' => 11,'placeholder'=>$translator->trans('+71019090101')),'label' => $translator->trans('phone number'),'data'=>$options['data']['user_phone']))
                 ->add('userphoto',TextType::class,array('attr' => array('maxlength' => 2083,'placeholder'=>$translator->trans('site.com/image.jpg')),'label' => $translator->trans('avatar url'),'data'=>$options['data']['user_photo'],'required' => false))
-                ->add('onlysubscribercanread',CheckboxType::class ,array('attr' => array(),'label' => $translator->trans('onlysubscribercanread'),'required' => false,'value'=>$options['data']['ipoetry_user_followers_can_read']))
+                ->add('onlysubscribercanread',CheckboxType::class ,array('attr' => $attr,'label' => $translator->trans('onlysubscribercanread'),'required' => false,'value'=>$options['data']['ipoetry_user_followers_can_read']))
                     
                 //->add('captcha', $CaptchaType,array('attr' => array('required' => true,'disabled' => false)))
                 ->add('enter', SubmitType::class, array('attr'=>array('class'=>'btn btn-lg btn-primary btn-block'),'label' => $translator->trans('Refresh')));

@@ -33,7 +33,7 @@ class ExceptionListener {
             $exception->getFile(),
             $exception->getMessage(),
             $exception->getCode(),
-            VarDumper::dump($exception->getTrace())
+            VarDumper::dump($exception)
         );
         //$container = new ContainerBuilder();
         //$container->register('loginvk','IpoetryBundle\Controller\LoginVkController');
