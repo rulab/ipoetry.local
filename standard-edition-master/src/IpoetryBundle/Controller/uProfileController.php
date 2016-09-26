@@ -458,13 +458,14 @@ class uProfileController extends LoggingController {
         //array('userId'=>-1,'userName'=>'undefined','userLastname'=>'undefined','userPhotoUrl'=>'undefined')
         $loggeduser=$this->UserHeaderInfo($request);
         //если нет картинки то ставим по умолчанию дефолтную
-        if (!$this->session->has('poetry_background_image'))
-            if (null !==$this->request->server->get('BASE'))
+        if (!$this->session->has('poetry_background_image')) {
+            if ($this->request->server->has('BASE'))
                 $pathpart=$this->request->server->get('BASE');
             else
                 $pathpart='';
-                
-            $this->session->set('poetry_background_image',$this->request->server->get('DOCUMENT_ROOT').$pathpart.'/images/post-bg.jpg');
+            VarDumper::dump(array($this->request->server->has('BASE'),$pathpart));                
+            $this->session->set('poetry_background_image',$this->request->server->get('DOCUMENT_ROOT').$pathpart.'/images/post-bg.jpg');            
+        }
         if ($loggeduser[0]['userId']==-1 || !$this->session->has('poetry_body') || !$this->session->has('poetry_background_image')) {
             return 0;            
         }
