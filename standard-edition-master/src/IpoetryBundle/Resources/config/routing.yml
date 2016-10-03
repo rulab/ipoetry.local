@@ -214,6 +214,15 @@ IpoetryBundle_unewsfeedentity:
         _locale: en|ru
         user: "\d+"
         poetry: "\d+"
+#читать случайный стих пользователя
+IpoetryBundle_unewsfeedentityrnd:
+    path: /unewsfeedentityrnd/{user}_{poetry}
+    defaults: { _controller: IpoetryBundle:uProfile:unewsfeedentityrnd }
+    requirements:
+        _method:  GET|POST
+        _locale: en|ru
+        user: "\d+"
+        poetry: "\d+|rnd"
 #Страница выполнения вычислений по дневному рейтингу стихов
 IpoetryBundle_DailyPoetryRating:
     path: /dailypoetryrating

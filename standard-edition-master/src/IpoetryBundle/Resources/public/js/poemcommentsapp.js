@@ -33,6 +33,36 @@ var poemApp = angular.module('poemApp', ['mgcrea.ngStrap', 'mgcrea.ngStrap.selec
     }
   }
 })
+.directive('styler', function () {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+         link: function (scope, element, attrs, ngModelCtrl) {
+         	
+         		if(attrs.type == 'checkbox')
+         		{
+         		
+         		//	console.log(ngModelCtrl.modelValue,attrs.ngTrueValue.replace(/'/g,""),attrs);
+         			if(attrs.value == attrs.ngTrueValue.replace(/'/g,""))
+         				element.prop('checked', true);
+         			else	
+         				element.prop('checked', false);
+         				
+         				
+         		}
+	            $(element).styler({
+					onSelectClosed: function() {
+						ngModelCtrl.$setViewValue(element.val());
+	                    scope.$apply();	
+					},
+					onFormStyled: function() {					
+					
+		         								
+					}
+	            });
+        }
+    };
+})
 .controller('PoemCommentsController', function($scope, $http, $filter, $modal, $route, $routeParams, $location, $rootScope) {
     //var searchedpoetries=this;
     $scope.page;
@@ -44,6 +74,7 @@ var poemApp = angular.module('poemApp', ['mgcrea.ngStrap', 'mgcrea.ngStrap.selec
     $scope.poemid;
     $scope.ajaxurls;
     $scope.delcommentid;
+    $scope.getcommentsblockbtn_visibility=false;
     $scope.delbtnname='Пожаловаться';
     $scope.title = 'Подтверждение действия.';
     function MyModalController($scope) {
@@ -107,13 +138,16 @@ var poemApp = angular.module('poemApp', ['mgcrea.ngStrap', 'mgcrea.ngStrap.selec
                         //заполняем элементы данными
                         $scope.comments_count=response.commentscount;
                         $scope.comments=response.commentslist;
+                        $scope.getcommentsblockbtn_visibility=true;
                         //защита от множественных ajax
                         if ($scope.page==1)
-                            $scope.page++;
+                            $scope.plusPage();
                     }
                     else
                     {
-                        $('#getcommentsblockbtn').fadeOut();
+                        console.log('(#getcommentsblockbtn).fadeOut()');
+                        $scope.getcommentsblockbtn_visibility=false;
+                        //$('#getcommentsblockbtn').fadeOut();
                         // $scope.loginError = response.error;
                     }
             });
@@ -130,12 +164,14 @@ var poemApp = angular.module('poemApp', ['mgcrea.ngStrap', 'mgcrea.ngStrap.selec
                     //заполняем элементы данными
                     $scope.comments_count=response.commentscount;
                     $scope.comments=$scope.comments.concat(response.commentslist);
-                    $scope.page++;
+                    $scope.getcommentsblockbtn_visibility=true;
+                    $scope.plusPage();
                     //$scope.$apply();
                 }
                 else
                 {
-                    $('#getcommentsblockbtn').fadeOut();
+                    $scope.getcommentsblockbtn_visibility=false;
+                    //$('#getcommentsblockbtn').fadeOut();
                     // $scope.loginError = response.error;
                 }
         });

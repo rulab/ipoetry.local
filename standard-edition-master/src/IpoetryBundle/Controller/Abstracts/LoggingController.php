@@ -25,6 +25,7 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -214,10 +215,7 @@ abstract class LoggingController extends Controller{
         $this->request=$request;
         $this->GetTranslator($request);
         //директория для хранения временных файлов
-        if (null !==$this->request->server->get('BASE'))
-            $pathpart=$this->request->server->get('BASE');
-        else
-            $pathpart='';
+        $pathpart=$this->getPatchPart();
         $uploadtmp=$this->request->server->get('DOCUMENT_ROOT').$pathpart.'/uploadtmp';        
         //читаем данные по стихотворению по данным в параметрах url
         //$stmt='';
@@ -1238,5 +1236,30 @@ abstract class LoggingController extends Controller{
         else
             return $request->server->get('DOCUMENT_ROOT').'/standard-edition-master/src/IpoetryBundle/Resources/translations';
     }
-   
+    //в зависимости от типа OS возвращаем часть пути директории
+    public function getPatchPart(){
+        if ($this->request->server->has('BASE'))
+            $pathpart=$this->request->server->get('BASE');
+        else
+            $pathpart='';
+        return $pathpart;
+    }
+    public function getRandomPoetry($user=0,$sessionActivity){
+        try {
+            if ($sessionActivity===true){
+                $poetries = $this->getDoctrine()->getConnection()
+                            ->prepare('SELECT poetry.poetry_id,usr.user_id FROM ipoetry_poetry poetry LEFT JOIN ipoetry_user_ipoetry_poetry_relation usrrel ON poetry.poetry_id=usrrel.ipoetry_poetry_poetry_id LEFT JOIN ipoetry_user usr ON usrrel.ipoetry_user_user_id=usr.user_id WHERE usr.user_id!=:user');
+                $poetries->bindValue(':user', $user);
+            }
+            if ($sessionActivity===false){
+                $poetries = $this->getDoctrine()->getConnection()
+                            ->prepare('SELECT poetry.poetry_id,usr.user_id FROM ipoetry_poetry poetry JOIN ipoetry_user_ipoetry_poetry_relation usrrel ON usrrel.ipoetry_poetry_poetry_id=poetry.poetry_id JOIN ipoetry_user usr ON usrrel.ipoetry_user_user_id=usr.user_id');
+            }
+
+            $poetries->execute();
+            return $poetries->fetchAll(\PDO::FETCH_ASSOC); 
+        } catch (\Exception $err){
+            throw $err;
+        }
+    }
 }

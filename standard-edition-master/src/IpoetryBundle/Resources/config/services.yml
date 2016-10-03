@@ -22,7 +22,12 @@ services:
         class: IpoetryBundle\Twig\IpoetryBundleTwigExtension
         public: false
         tags:
-             - { name: 'twig.extension' }        
+             - { name: 'twig.extension' }
+             
+    ipoetry.request_stack:
+        class:  IpoetryBundle\EventListener\ipoetryRequestStack
+        public: false
+        
     #twig.extension.trans:
     #  class: IpoetryBundle\Twig\AppTranslationExtension
     #  public: false

@@ -10,7 +10,7 @@ namespace IpoetryBundle\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-
+use IpoetryBundle\EventListener\ipoetryRequestStack;
 /**
  * Description of SessionListener
  *
@@ -27,7 +27,7 @@ class SessionListener {
         if ($event->getRequestType() !== HttpKernelInterface::MASTER_REQUEST) {
             return;
         }
-
+        //\Symfony\Component\VarDumper\VarDumper::dump(array($event));
         if ($event->getRequest()->hasSession()){
             $session = $event->getRequest()->getSession();
             $metadataBag = $session->getMetadataBag();
@@ -52,6 +52,5 @@ class SessionListener {
                 'intval($this->parameter)'=>intval($this->parameter)));
             */
         }
-
     }
 }
